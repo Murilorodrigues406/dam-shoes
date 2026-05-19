@@ -3,471 +3,759 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DAM SHOES — Qualidade & Estilo</title>
+<title>DAM SHOES — Premium Sneakers & Casual</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --orange: #F4611A;
-    --orange-light: #FF7A35;
-    --orange-dim: #FFF0E8;
-    --dark: #1A1A1A;
-    --mid: #555;
-    --light: #999;
-    --border: #E8E8E8;
-    --bg: #FAFAFA;
-    --white: #FFFFFF;
-  }
+/* ═══════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --or: #FF6A00; --dark: #2A2A2A; --mid: #6B6B6B;
+  --light: #E6E6E6; --bg: #F7F7F7; --white: #fff;
+  --green: #25D366; --red: #EF4444; --panel: #1C1C1C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--dark);-webkit-font-smoothing:antialiased;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ═══════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════ */
+header{background:var(--white);border-bottom:2px solid var(--light);position:sticky;top:0;z-index:200;padding:0 24px;}
+.hdr{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:68px;}
+.logo-wrap{display:flex;align-items:center;gap:12px;}
+.logo-svg{width:44px;height:44px;flex-shrink:0;}
+.logo-name{font-size:1.35rem;font-weight:900;letter-spacing:.07em;color:var(--dark);line-height:1;}
+.logo-tagline{font-family:'Rajdhani',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.18em;color:var(--or);text-transform:uppercase;margin-top:2px;display:block;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.badge-promo{background:var(--or);color:#fff;font-family:'Rajdhani',sans-serif;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border-radius:4px;}
+.btn-admin{background:transparent;border:1.5px solid var(--light);color:var(--mid);font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:700;padding:6px 12px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;}
+.btn-admin:hover{border-color:var(--dark);color:var(--dark);}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--dark);
-    -webkit-font-smoothing: antialiased;
-  }
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero{background:var(--dark);color:#fff;padding:70px 24px 56px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'DS';position:absolute;font-size:42vw;font-weight:900;color:rgba(255,255,255,.03);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;line-height:1;}
+.eyebrow{display:inline-block;background:rgba(255,106,0,.15);border:1px solid rgba(255,106,0,.4);color:var(--or);font-family:'Rajdhani',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:5px 16px;border-radius:4px;margin-bottom:20px;animation:fadeUp .5s ease both;}
+.hero h1{font-size:clamp(2.4rem,8vw,4.8rem);font-weight:900;letter-spacing:.03em;line-height:1.02;margin-bottom:10px;animation:fadeUp .5s .1s ease both;}
+.hero h1 em{color:var(--or);font-style:normal;}
+.slogan{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:32px;animation:fadeUp .5s .15s ease both;}
+.slogan span{color:var(--or);}
+.chips{display:inline-flex;flex-wrap:wrap;gap:10px;justify-content:center;animation:fadeUp .5s .2s ease both;}
+.chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.8);font-family:'Rajdhani',sans-serif;font-size:.84rem;font-weight:500;letter-spacing:.06em;padding:9px 18px;border-radius:4px;}
+.chip strong{color:#fff;}
 
-  /* ── HEADER ── */
-  header {
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    padding: 0 20px;
-  }
-  .header-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-  }
-  .logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    letter-spacing: .08em;
-    color: var(--dark);
-    line-height: 1;
-  }
-  .logo span { color: var(--orange); }
-  .logo-sub {
-    font-size: .6rem;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--light);
-    margin-top: 2px;
-  }
-  .header-badge {
-    background: var(--orange);
-    color: #fff;
-    font-size: .72rem;
-    font-weight: 600;
-    letter-spacing: .06em;
-    padding: 5px 12px;
-    border-radius: 20px;
-    text-transform: uppercase;
-  }
+/* ═══════════════════════════════════════════════
+   AVISO
+═══════════════════════════════════════════════ */
+.notice{background:#FFF3EC;border-top:3px solid var(--or);border-bottom:1px solid #FDDCC4;padding:13px 24px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:500;color:#7A3A10;letter-spacing:.03em;}
+.notice strong{color:var(--or);font-weight:700;}
 
-  /* ── HERO ── */
-  .hero {
-    background: var(--dark);
-    color: #fff;
-    padding: 60px 20px 50px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content: 'DAM';
-    position: absolute;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28vw;
-    color: rgba(255,255,255,.03);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    white-space: nowrap;
-  }
-  .hero-tag {
-    display: inline-block;
-    background: var(--orange);
-    color: #fff;
-    font-size: .7rem;
-    font-weight: 600;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    padding: 5px 14px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    animation: fadeUp .5s ease both;
-  }
-  .hero h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2.8rem, 9vw, 5.5rem);
-    letter-spacing: .04em;
-    line-height: 1;
-    margin-bottom: 14px;
-    animation: fadeUp .5s .1s ease both;
-  }
-  .hero h1 span { color: var(--orange); }
-  .hero p {
-    color: rgba(255,255,255,.55);
-    font-size: 1rem;
-    max-width: 460px;
-    margin: 0 auto 30px;
-    animation: fadeUp .5s .2s ease both;
-  }
-  .hero-info {
-    display: inline-flex;
-    gap: 28px;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 12px;
-    padding: 14px 28px;
-    font-size: .82rem;
-    color: rgba(255,255,255,.7);
-    animation: fadeUp .5s .3s ease both;
-  }
-  .hero-info span { display: flex; align-items: center; gap: 6px; }
-  .hero-info strong { color: #fff; }
+/* ═══════════════════════════════════════════════
+   CATÁLOGO
+═══════════════════════════════════════════════ */
+.catalog{max-width:1100px;margin:0 auto;padding:48px 24px 80px;}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;}
+.sec-head h2{font-size:1.5rem;font-weight:900;letter-spacing:.06em;}
+.sec-head span{font-size:.78rem;color:var(--mid);}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+.fbtn{border:1.5px solid var(--light);background:var(--white);color:var(--mid);font-family:'Montserrat',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:7px 16px;border-radius:4px;cursor:pointer;transition:all .2s;}
+.fbtn:hover,.fbtn.active{background:var(--or);border-color:var(--or);color:#fff;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px;}
 
-  /* ── AVISO ── */
-  .notice {
-    background: var(--orange-dim);
-    border-bottom: 2px solid var(--orange);
-    padding: 12px 20px;
-    text-align: center;
-    font-size: .82rem;
-    color: #8B3A10;
-  }
-  .notice strong { color: var(--orange); }
+/* ═══════════════════════════════════════════════
+   CARD
+═══════════════════════════════════════════════ */
+.card{background:var(--white);border-radius:8px;border:1px solid var(--light);overflow:hidden;display:flex;flex-direction:column;transition:transform .22s,box-shadow .22s;animation:fadeUp .4s ease both;position:relative;}
+.card:hover{transform:translateY(-5px);box-shadow:0 18px 44px rgba(42,42,42,.12);}
+.card.esgotado{opacity:.7;}
+.card.esgotado .card-img::after{content:'ESGOTADO';position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;font-family:'Montserrat',sans-serif;font-size:.85rem;font-weight:900;letter-spacing:.12em;display:flex;align-items:center;justify-content:center;}
+.card-img{position:relative;background:#EFEFEF;aspect-ratio:1/1;overflow:hidden;}
+.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+.card:hover .card-img img{transform:scale(1.05);}
+.c-brand{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.93);font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);padding:3px 9px;border-radius:3px;z-index:2;}
+.c-sizes{position:absolute;bottom:10px;right:10px;background:var(--dark);color:#fff;font-size:.62rem;font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:3px;z-index:2;}
+.card-body{padding:16px;flex:1;display:flex;flex-direction:column;}
+.c-ref{font-size:.62rem;color:var(--mid);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;font-weight:600;}
+.c-name{font-size:.9rem;font-weight:700;line-height:1.3;margin-bottom:12px;}
+.prices{display:flex;align-items:baseline;gap:8px;margin-bottom:3px;}
+.p-old{font-size:.76rem;color:#C0C0C0;text-decoration:line-through;}
+.p-new{font-size:1.35rem;font-weight:800;color:var(--or);line-height:1;}
+.p-inst{font-family:'Rajdhani',sans-serif;font-size:.8rem;color:var(--mid);margin-bottom:12px;font-weight:500;}
+.p-inst strong{color:var(--or);font-weight:700;}
+.card-foot{margin-top:auto;display:flex;flex-direction:column;gap:7px;}
+.prazo{font-family:'Rajdhani',sans-serif;font-size:.76rem;color:var(--mid);font-weight:500;display:flex;align-items:center;gap:6px;letter-spacing:.04em;}
+.prazo::before{content:'';display:inline-block;width:7px;height:7px;background:#27C770;border-radius:50%;flex-shrink:0;}
+.btn-wpp{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--green);color:#fff;font-family:'Montserrat',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.04em;padding:12px;border-radius:5px;border:none;cursor:pointer;text-decoration:none;transition:background .2s,transform .15s;}
+.btn-wpp:hover{background:#1ebe5d;transform:scale(1.02);}
+.btn-wpp:disabled,.btn-wpp.disabled{background:#CCC;cursor:not-allowed;transform:none;}
+.btn-wpp svg{width:16px;height:16px;fill:#fff;flex-shrink:0;}
+/* botão editar card */
+.btn-edit-card{display:none;position:absolute;top:8px;right:8px;background:var(--dark);color:#fff;border:none;border-radius:4px;font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:700;padding:5px 9px;cursor:pointer;z-index:10;transition:background .2s;}
+.btn-edit-card:hover{background:var(--or);}
+body.admin-mode .btn-edit-card{display:block;}
 
-  /* ── GRID ── */
-  .catalog {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 48px 20px 80px;
-  }
-  .catalog-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 28px;
-  }
-  .catalog-header h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.9rem;
-    letter-spacing: .05em;
-  }
-  .catalog-header span {
-    font-size: .8rem;
-    color: var(--light);
-  }
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer{background:var(--dark);color:rgba(255,255,255,.35);padding:32px 24px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;}
+.ft-logo{font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:900;letter-spacing:.06em;color:rgba(255,255,255,.8);margin-bottom:5px;}
+.ft-logo span{color:var(--or);}
+.ft-slogan{font-size:.72rem;letter-spacing:.22em;color:rgba(255,255,255,.28);margin-bottom:12px;}
+.ft-slogan em{color:var(--or);font-style:normal;}
 
-  /* filter bar */
-  .filter-bar {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-  }
-  .filter-btn {
-    border: 1.5px solid var(--border);
-    background: var(--white);
-    color: var(--mid);
-    font-family: 'DM Sans', sans-serif;
-    font-size: .78rem;
-    font-weight: 500;
-    padding: 6px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .filter-btn:hover, .filter-btn.active {
-    background: var(--orange);
-    border-color: var(--orange);
-    color: #fff;
-  }
+/* ═══════════════════════════════════════════════
+   PAINEL ADMIN — OVERLAY
+═══════════════════════════════════════════════ */
+.admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center;padding:20px;}
+.admin-overlay.open{display:flex;}
+.admin-panel{background:#1C1C1C;border-radius:14px;width:100%;max-width:780px;max-height:90vh;overflow-y:auto;border:1px solid rgba(255,255,255,.1);}
+.ap-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.08);}
+.ap-header h2{font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:900;letter-spacing:.05em;color:#fff;}
+.ap-tabs{display:flex;gap:0;margin:0 24px;border-bottom:1px solid rgba(255,255,255,.08);}
+.ap-tab{background:none;border:none;color:rgba(255,255,255,.4);font-family:'Montserrat',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:14px 18px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px;}
+.ap-tab.active{color:var(--or);border-bottom-color:var(--or);}
+.ap-body{padding:24px;}
+.ap-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+.ap-close:hover{background:rgba(255,255,255,.2);}
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
-  }
+/* Produto editor */
+.prod-list{display:flex;flex-direction:column;gap:10px;}
+.prod-row{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .2s;}
+.prod-row:hover{border-color:var(--or);}
+.prod-row.selected{border-color:var(--or);background:rgba(255,106,0,.08);}
+.prod-thumb{width:48px;height:48px;border-radius:6px;object-fit:cover;flex-shrink:0;background:#333;}
+.prod-info{flex:1;min-width:0;}
+.prod-info-name{font-size:.82rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prod-info-ref{font-size:.68rem;color:rgba(255,255,255,.4);font-family:monospace;}
+.prod-stock{display:flex;align-items:center;gap:6px;}
+.stock-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.stock-dot.disp{background:#27C770;}
+.stock-dot.esgo{background:var(--red);}
+.stock-label{font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.stock-label.disp{color:#27C770;}
+.stock-label.esgo{color:var(--red);}
 
-  /* ── CARD ── */
-  .card {
-    background: var(--white);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    transition: transform .22s, box-shadow .22s;
-    display: flex;
-    flex-direction: column;
-  }
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(0,0,0,.09);
-  }
-  .card-img {
-    position: relative;
-    background: #F2F2F2;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-  }
-  .card-img img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    transition: transform .4s ease;
-  }
-  .card:hover .card-img img { transform: scale(1.04); }
-  .card-brand {
-    position: absolute;
-    top: 10px; left: 10px;
-    background: rgba(255,255,255,.92);
-    color: var(--mid);
-    font-size: .65rem;
-    font-weight: 600;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    padding: 3px 9px;
-    border-radius: 8px;
-  }
-  .card-num {
-    position: absolute;
-    bottom: 10px; right: 10px;
-    background: var(--dark);
-    color: #fff;
-    font-size: .68rem;
-    font-weight: 500;
-    padding: 3px 9px;
-    border-radius: 8px;
-  }
+/* Editor form */
+.editor-form{display:none;}
+.editor-form.open{display:block;}
+.ef-back{background:none;border:none;color:rgba(255,255,255,.5);font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;margin-bottom:20px;padding:0;}
+.ef-back:hover{color:#fff;}
+.ef-preview{display:flex;gap:16px;align-items:flex-start;margin-bottom:24px;}
+.ef-img-wrap{position:relative;width:100px;height:100px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#333;}
+.ef-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.ef-img-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;cursor:pointer;}
+.ef-img-wrap:hover .ef-img-overlay{opacity:1;}
+.ef-img-overlay span{font-size:.7rem;font-weight:700;color:#fff;letter-spacing:.06em;text-align:center;}
+.ef-meta{flex:1;}
+.ef-meta .ef-name{font-size:1rem;font-weight:800;color:#fff;margin-bottom:4px;}
+.ef-meta .ef-ref{font-size:.72rem;color:rgba(255,255,255,.4);font-family:monospace;}
 
-  .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
-  .card-ref { font-size: .68rem; color: var(--light); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
-  .card-name { font-size: .95rem; font-weight: 600; color: var(--dark); margin-bottom: 12px; line-height: 1.3; }
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.form-full{grid-column:1/-1;}
+.field label{display:block;font-family:'Rajdhani',sans-serif;font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#fff;font-family:'Montserrat',sans-serif;font-size:.85rem;font-weight:500;padding:9px 12px;outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--or);}
+.field textarea{resize:vertical;min-height:60px;}
+.field select option{background:#2a2a2a;}
+.field input[type=file]{display:none;}
+.file-label{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1.5px dashed rgba(255,255,255,.15);border-radius:6px;color:rgba(255,255,255,.5);font-size:.78rem;font-weight:600;padding:10px 14px;cursor:pointer;transition:border-color .2s;}
+.file-label:hover{border-color:var(--or);color:var(--or);}
 
-  .price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
-  .price-old { font-size: .8rem; color: var(--light); text-decoration: line-through; }
-  .price-new { font-size: 1.35rem; font-weight: 700; color: var(--orange); line-height: 1; }
-  .price-installment { font-size: .73rem; color: var(--mid); margin-bottom: 14px; }
-  .price-installment strong { color: var(--orange); }
+/* toggle stock */
+.toggle-wrap{display:flex;align-items:center;gap:12px;}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.1);border-radius:24px;transition:background .3s;}
+.toggle-track::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .3s;}
+.toggle input:checked + .toggle-track{background:#27C770;}
+.toggle input:checked + .toggle-track::before{transform:translateX(20px);}
+.toggle-text{font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fff;}
 
-  .card-footer { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
-  .prazo-tag {
-    font-size: .7rem;
-    color: var(--mid);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .prazo-tag::before {
-    content: '';
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: #27ae60;
-    border-radius: 50%;
-  }
+/* url input group */
+.url-group{display:flex;gap:8px;}
+.url-group input{flex:1;}
+.url-or{font-size:.72rem;color:rgba(255,255,255,.3);align-self:center;white-space:nowrap;}
 
-  .btn-wpp {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: #25D366;
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: .82rem;
-    font-weight: 600;
-    padding: 11px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background .2s, transform .15s;
-    margin-top: 4px;
-  }
-  .btn-wpp:hover { background: #1ebe5d; transform: scale(1.02); }
-  .btn-wpp svg { width: 17px; height: 17px; fill: #fff; flex-shrink: 0; }
+/* action btns */
+.form-actions{display:flex;gap:10px;margin-top:6px;}
+.btn-save{flex:1;background:var(--or);color:#fff;border:none;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.05em;padding:12px;cursor:pointer;transition:background .2s;}
+.btn-save:hover{background:#e05500;}
+.btn-cancel{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:700;padding:12px 18px;cursor:pointer;transition:background .2s;}
+.btn-cancel:hover{background:rgba(255,255,255,.14);}
 
-  /* ── FOOTER ── */
-  footer {
-    background: var(--dark);
-    color: rgba(255,255,255,.4);
-    text-align: center;
-    padding: 28px 20px;
-    font-size: .78rem;
-    letter-spacing: .04em;
-  }
-  footer strong { color: rgba(255,255,255,.8); }
+/* Configurações gerais */
+.cfg-section{margin-bottom:28px;}
+.cfg-title{font-family:'Rajdhani',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07);}
+.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.cfg-full{grid-column:1/-1;}
 
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .card { animation: fadeUp .45s ease both; }
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--dark);color:#fff;font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:600;padding:12px 20px;border-radius:8px;border-left:3px solid var(--or);z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-left-color:#27C770;}
 
-  @media (max-width: 480px) {
-    .hero-info { flex-direction: column; gap: 10px; text-align: left; }
-    .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .card-body { padding: 12px; }
-    .price-new { font-size: 1.15rem; }
-  }
+/* barra de admin mode */
+.admin-bar{display:none;background:var(--dark);border-bottom:2px solid var(--or);padding:8px 24px;}
+.admin-bar.visible{display:block;}
+.admin-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.admin-bar span{font-family:'Rajdhani',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--or);}
+.btn-exit-admin{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-family:'Montserrat',sans-serif;font-size:.7rem;font-weight:700;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all .2s;}
+.btn-exit-admin:hover{border-color:#fff;color:#fff;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:520px){
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .card-body{padding:11px;}
+  .p-new{font-size:1.1rem;}
+  .hero h1{font-size:2.2rem;}
+  .chips{flex-direction:column;align-items:center;}
+  .form-grid,.cfg-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
 
+<!-- BARRA MODO ADMIN -->
+<div class="admin-bar" id="adminBar">
+  <div class="admin-bar-inner">
+    <span>⚙ Modo Administrador — clique em Editar em qualquer produto</span>
+    <button class="btn-exit-admin" onclick="exitAdmin()">Sair do modo admin</button>
+  </div>
+</div>
+
 <!-- HEADER -->
 <header>
-  <div class="header-inner">
-    <div>
-      <div class="logo">DAM <span>SHOES</span></div>
-      <div class="logo-sub">Qualidade &amp; Estilo</div>
+  <div class="hdr">
+    <div class="logo-wrap">
+      <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 16 H42 C60 16 72 30 72 50 C72 70 60 84 42 84 H8 Z" fill="none" stroke="#2A2A2A" stroke-width="8" stroke-linejoin="round"/>
+        <path d="M94 30 C94 22 87 16 75 16 C63 16 56 23 56 33 C56 43 66 48 76 53 C86 58 96 64 96 76 C96 87 87 92 74 92 C61 92 53 86 53 78" fill="none" stroke="#FF6A00" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="logo-name">DAM SHOES</div>
+        <span class="logo-tagline">Premium Sneakers &amp; Casual</span>
+      </div>
     </div>
-    <div class="header-badge">🔥 Sob Encomenda</div>
+    <div class="hdr-right">
+      <div class="badge-promo">🔥 Sob Encomenda</div>
+      <button class="btn-admin" onclick="openAdminLogin()">⚙ Admin</button>
+    </div>
   </div>
 </header>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-tag">Promoção Especial</div>
-  <h1>Tênis com <span>Estilo</span><br>que fala por si só</h1>
-  <p>DAM SHOES — onde qualidade e estilo se encontram no mesmo par.</p>
-  <div class="hero-info">
-    <span>🚚 <strong>Até 7 dias úteis</strong></span>
-    <span>💳 <strong>10x no cartão</strong></span>
-    <span>📲 <strong>Fechamento via WhatsApp</strong></span>
+  <div class="eyebrow">Promoção Especial</div>
+  <h1>TÊNIS QUE<br><em>FALAM</em> POR SI</h1>
+  <p class="slogan">Urban Style. <span>Every Step.</span></p>
+  <div class="chips">
+    <div class="chip">🚚 <strong>Até 7 dias úteis</strong></div>
+    <div class="chip">💳 <strong>10x no cartão</strong></div>
+    <div class="chip">📲 <strong>Via WhatsApp</strong></div>
   </div>
 </section>
 
 <!-- AVISO -->
 <div class="notice">
-  <strong>Produto sob encomenda.</strong> Prazo médio de entrega: até <strong>7 dias úteis</strong> após confirmação. Parcelamento em até <strong>10x no cartão.</strong>
+  <strong>Produto sob encomenda.</strong> Prazo médio de entrega: até <strong>7 dias úteis</strong>. Parcelamento em até <strong>10x no cartão.</strong>
 </div>
 
 <!-- CATÁLOGO -->
 <section class="catalog">
-  <div class="catalog-header">
-    <h2>Catálogo</h2>
-    <span id="count-label">carregando...</span>
+  <div class="sec-head">
+    <h2>CATÁLOGO</h2>
+    <span id="count-label"></span>
   </div>
-
-  <div class="filter-bar" id="filter-bar"></div>
+  <div class="filters" id="filters"></div>
   <div class="grid" id="grid"></div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <strong>DAM SHOES</strong> · Sob encomenda · Até 7 dias úteis · Parcelamento em até 10x no cartão<br>
-  <span style="font-size:.7rem; margin-top:4px; display:block;">Dúvidas? Fale conosco pelo WhatsApp</span>
+  <div class="ft-logo">DAM <span>SHOES</span></div>
+  <div class="ft-slogan">Urban Style. <em>Every Step.</em></div>
+  Sob encomenda · Até 7 dias úteis · Parcelamento em até 10x no cartão
 </footer>
 
-<script>
-const WHATSAPP = '5584987648955';
+<!-- ═══════════════════════════════════════════
+   PAINEL ADMIN
+═══════════════════════════════════════════ -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-panel">
+    <div class="ap-header">
+      <h2>⚙ Painel DAM SHOES</h2>
+      <button class="ap-close" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="ap-tabs">
+      <button class="ap-tab active" onclick="switchTab('produtos', this)">Produtos</button>
+      <button class="ap-tab" onclick="switchTab('novo', this)">+ Novo Produto</button>
+      <button class="ap-tab" onclick="switchTab('config', this)">Configurações</button>
+    </div>
+    <div class="ap-body">
 
-const produtos = [
-  // NIKE
-  { id: 1,  marca: 'Nike',    ref: 'NK-AIRMAX90-BK',   nome: 'Air Max 90 Preto/Branco',        nums: ['37','38','39','40','41','42','43'], custo: 189, preco: 359, old: 449 },
-  { id: 2,  marca: 'Nike',    ref: 'NK-DUNK-LW-WH',    nome: 'Dunk Low Branco/Cinza',          nums: ['37','38','39','40','41','42'],     custo: 175, preco: 339, old: 429 },
-  { id: 3,  marca: 'Nike',    ref: 'NK-AIRFORCE1-WH',  nome: 'Air Force 1 All White',          nums: ['38','39','40','41','42','43'],     custo: 168, preco: 319, old: 399 },
-  { id: 4,  marca: 'Nike',    ref: 'NK-REACT-BL',      nome: 'React Vision Azul/Branco',       nums: ['38','39','40','41','42'],          custo: 198, preco: 379, old: 469 },
-  // ADIDAS
-  { id: 5,  marca: 'Adidas',  ref: 'AD-SAMBA-BK',      nome: 'Samba OG Preto/Goma',           nums: ['37','38','39','40','41','42','43'], custo: 182, preco: 349, old: 439 },
-  { id: 6,  marca: 'Adidas',  ref: 'AD-GAZELLE-GR',    nome: 'Gazelle Verde Escuro',           nums: ['38','39','40','41','42'],          custo: 172, preco: 329, old: 409 },
-  { id: 7,  marca: 'Adidas',  ref: 'AD-FORUM-WH',      nome: 'Forum Low Branco/Azul',          nums: ['37','38','39','40','41','42'],     custo: 179, preco: 339, old: 429 },
-  // NEW BALANCE
-  { id: 8,  marca: 'New Balance', ref: 'NB-574-GR',    nome: '574 Cinza/Branco',               nums: ['38','39','40','41','42','43'],     custo: 185, preco: 355, old: 449 },
-  { id: 9,  marca: 'New Balance', ref: 'NB-9060-BKCR2',nome: '9060 Preto/Creme',               nums: ['38','39','40','41','42'],          custo: 205, preco: 389, old: 479 },
-  // LACOSTE
-  { id: 10, marca: 'Lacoste', ref: 'LAC-EUR-BK',       nome: 'Europa Pro Preto/Branco',        nums: ['37','38','39','40','41','42'],     custo: 195, preco: 369, old: 459 },
-  { id: 11, marca: 'Lacoste', ref: 'LAC-EUR-WNV',      nome: 'Europa Pro Branco/Marinho/Verm.',nums: ['38','39','40','41','42'],          custo: 195, preco: 369, old: 459 },
-  // MIZUNO
-  { id: 12, marca: 'Mizuno',  ref: 'MIZ-WAVE-BL',      nome: 'Wave Rider 27 Azul/Prata',       nums: ['38','39','40','41','42','43'],     custo: 178, preco: 339, old: 429 },
+      <!-- TAB PRODUTOS -->
+      <div id="tab-produtos">
+        <!-- lista de produtos -->
+        <div id="prod-list-view">
+          <div class="prod-list" id="prodList"></div>
+        </div>
+        <!-- editor de produto -->
+        <div class="editor-form" id="editorForm">
+          <button class="ef-back" onclick="backToList()">← Voltar à lista</button>
+          <div class="ef-preview">
+            <div class="ef-img-wrap" onclick="document.getElementById('fileInput').click()">
+              <img id="efImg" src="" alt="">
+              <div class="ef-img-overlay"><span>📷<br>Trocar<br>foto</span></div>
+            </div>
+            <div class="ef-meta">
+              <div class="ef-name" id="efName"></div>
+              <div class="ef-ref" id="efRef"></div>
+              <div style="margin-top:10px">
+                <div class="toggle-wrap">
+                  <label class="toggle">
+                    <input type="checkbox" id="efStock" onchange="updateStockLabel()">
+                    <div class="toggle-track"></div>
+                  </label>
+                  <span class="toggle-text" id="stockLabel">Disponível</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+
+          <div class="form-grid">
+            <div class="field form-full">
+              <label>URL da imagem (cole o link ou use o botão acima para upload)</label>
+              <input type="text" id="efImgUrl" placeholder="https://... ou deixe vazio para usar upload" oninput="previewImgUrl()">
+            </div>
+            <div class="field">
+              <label>Nome do produto</label>
+              <input type="text" id="efNome">
+            </div>
+            <div class="field">
+              <label>Referência</label>
+              <input type="text" id="efRefInput">
+            </div>
+            <div class="field">
+              <label>Marca</label>
+              <input type="text" id="efMarca">
+            </div>
+            <div class="field">
+              <label>Numerações (ex: 37–43)</label>
+              <input type="text" id="efNums" placeholder="37–43">
+            </div>
+            <div class="field">
+              <label>Preço de venda (R$)</label>
+              <input type="number" id="efPreco" min="0" step="0.01">
+            </div>
+            <div class="field">
+              <label>Preço antigo / De (R$)</label>
+              <input type="number" id="efOld" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-cancel" onclick="backToList()">Cancelar</button>
+            <button class="btn-save" onclick="saveProduct()">💾 Salvar produto</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB NOVO PRODUTO -->
+      <div id="tab-novo" style="display:none">
+        <div class="form-grid">
+          <div class="field form-full">
+            <label>Foto — Upload ou URL</label>
+            <label class="file-label" for="newFileInput">📷 Escolher foto do dispositivo</label>
+            <input type="file" id="newFileInput" accept="image/*" onchange="handleNewFile(event)">
+            <input type="text" id="newImgUrl" placeholder="ou cole uma URL de imagem aqui" oninput="previewNewImg()" style="margin-top:8px">
+            <div style="margin-top:10px;text-align:center;">
+              <img id="newImgPreview" src="" alt="" style="display:none;width:90px;height:90px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.1)">
+            </div>
+          </div>
+          <div class="field">
+            <label>Nome do produto *</label>
+            <input type="text" id="newNome" placeholder="Ex: Air Max 90 Preto">
+          </div>
+          <div class="field">
+            <label>Referência *</label>
+            <input type="text" id="newRef" placeholder="Ex: NK-AM90-BK">
+          </div>
+          <div class="field">
+            <label>Marca *</label>
+            <input type="text" id="newMarca" placeholder="Ex: Nike">
+          </div>
+          <div class="field">
+            <label>Numerações disponíveis</label>
+            <input type="text" id="newNums" placeholder="Ex: 37-43">
+          </div>
+          <div class="field">
+            <label>Preço de venda (R$) *</label>
+            <input type="number" id="newPreco" min="0" step="0.01" placeholder="0,00">
+          </div>
+          <div class="field">
+            <label>Preço antigo / De (R$)</label>
+            <input type="number" id="newOld" min="0" step="0.01" placeholder="0,00">
+          </div>
+          <div class="field form-full">
+            <label>Disponibilidade</label>
+            <div class="toggle-wrap" style="margin-top:4px">
+              <label class="toggle">
+                <input type="checkbox" id="newStock" checked>
+                <div class="toggle-track"></div>
+              </label>
+              <span class="toggle-text">Disponível</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="clearNewForm()">Limpar</button>
+          <button class="btn-save" onclick="addProduct()">+ Cadastrar produto</button>
+        </div>
+      </div>
+
+      <!-- TAB CONFIG -->
+      <div id="tab-config" style="display:none">
+        <div class="cfg-section">
+          <div class="cfg-title">WhatsApp</div>
+          <div class="cfg-grid">
+            <div class="field cfg-full">
+              <label>Número do WhatsApp (com DDD, sem + ou espaço)</label>
+              <input type="text" id="cfgWpp" placeholder="5584987648955">
+            </div>
+          </div>
+        </div>
+        <div class="cfg-section">
+          <div class="cfg-title">Entrega &amp; Pagamento</div>
+          <div class="cfg-grid">
+            <div class="field">
+              <label>Prazo de entrega</label>
+              <input type="text" id="cfgPrazo" placeholder="7 dias úteis">
+            </div>
+            <div class="field">
+              <label>Parcelas no cartão</label>
+              <input type="number" id="cfgParcelas" min="1" max="24" placeholder="10">
+            </div>
+            <div class="field">
+              <label>Taxa do cartão (%)</label>
+              <input type="number" id="cfgTaxa" step="0.01" placeholder="2.99">
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="saveConfig()">💾 Salvar configurações</button>
+        </div>
+      </div>
+
+    </div><!-- ap-body -->
+  </div><!-- admin-panel -->
+</div><!-- admin-overlay -->
+
+<!-- LOGIN MODAL -->
+<div class="admin-overlay" id="loginOverlay">
+  <div class="admin-panel" style="max-width:360px;">
+    <div class="ap-header">
+      <h2>🔐 Acesso Admin</h2>
+      <button class="ap-close" onclick="closeLogin()">✕</button>
+    </div>
+    <div class="ap-body">
+      <div class="field" style="margin-bottom:16px">
+        <label>Senha</label>
+        <input type="password" id="loginPwd" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="doLogin()">Entrar</button>
+      </div>
+      <p style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:14px;text-align:center;font-family:'Rajdhani',sans-serif;letter-spacing:.06em;">Senha padrão: <strong style="color:rgba(255,255,255,.5)">dam2025</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+   SCRIPT
+═══════════════════════════════════════════ -->
+<script>
+/* ── DADOS ── */
+const PARC=10, TAXA_DEFAULT=0.0299;
+const DEFAULT_IMG='https://placehold.co/400x400/EFEFEF/6B6B6B?text=Foto';
+const ADMIN_PASS='dam2025';
+
+const brandPlaceholders={
+  'Nike':'https://placehold.co/400x400/E8E8E8/2A2A2A?text=Nike',
+  'Adidas':'https://placehold.co/400x400/1A1A1A/FFFFFF?text=Adidas',
+  'New Balance':'https://placehold.co/400x400/1D3557/E8E8E8?text=New+Balance',
+  'Lacoste':'https://placehold.co/400x400/1B5E20/FFFFFF?text=Lacoste',
+  'Mizuno':'https://placehold.co/400x400/0D47A1/90CAF9?text=Mizuno',
+};
+
+let produtos = JSON.parse(localStorage.getItem('dam_produtos') || 'null') || [
+  {id:1,  marca:'Nike',        ref:'NK-AIRMAX90-BK',  nome:'Air Max 90 Preto/Branco',         nums:'37–43', preco:359, old:449, img:'', disponivel:true},
+  {id:2,  marca:'Nike',        ref:'NK-DUNK-LW-WH',   nome:'Dunk Low Branco/Cinza',           nums:'37–42', preco:339, old:429, img:'', disponivel:true},
+  {id:3,  marca:'Nike',        ref:'NK-AIRFORCE1-WH', nome:'Air Force 1 All White',           nums:'38–43', preco:319, old:399, img:'', disponivel:true},
+  {id:4,  marca:'Nike',        ref:'NK-REACT-BL',     nome:'React Vision Azul/Branco',        nums:'38–42', preco:379, old:469, img:'', disponivel:true},
+  {id:5,  marca:'Adidas',      ref:'AD-SAMBA-BK',     nome:'Samba OG Preto/Goma',             nums:'37–43', preco:349, old:439, img:'', disponivel:true},
+  {id:6,  marca:'Adidas',      ref:'AD-GAZELLE-GR',   nome:'Gazelle Verde Escuro',            nums:'38–42', preco:329, old:409, img:'', disponivel:true},
+  {id:7,  marca:'Adidas',      ref:'AD-FORUM-WH',     nome:'Forum Low Branco/Azul',           nums:'37–42', preco:339, old:429, img:'', disponivel:true},
+  {id:8,  marca:'New Balance', ref:'NB-574-GR',       nome:'574 Cinza/Branco',                nums:'38–43', preco:355, old:449, img:'', disponivel:true},
+  {id:9,  marca:'New Balance', ref:'NB-9060-BKCR2',   nome:'9060 Preto/Creme',                nums:'38–42', preco:389, old:479, img:'', disponivel:true},
+  {id:10, marca:'Lacoste',     ref:'LAC-EUR-BK',      nome:'Europa Pro Preto/Branco',         nums:'37–42', preco:369, old:459, img:'', disponivel:true},
+  {id:11, marca:'Lacoste',     ref:'LAC-EUR-WNV',     nome:'Europa Pro Branco/Marinho/Verm.', nums:'38–42', preco:369, old:459, img:'', disponivel:true},
+  {id:12, marca:'Mizuno',      ref:'MIZ-WAVE-BL',     nome:'Wave Rider 27 Azul/Prata',        nums:'38–43', preco:339, old:429, img:'', disponivel:true},
 ];
 
-const PARCELAS = 10;
-const TAXA = 0.0299;
+let config = JSON.parse(localStorage.getItem('dam_config') || 'null') || {
+  wpp:'5584987648955', prazo:'7 dias úteis', parcelas:10, taxa:2.99
+};
 
-function parcela(preco) {
-  const total = preco * (1 + TAXA);
-  return (total / PARCELAS).toFixed(2).replace('.', ',');
+let editingId = null;
+let adminMode = false;
+
+/* ── SAVE ── */
+function save(){localStorage.setItem('dam_produtos',JSON.stringify(produtos));localStorage.setItem('dam_config',JSON.stringify(config));}
+
+/* ── UTILS ── */
+function parc(p){const t=config.taxa/100;return(p*(1+t)/config.parcelas).toFixed(2).replace('.',',');}
+function imgFor(p){return p.img||(brandPlaceholders[p.marca]||DEFAULT_IMG);}
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show '+(type);
+  setTimeout(()=>t.className='toast',2500);
 }
+const WPP_SVG=`<svg viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`;
 
-function imgPlaceholder(marca, nome) {
-  const cores = {
-    'Nike': ['#111','#EEE'], 'Adidas': ['#000','#FFF'],
-    'New Balance': ['#1D3557','#E8E8E8'], 'Lacoste': ['#1B5E20','#FFF'],
-    'Mizuno': ['#0D47A1','#90CAF9']
-  };
-  const [bg, fg] = cores[marca] || ['#333','#EEE'];
-  return `https://placehold.co/400x400/${bg.replace('#','')}/FFF?text=${encodeURIComponent(marca)}`;
-}
-
-function numsBadge(nums) {
-  return nums.join(' · ');
-}
-
-function renderCards(list) {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-  document.getElementById('count-label').textContent = `${list.length} modelo${list.length !== 1 ? 's' : ''}`;
-  list.forEach((p, i) => {
-    const msg = encodeURIComponent(`Olá! Tenho interesse no ${p.nome}, referência ${p.ref}. Ainda está disponível?`);
-    const link = `https://wa.me/${WHATSAPP}?text=${msg}`;
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.style.animationDelay = `${i * 0.04}s`;
-    card.innerHTML = `
+/* ── RENDER CATÁLOGO ── */
+function renderCards(list){
+  const g=document.getElementById('grid');g.innerHTML='';
+  document.getElementById('count-label').textContent=`${list.length} modelo${list.length!==1?'s':''}`;
+  list.forEach((p,i)=>{
+    const msg=encodeURIComponent(`Olá! Tenho interesse no ${p.nome}, ref ${p.ref}, tamanhos ${p.nums}. Ainda está disponível?`);
+    const card=document.createElement('div');
+    card.className='card'+(p.disponivel?'':' esgotado');
+    card.style.animationDelay=`${i*.04}s`;
+    card.dataset.id=p.id;
+    const btnDisabled=!p.disponivel?' disabled class="btn-wpp disabled"':' class="btn-wpp"';
+    card.innerHTML=`
+      <button class="btn-edit-card" onclick="openEditFromCard(${p.id},event)">✏ Editar</button>
       <div class="card-img">
-        <img src="${imgPlaceholder(p.marca, p.nome)}" alt="${p.nome}" loading="lazy">
-        <div class="card-brand">${p.marca}</div>
-        <div class="card-num">Nº ${p.nums[0]}–${p.nums[p.nums.length-1]}</div>
+        <img src="${imgFor(p)}" alt="${p.nome}" loading="lazy" onerror="this.src='${DEFAULT_IMG}'">
+        <div class="c-brand">${p.marca}</div>
+        <div class="c-sizes">Nº ${p.nums}</div>
       </div>
       <div class="card-body">
-        <div class="card-ref">${p.ref}</div>
-        <div class="card-name">${p.nome}</div>
-        <div class="price-row">
-          <span class="price-old">R$ ${p.old}</span>
-          <span class="price-new">R$ ${p.preco}</span>
+        <div class="c-ref">${p.ref}</div>
+        <div class="c-name">${p.nome}</div>
+        <div class="prices"><span class="p-old">R$ ${p.old}</span><span class="p-new">R$ ${p.preco}</span></div>
+        <div class="p-inst">ou <strong>${config.parcelas}x de R$ ${parc(p.preco)}</strong> no cartão</div>
+        <div class="card-foot">
+          <div class="prazo">Entrega em até ${config.prazo}</div>
+          ${p.disponivel
+            ?`<a class="btn-wpp" href="https://wa.me/${config.wpp}?text=${msg}" target="_blank">${WPP_SVG} Comprar pelo WhatsApp</a>`
+            :`<button class="btn-wpp disabled" disabled>Produto esgotado</button>`}
         </div>
-        <div class="price-installment">ou <strong>${PARCELAS}x de R$ ${parcela(p.preco)}</strong> no cartão</div>
-        <div class="card-footer">
-          <div class="prazo-tag">Entrega em até 7 dias úteis</div>
-          <a class="btn-wpp" href="${link}" target="_blank">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            Reservar pelo WhatsApp
-          </a>
-        </div>
+      </div>`;
+    g.appendChild(card);
+  });
+}
+
+function buildFilters(){
+  const marcas=['Todos',...new Set(produtos.map(p=>p.marca))];
+  const bar=document.getElementById('filters');bar.innerHTML='';
+  marcas.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(m==='Todos'?' active':'');b.textContent=m;
+    b.onclick=()=>{bar.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderCards(m==='Todos'?produtos:produtos.filter(p=>p.marca===m));};
+    bar.appendChild(b);
+  });
+}
+
+function refreshAll(){buildFilters();renderCards(produtos);}
+
+/* ── ADMIN LOGIN ── */
+function openAdminLogin(){document.getElementById('loginOverlay').classList.add('open');}
+function closeLogin(){document.getElementById('loginOverlay').classList.remove('open');document.getElementById('loginPwd').value='';}
+function doLogin(){
+  const pwd=document.getElementById('loginPwd').value;
+  if(pwd===ADMIN_PASS){closeLogin();openAdmin();}
+  else{toast('Senha incorreta','');document.getElementById('loginPwd').value='';}
+}
+
+/* ── ADMIN PANEL ── */
+function openAdmin(){
+  adminMode=true;
+  document.body.classList.add('admin-mode');
+  document.getElementById('adminBar').classList.add('visible');
+  document.getElementById('adminOverlay').classList.add('open');
+  loadProdList();
+  loadConfig();
+  switchTab('produtos',document.querySelector('.ap-tab'));
+}
+function closeAdmin(){document.getElementById('adminOverlay').classList.remove('open');}
+function exitAdmin(){adminMode=false;document.body.classList.remove('admin-mode');document.getElementById('adminBar').classList.remove('visible');closeAdmin();}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.ap-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-produtos').style.display=name==='produtos'?'block':'none';
+  document.getElementById('tab-novo').style.display=name==='novo'?'block':'none';
+  document.getElementById('tab-config').style.display=name==='config'?'block':'none';
+  if(name==='produtos'){loadProdList();document.getElementById('editorForm').classList.remove('open');document.getElementById('prod-list-view').style.display='block';}
+  if(name==='novo'){clearNewForm();}
+}
+
+/* ── NOVO PRODUTO ── */
+function handleNewFile(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const d=ev.target.result;
+    document.getElementById('newImgUrl').value=d;
+    const prev=document.getElementById('newImgPreview');
+    prev.src=d;prev.style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+function previewNewImg(){
+  const url=document.getElementById('newImgUrl').value.trim();
+  const prev=document.getElementById('newImgPreview');
+  if(url){prev.src=url;prev.style.display='block';}
+  else prev.style.display='none';
+}
+function clearNewForm(){
+  ['newNome','newRef','newMarca','newNums','newPreco','newOld','newImgUrl'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('newStock').checked=true;
+  const prev=document.getElementById('newImgPreview');
+  prev.src='';prev.style.display='none';
+  document.getElementById('newFileInput').value='';
+}
+function addProduct(){
+  const nome=document.getElementById('newNome').value.trim();
+  const ref=document.getElementById('newRef').value.trim();
+  const marca=document.getElementById('newMarca').value.trim();
+  const preco=parseFloat(document.getElementById('newPreco').value);
+  if(!nome||!ref||!marca||!preco){toast('Preencha os campos obrigatórios (*)','');return;}
+  const newId=produtos.length>0?Math.max(...produtos.map(p=>p.id))+1:1;
+  const novo={
+    id:newId,
+    marca,ref,nome,
+    nums:document.getElementById('newNums').value.trim()||'Único',
+    preco,
+    old:parseFloat(document.getElementById('newOld').value)||preco,
+    img:document.getElementById('newImgUrl').value.trim(),
+    disponivel:document.getElementById('newStock').checked,
+  };
+  produtos.push(novo);
+  save();refreshAll();clearNewForm();
+  toast('Produto cadastrado com sucesso!','success');
+}
+
+/* ── LISTA DE PRODUTOS ── */
+function loadProdList(){
+  const list=document.getElementById('prodList');list.innerHTML='';
+  produtos.forEach(p=>{
+    const row=document.createElement('div');
+    row.className='prod-row';row.dataset.id=p.id;
+    row.innerHTML=`
+      <img class="prod-thumb" src="${imgFor(p)}" onerror="this.src='${DEFAULT_IMG}'" alt="">
+      <div class="prod-info">
+        <div class="prod-info-name">${p.nome}</div>
+        <div class="prod-info-ref">${p.ref} · R$ ${p.preco}</div>
       </div>
-    `;
-    grid.appendChild(card);
+      <div class="prod-stock">
+        <div class="stock-dot ${p.disponivel?'disp':'esgo'}"></div>
+        <div class="stock-label ${p.disponivel?'disp':'esgo'}">${p.disponivel?'Disponível':'Esgotado'}</div>
+      </div>`;
+    row.onclick=()=>openEditor(p.id);
+    list.appendChild(row);
   });
 }
 
-function buildFilters() {
-  const marcas = ['Todos', ...new Set(produtos.map(p => p.marca))];
-  const bar = document.getElementById('filter-bar');
-  marcas.forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = 'filter-btn' + (m === 'Todos' ? ' active' : '');
-    btn.textContent = m;
-    btn.onclick = () => {
-      bar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderCards(m === 'Todos' ? produtos : produtos.filter(p => p.marca === m));
-    };
-    bar.appendChild(btn);
-  });
+/* ── EDITOR ── */
+function openEditor(id){
+  const p=produtos.find(x=>x.id===id);if(!p)return;
+  editingId=id;
+  document.getElementById('prod-list-view').style.display='none';
+  document.getElementById('editorForm').classList.add('open');
+  document.getElementById('efImg').src=imgFor(p);
+  document.getElementById('efName').textContent=p.nome;
+  document.getElementById('efRef').textContent=p.ref;
+  document.getElementById('efImgUrl').value=p.img||'';
+  document.getElementById('efNome').value=p.nome;
+  document.getElementById('efRefInput').value=p.ref;
+  document.getElementById('efMarca').value=p.marca;
+  document.getElementById('efNums').value=p.nums;
+  document.getElementById('efPreco').value=p.preco;
+  document.getElementById('efOld').value=p.old;
+  document.getElementById('efStock').checked=p.disponivel;
+  updateStockLabel();
+}
+function openEditFromCard(id,e){e.stopPropagation();if(!adminMode)return;openAdmin();setTimeout(()=>openEditor(id),50);}
+function backToList(){document.getElementById('editorForm').classList.remove('open');document.getElementById('prod-list-view').style.display='block';editingId=null;}
+
+function updateStockLabel(){
+  const ok=document.getElementById('efStock').checked;
+  document.getElementById('stockLabel').textContent=ok?'Disponível':'Esgotado';
 }
 
-buildFilters();
-renderCards(produtos);
+function previewImgUrl(){
+  const url=document.getElementById('efImgUrl').value.trim();
+  if(url)document.getElementById('efImg').src=url;
+}
+
+function handleFileUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const dataUrl=ev.target.result;
+    document.getElementById('efImg').src=dataUrl;
+    document.getElementById('efImgUrl').value=dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProduct(){
+  const idx=produtos.findIndex(x=>x.id===editingId);if(idx<0)return;
+  const url=document.getElementById('efImgUrl').value.trim();
+  produtos[idx]={
+    ...produtos[idx],
+    nome:document.getElementById('efNome').value.trim()||produtos[idx].nome,
+    ref:document.getElementById('efRefInput').value.trim()||produtos[idx].ref,
+    marca:document.getElementById('efMarca').value.trim()||produtos[idx].marca,
+    nums:document.getElementById('efNums').value.trim()||produtos[idx].nums,
+    preco:parseFloat(document.getElementById('efPreco').value)||produtos[idx].preco,
+    old:parseFloat(document.getElementById('efOld').value)||produtos[idx].old,
+    img:url,
+    disponivel:document.getElementById('efStock').checked,
+  };
+  save();refreshAll();backToList();loadProdList();
+  toast('Produto salvo com sucesso!','success');
+}
+
+/* ── CONFIG ── */
+function loadConfig(){
+  document.getElementById('cfgWpp').value=config.wpp||'';
+  document.getElementById('cfgPrazo').value=config.prazo||'7 dias úteis';
+  document.getElementById('cfgParcelas').value=config.parcelas||10;
+  document.getElementById('cfgTaxa').value=config.taxa||2.99;
+}
+function saveConfig(){
+  config={
+    wpp:document.getElementById('cfgWpp').value.trim()||config.wpp,
+    prazo:document.getElementById('cfgPrazo').value.trim()||config.prazo,
+    parcelas:parseInt(document.getElementById('cfgParcelas').value)||config.parcelas,
+    taxa:parseFloat(document.getElementById('cfgTaxa').value)||config.taxa,
+  };
+  save();refreshAll();
+  toast('Configurações salvas!','success');
+}
+
+/* ── INIT ── */
+refreshAll();
 </script>
 </body>
 </html>
