@@ -980,7 +980,7 @@ select option { background: var(--dark); }
 .side-overlay.open { display: block; }
 
 .side-menu {
-  position: absolute;
+  position: fixed;
   top: 0; left: 0;
   width: min(320px, 85vw);
   height: 100%;
@@ -991,8 +991,9 @@ select option { background: var(--dark); }
   overflow-y: auto;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
+  z-index: 801;
 }
-.side-overlay.open .side-menu { transform: translateX(0); }
+.side-overlay.open .side-menu { transform: translateX(0) !important; }
 
 .side-menu-header {
   display: flex;
