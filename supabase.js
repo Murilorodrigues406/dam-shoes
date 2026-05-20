@@ -12,7 +12,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const ADMIN_PASSWORD = 'damshoes2025';
 
 // WhatsApp padrão da loja
-const WHATSAPP = '5584987648955';
+const WHATSAPP = '5591996247783';
 
 // Inicializa cliente Supabase (carregado via CDN no HTML)
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
