@@ -302,10 +302,14 @@ async function addProduct() {
   const price = parseFloat(v('add-price'));
 
   if (!name || isNaN(price)) { showMsg('msg-add','Nome e preço são obrigatórios.',true); return; }
-  btn.disabled=true; btn.textContent='Salvando...';
+  if (addPhotos.length===0) { showMsg('msg-add','Adicione pelo menos 1 foto.',true); return; }
+
+  btn.disabled=true; btn.textContent='Enviando fotos...';
 
   try {
-    const photos = [v('add-photo-1'), v('add-photo-2'), v('add-photo-3')].filter(Boolean);
+    const ref    = v('add-ref') || name.replace(/\s+/g,'-').toLowerCase();
+    const photos = await resolvePhotos(addPhotos, ref);
+    btn.textContent = 'Salvando...';
 
     const { error } = await db.from('products').insert([{
       name, price,
@@ -336,7 +340,8 @@ async function addProduct() {
 function clearAddForm() {
   ['add-name','add-brand','add-ref','add-price','add-price-old','add-cost','add-sizes','add-desc'].forEach(clearField);
   document.getElementById('add-status').value='available';
-  ['add-photo-1','add-photo-2','add-photo-3'].forEach(clearField);
+  addPhotos=[];
+  buildPhotoUploader('add-photo-uploader', addPhotos);
   updateMargin();
 }
 
@@ -400,10 +405,8 @@ function openEdit(id) {
   document.getElementById('edit-status').value = p.status||'available';
 
   // carregar fotos existentes
-  const existingPhotos = parseArr(p.photos);
-  setField('edit-photo-1', existingPhotos[0] || '');
-  setField('edit-photo-2', existingPhotos[1] || '');
-  setField('edit-photo-3', existingPhotos[2] || '');
+  editPhotos = parseArr(p.photos).map(url=>({ url }));
+  buildPhotoUploader('edit-photo-uploader', editPhotos);
   updateEditMargin();
   showMsg('msg-edit','',false);
   editOverlay.classList.add('open');
@@ -429,10 +432,12 @@ async function saveEdit() {
   const price = parseFloat(v('edit-price'));
   if (!name||isNaN(price)) { showMsg('msg-edit','Nome e preço são obrigatórios.',true); return; }
 
-  btn.disabled=true; btn.textContent='Salvando...';
+  btn.disabled=true; btn.textContent='Enviando fotos...';
 
   try {
-    const photos = [v('edit-photo-1'), v('edit-photo-2'), v('edit-photo-3')].filter(Boolean);
+    const ref    = v('edit-ref')||name.replace(/\s+/g,'-').toLowerCase();
+    const photos = await resolvePhotos(editPhotos, ref);
+    btn.textContent='Salvando...';
 
     const { error } = await db.from('products').update({
       name, price,
