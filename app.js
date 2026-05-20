@@ -302,15 +302,10 @@ async function addProduct() {
   const price = parseFloat(v('add-price'));
 
   if (!name || isNaN(price)) { showMsg('msg-add','Nome e preço são obrigatórios.',true); return; }
-  if (addPhotos.length===0)  { showMsg('msg-add','Adicione pelo menos 1 foto.',true); return; }
-
-  btn.disabled=true; btn.textContent='Enviando fotos...';
+  btn.disabled=true; btn.textContent='Salvando...';
 
   try {
-    const ref    = v('add-ref') || name.replace(/\s+/g,'-').toLowerCase();
-    const photos = await resolvePhotos(addPhotos, ref);
-
-    btn.textContent = 'Salvando...';
+    const photos = [v('add-photo-1'), v('add-photo-2'), v('add-photo-3')].filter(Boolean);
 
     const { error } = await db.from('products').insert([{
       name, price,
@@ -341,8 +336,7 @@ async function addProduct() {
 function clearAddForm() {
   ['add-name','add-brand','add-ref','add-price','add-price-old','add-cost','add-sizes','add-desc'].forEach(clearField);
   document.getElementById('add-status').value='available';
-  addPhotos=[];
-  buildPhotoUploader('add-photo-uploader', addPhotos);
+  ['add-photo-1','add-photo-2','add-photo-3'].forEach(clearField);
   updateMargin();
 }
 
@@ -406,8 +400,10 @@ function openEdit(id) {
   document.getElementById('edit-status').value = p.status||'available';
 
   // carregar fotos existentes
-  editPhotos = parseArr(p.photos).map(url=>({ url }));
-  buildPhotoUploader('edit-photo-uploader', editPhotos);
+  const existingPhotos = parseArr(p.photos);
+  setField('edit-photo-1', existingPhotos[0] || '');
+  setField('edit-photo-2', existingPhotos[1] || '');
+  setField('edit-photo-3', existingPhotos[2] || '');
   updateEditMargin();
   showMsg('msg-edit','',false);
   editOverlay.classList.add('open');
@@ -433,13 +429,10 @@ async function saveEdit() {
   const price = parseFloat(v('edit-price'));
   if (!name||isNaN(price)) { showMsg('msg-edit','Nome e preço são obrigatórios.',true); return; }
 
-  btn.disabled=true; btn.textContent='Enviando fotos...';
+  btn.disabled=true; btn.textContent='Salvando...';
 
   try {
-    const ref    = v('edit-ref')||name.replace(/\s+/g,'-').toLowerCase();
-    const photos = await resolvePhotos(editPhotos, ref);
-
-    btn.textContent='Salvando...';
+    const photos = [v('edit-photo-1'), v('edit-photo-2'), v('edit-photo-3')].filter(Boolean);
 
     const { error } = await db.from('products').update({
       name, price,
@@ -527,30 +520,21 @@ function updateSideBrands() {
   if (!container) return;
 
   // ícones por marca
-  const brandIcons = {
-    'Nike': '✔', 'Adidas': '🔵', 'New Balance': '🟢',
-    'Lacoste': '🐊', 'Mizuno': '🔷', 'Puma': '🐆',
-    'Vans': '🔶', 'Converse': '⭐'
-  };
-
   // botão Todos
   const todosCount = allProducts.length;
   let html = `
     <button class="side-brand-btn ${currentFilter==='all'?'active':''}" 
       data-filter="all" onclick="sideFilter('all',this)">
-      <span class="side-brand-icon">👟</span>
       Todos
       <span class="side-brand-count">${todosCount}</span>
     </button>`;
 
   brands.forEach(brand => {
     const count = allProducts.filter(p => p.brand === brand).length;
-    const icon  = brandIcons[brand] || '👟';
     const isActive = currentFilter === 'brand:' + brand;
     html += `
     <button class="side-brand-btn ${isActive?'active':''}" 
       data-filter="brand:${brand}" onclick="sideFilter('brand:${brand}',this)">
-      <span class="side-brand-icon">${icon}</span>
       ${brand}
       <span class="side-brand-count">${count}</span>
     </button>`;
@@ -600,8 +584,10 @@ async function saveSettings() {
   const promo   = v('cfg-promo');
   const wa      = v('cfg-whatsapp');
 
-  const { error } = await db.from('settings').upsert({
-    id:           1,
+  // Tenta UPDATE primeiro, se falhar tenta INSERT
+  let error = null;
+
+  const updateResult = await db.from('settings').update({
     whatsapp:     wa      || WHATSAPP,
     prazo:        v('cfg-prazo')    || '7 dias úteis',
     parcelas:     parseInt(v('cfg-parcelas')) || 10,
@@ -609,25 +595,51 @@ async function saveSettings() {
     promo:        promo   || '',
     hero_img:     heroImg || '',
     updated_at:   new Date().toISOString(),
-  });
+  }).eq('id', 1);
+
+  error = updateResult.error;
+
+  // Se update falhou, tenta insert
+  if (error) {
+    const insertResult = await db.from('settings').insert({
+      id:           1,
+      whatsapp:     wa      || WHATSAPP,
+      prazo:        v('cfg-prazo')    || '7 dias úteis',
+      parcelas:     parseInt(v('cfg-parcelas')) || 10,
+      taxa_cartao:  parseFloat(v('cfg-taxa'))   || 2.99,
+      promo:        promo   || '',
+      hero_img:     heroImg || '',
+    });
+    error = insertResult.error;
+  }
 
   btn.disabled = false; btn.textContent = 'Salvar Configurações';
 
   if (error) {
-    showMsg('msg-settings', error.message, true);
+    // Salva localmente no navegador como fallback
+    localStorage.setItem('dam_settings', JSON.stringify({
+      whatsapp: wa || WHATSAPP,
+      prazo: v('cfg-prazo') || '7 dias úteis',
+      parcelas: parseInt(v('cfg-parcelas')) || 10,
+      taxa_cartao: parseFloat(v('cfg-taxa')) || 2.99,
+      promo: promo || '',
+      hero_img: heroImg || '',
+    }));
+    showMsg('msg-settings', 'Configurações salvas localmente!', false);
   } else {
     showMsg('msg-settings', 'Configurações salvas!', false);
-    // aplica mudanças em tempo real
-    if (heroImg) {
-      const heroEl = document.querySelector('.hero-img');
-      if (heroEl) heroEl.src = heroImg;
-    }
-    if (promo) {
-      const promoEl = document.querySelector('.hero-promo strong');
-      if (promoEl) promoEl.textContent = promo;
-    }
-    setTimeout(() => showMsg('msg-settings', '', false), 3000);
   }
+
+  // Aplica mudanças em tempo real independente de erro
+  if (heroImg) {
+    const heroEl = document.querySelector('.hero-img');
+    if (heroEl) heroEl.src = heroImg;
+  }
+  if (promo) {
+    const promoEl = document.querySelector('.hero-promo strong');
+    if (promoEl) promoEl.textContent = promo;
+  }
+  setTimeout(() => showMsg('msg-settings', '', false), 3000);
 }
 
 // carrega configurações ao abrir aba

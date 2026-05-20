@@ -64,7 +64,7 @@
   <div class="hero-pattern"></div>
   <!-- Substitua o src abaixo pela URL de uma foto real de tênis urbano -->
   <img class="hero-img"
-    src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1400&q=80"
+    src="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=1400&q=80"
     alt="DAM Shoes — Tênis Premium"
     loading="eager"
   />
@@ -271,9 +271,13 @@
           <input type="text" id="add-sizes" placeholder="37, 38, 39, 40, 41, 42, 43" />
         </div>
         <div class="form-row" style="margin-top:.85rem">
-          <label>Fotos do produto (máx. 3)</label>
-          <p class="form-hint">Toque em + para escolher fotos da galeria ou tirar uma foto.</p>
-          <div class="photo-uploader" id="add-photo-uploader"></div>
+          <label>Foto 1 (URL)</label>
+          <input type="text" id="add-photo-1" placeholder="https://..." />
+          <label style="margin-top:.5rem">Foto 2 (URL)</label>
+          <input type="text" id="add-photo-2" placeholder="https://..." />
+          <label style="margin-top:.5rem">Foto 3 (URL)</label>
+          <input type="text" id="add-photo-3" placeholder="https://..." />
+          <p class="form-hint">Cole a URL de qualquer imagem da internet ou do Google Imagens.</p>
         </div>
         <div class="form-row" style="margin-top:.85rem">
           <label for="add-desc">Descrição (opcional)</label>
@@ -383,9 +387,12 @@
       <input type="text" id="edit-sizes" />
     </div>
     <div class="form-row" style="margin-top:.85rem">
-      <label>Fotos do produto (máx. 3)</label>
-      <p class="form-hint">Toque em + para adicionar ou substituir fotos.</p>
-      <div class="photo-uploader" id="edit-photo-uploader"></div>
+      <label>Foto 1 (URL)</label>
+      <input type="text" id="edit-photo-1" placeholder="https://..." />
+      <label style="margin-top:.5rem">Foto 2 (URL)</label>
+      <input type="text" id="edit-photo-2" placeholder="https://..." />
+      <label style="margin-top:.5rem">Foto 3 (URL)</label>
+      <input type="text" id="edit-photo-3" placeholder="https://..." />
     </div>
     <div class="form-row" style="margin-top:.85rem">
       <label>Descrição</label>
