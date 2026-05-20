@@ -499,3 +499,175 @@ function svgWA() {
 
 /* ── INIT ────────────────────────────────── */
 loadProducts();
+
+/* ══════════════════════════════════════════
+   ANO AUTOMÁTICO NO RODAPÉ
+══════════════════════════════════════════ */
+document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+/* ══════════════════════════════════════════
+   MENU LATERAL
+══════════════════════════════════════════ */
+const sideOverlay = document.getElementById('side-menu-overlay');
+
+document.getElementById('btn-menu').addEventListener('click', () => {
+  sideOverlay.classList.add('open');
+});
+document.getElementById('close-side-menu').addEventListener('click', closeSideMenu);
+sideOverlay.addEventListener('click', e => { if (e.target === sideOverlay) closeSideMenu(); });
+
+function closeSideMenu() {
+  sideOverlay.classList.remove('open');
+}
+
+// Atualiza marcas no menu lateral
+function updateSideBrands() {
+  const brands = [...new Set(allProducts.map(p => p.brand).filter(Boolean))];
+  const container = document.getElementById('side-brands');
+  if (!container) return;
+
+  // ícones por marca
+  const brandIcons = {
+    'Nike': '✔', 'Adidas': '🔵', 'New Balance': '🟢',
+    'Lacoste': '🐊', 'Mizuno': '🔷', 'Puma': '🐆',
+    'Vans': '🔶', 'Converse': '⭐'
+  };
+
+  // botão Todos
+  const todosCount = allProducts.length;
+  let html = `
+    <button class="side-brand-btn ${currentFilter==='all'?'active':''}" 
+      data-filter="all" onclick="sideFilter('all',this)">
+      <span class="side-brand-icon">👟</span>
+      Todos
+      <span class="side-brand-count">${todosCount}</span>
+    </button>`;
+
+  brands.forEach(brand => {
+    const count = allProducts.filter(p => p.brand === brand).length;
+    const icon  = brandIcons[brand] || '👟';
+    const isActive = currentFilter === 'brand:' + brand;
+    html += `
+    <button class="side-brand-btn ${isActive?'active':''}" 
+      data-filter="brand:${brand}" onclick="sideFilter('brand:${brand}',this)">
+      <span class="side-brand-icon">${icon}</span>
+      ${brand}
+      <span class="side-brand-count">${count}</span>
+    </button>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function sideFilter(filter, btn) {
+  // atualiza filtro principal
+  currentFilter = filter;
+  filterBar.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filter);
+  });
+  // atualiza visual do menu lateral
+  document.querySelectorAll('.side-brand-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filter);
+  });
+  renderProducts();
+  closeSideMenu();
+  // scroll para o catálogo
+  document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════
+   CONFIGURAÇÕES (ADMIN)
+══════════════════════════════════════════ */
+async function loadSettings() {
+  const { data } = await db.from('settings').select('*').eq('id', 1).single();
+  if (!data) return;
+
+  setField('cfg-whatsapp', data.whatsapp || '');
+  setField('cfg-prazo',    data.prazo    || '');
+  setField('cfg-parcelas', data.parcelas || '');
+  setField('cfg-taxa',     data.taxa_cartao || '');
+  setField('cfg-promo',    data.promo    || '');
+  setField('cfg-hero-img', data.hero_img || '');
+}
+
+document.getElementById('btn-save-settings')?.addEventListener('click', saveSettings);
+
+async function saveSettings() {
+  const btn = document.getElementById('btn-save-settings');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  const heroImg = v('cfg-hero-img');
+  const promo   = v('cfg-promo');
+  const wa      = v('cfg-whatsapp');
+
+  const { error } = await db.from('settings').upsert({
+    id:           1,
+    whatsapp:     wa      || WHATSAPP,
+    prazo:        v('cfg-prazo')    || '7 dias úteis',
+    parcelas:     parseInt(v('cfg-parcelas')) || 10,
+    taxa_cartao:  parseFloat(v('cfg-taxa'))   || 2.99,
+    promo:        promo   || '',
+    hero_img:     heroImg || '',
+    updated_at:   new Date().toISOString(),
+  });
+
+  btn.disabled = false; btn.textContent = 'Salvar Configurações';
+
+  if (error) {
+    showMsg('msg-settings', error.message, true);
+  } else {
+    showMsg('msg-settings', 'Configurações salvas!', false);
+    // aplica mudanças em tempo real
+    if (heroImg) {
+      const heroEl = document.querySelector('.hero-img');
+      if (heroEl) heroEl.src = heroImg;
+    }
+    if (promo) {
+      const promoEl = document.querySelector('.hero-promo strong');
+      if (promoEl) promoEl.textContent = promo;
+    }
+    setTimeout(() => showMsg('msg-settings', '', false), 3000);
+  }
+}
+
+// carrega configurações ao abrir aba
+const origSwitchTab = switchTab;
+// patch switchTab para carregar settings
+const _origSwitch = switchTab;
+window.switchTabPatched = function(tab) {
+  _origSwitch(tab);
+  document.getElementById('tab-settings').style.display = tab === 'settings' ? 'block' : 'none';
+  if (tab === 'settings') loadSettings();
+};
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.onclick = () => window.switchTabPatched(btn.dataset.tab);
+});
+
+// atualiza sidebar quando produtos carregam
+const _origRender = renderProducts;
+// hook after render
+const origLoadProducts = loadProducts;
+async function loadProductsWithSidebar() {
+  await origLoadProducts();
+  updateSideBrands();
+}
+// override
+window.loadProducts = loadProductsWithSidebar;
+
+// também atualiza as settings ao iniciar
+(async () => {
+  const { data } = await db.from('settings').select('*').eq('id', 1).single();
+  if (data) {
+    if (data.hero_img) {
+      const heroEl = document.querySelector('.hero-img');
+      if (heroEl) heroEl.src = data.hero_img;
+    }
+    if (data.promo) {
+      const promoEl = document.querySelector('.hero-promo strong');
+      if (promoEl) promoEl.textContent = data.promo;
+    }
+  }
+})();
+
+// adiciona coluna promo e hero_img na tabela settings se não existir
+// (rodado silenciosamente, falha sem problema)
