@@ -94,7 +94,7 @@ function buildCard(p, idx) {
   const waLink = `https://wa.me/${WHATSAPP}?text=${waMsg}`;
 
   return `
-  <div class="card${isEsg?' esgotado':''}" style="animation-delay:${idx*0.05}s">
+  <div class="card${isEsg?' esgotado':''}" style="animation-delay:${idx*0.05}s" onclick="openProduct('${p.id}')" style="cursor:pointer">
     <span class="card-badge ${isEsg?'esgotado':'available'}">${isEsg?'ESGOTADO':'● DISPONÍVEL'}</span>
     <div class="card-img-wrap">${imgEl}${dots}</div>
     <div class="card-body">
@@ -688,3 +688,161 @@ window.loadProducts = loadProductsWithSidebar;
 
 // adiciona coluna promo e hero_img na tabela settings se não existir
 // (rodado silenciosamente, falha sem problema)
+
+/* ══════════════════════════════════════════
+   MODAL VISUALIZAÇÃO DO PRODUTO
+══════════════════════════════════════════ */
+const productOverlay = document.getElementById('product-overlay');
+let galleryPhotos  = [];
+let galleryIndex   = 0;
+let selectedSize   = null;
+
+document.getElementById('close-product').addEventListener('click', () => {
+  productOverlay.classList.remove('open');
+});
+productOverlay.addEventListener('click', e => {
+  if (e.target === productOverlay) productOverlay.classList.remove('open');
+});
+
+// Abre o modal ao clicar no card
+function openProduct(id) {
+  const p = allProducts.find(x => x.id == id);
+  if (!p) return;
+
+  const photos = parseArr(p.photos);
+  const sizes  = parseArr(p.sizes);
+  const isEsg  = p.status === 'esgotado';
+
+  galleryPhotos = photos;
+  galleryIndex  = 0;
+  selectedSize  = null;
+
+  // Preenche informações
+  document.getElementById('detail-brand').textContent   = p.brand || '';
+  document.getElementById('detail-name').textContent    = p.name;
+  document.getElementById('detail-ref').textContent     = p.reference ? `REF: ${p.reference}` : '';
+  document.getElementById('detail-desc').textContent    = p.description || '';
+  document.getElementById('detail-desc').style.display  = p.description ? 'block' : 'none';
+
+  document.getElementById('detail-price-new').textContent = `R$ ${formatPrice(p.price)}`;
+  const oldEl = document.getElementById('detail-price-old');
+  oldEl.textContent = p.price_old ? `R$ ${formatPrice(p.price_old)}` : '';
+  oldEl.style.display = p.price_old ? 'inline' : 'none';
+
+  // Status
+  const statusEl = document.getElementById('detail-status');
+  statusEl.textContent = isEsg ? '○ Indisponível' : '● Disponível';
+  statusEl.style.color = isEsg ? 'var(--grey)' : 'var(--success)';
+
+  // Numerações
+  const sizesEl = document.getElementById('detail-sizes');
+  const sizeWrap = document.querySelector('.product-detail-sizes-wrap');
+  if (sizes.length > 0) {
+    sizesEl.innerHTML = sizes.map(s =>
+      `<span class="detail-size" onclick="selectSize(this,'${s}')">${s}</span>`
+    ).join('');
+    sizeWrap.style.display = 'block';
+  } else {
+    sizeWrap.style.display = 'none';
+  }
+
+  // Galeria
+  updateGallery();
+
+  // Botão WhatsApp
+  const waBtn = document.getElementById('detail-wa-btn');
+  if (isEsg) {
+    waBtn.className = 'btn-buy-detail disabled';
+    waBtn.textContent = 'Produto Esgotado';
+    waBtn.href = '#';
+  } else {
+    waBtn.className = 'btn-buy-detail';
+    waBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Comprar pelo WhatsApp`;
+    updateWaLink(p);
+  }
+
+  // guarda produto atual para atualizar link ao selecionar tamanho
+  productOverlay._currentProduct = p;
+  productOverlay.classList.add('open');
+}
+
+function selectSize(el, size) {
+  document.querySelectorAll('.detail-size').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSize = size;
+  const p = productOverlay._currentProduct;
+  if (p) updateWaLink(p);
+}
+
+function updateWaLink(p) {
+  const sizeText = selectedSize ? `Numeração: ${selectedSize}` : 'Numeração desejada: ';
+  const msg = encodeURIComponent(
+    `Olá! Tenho interesse no produto:\n*${p.name}*\nReferência: ${p.reference || 'N/A'}\n${sizeText}`
+  );
+  const waBtn = document.getElementById('detail-wa-btn');
+  if (waBtn && !waBtn.classList.contains('disabled')) {
+    waBtn.href = `https://wa.me/${WHATSAPP}?text=${msg}`;
+  }
+}
+
+function updateGallery() {
+  const mainImg = document.getElementById('gallery-main-img');
+  const counter = document.getElementById('gallery-counter');
+  const thumbs  = document.getElementById('gallery-thumbs');
+  const prevBtn = document.getElementById('gallery-prev');
+  const nextBtn = document.getElementById('gallery-next');
+
+  if (galleryPhotos.length === 0) {
+    mainImg.src = '';
+    mainImg.style.display = 'none';
+    counter.style.display = 'none';
+    thumbs.innerHTML = '';
+    prevBtn.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+    return;
+  }
+
+  mainImg.style.display = 'block';
+  mainImg.src = galleryPhotos[galleryIndex];
+  counter.textContent = `${galleryIndex + 1} / ${galleryPhotos.length}`;
+  counter.style.display = galleryPhotos.length > 1 ? 'block' : 'none';
+
+  prevBtn.classList.toggle('hidden', galleryPhotos.length <= 1);
+  nextBtn.classList.toggle('hidden', galleryPhotos.length <= 1);
+
+  thumbs.innerHTML = galleryPhotos.map((url, i) => `
+    <div class="gallery-thumb ${i === galleryIndex ? 'active' : ''}" onclick="goGallery(${i})">
+      <img src="${url}" onerror="this.parentElement.style.display='none'" />
+    </div>`
+  ).join('');
+  thumbs.style.display = galleryPhotos.length > 1 ? 'flex' : 'none';
+}
+
+function goGallery(idx) {
+  galleryIndex = idx;
+  updateGallery();
+}
+
+document.getElementById('gallery-prev').addEventListener('click', () => {
+  galleryIndex = (galleryIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
+  updateGallery();
+});
+
+document.getElementById('gallery-next').addEventListener('click', () => {
+  galleryIndex = (galleryIndex + 1) % galleryPhotos.length;
+  updateGallery();
+});
+
+// Swipe touch para mobile
+let touchStartX = 0;
+document.querySelector('.gallery-main')?.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].clientX;
+});
+document.querySelector('.gallery-main')?.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 40) {
+    if (diff > 0) galleryIndex = (galleryIndex + 1) % galleryPhotos.length;
+    else          galleryIndex = (galleryIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
+    updateGallery();
+  }
+});
