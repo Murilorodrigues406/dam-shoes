@@ -1367,3 +1367,20 @@ select option { background: var(--dark); }
 
   #product-overlay { align-items: flex-end; padding: 0; }
 }
+
+/* ══════════════════════════════════════════
+   PARCELAS
+══════════════════════════════════════════ */
+.card-parcela {
+  font-size: 0.68rem;
+  color: var(--orange);
+  margin-top: 0.2rem;
+}
+.card-parcela strong { font-weight: 700; }
+
+.detail-parcela {
+  font-size: 0.82rem;
+  color: var(--orange);
+  margin-top: -0.25rem;
+}
+.detail-parcela strong { font-weight: 700; }

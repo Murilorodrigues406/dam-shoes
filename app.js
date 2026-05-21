@@ -106,6 +106,7 @@ function buildCard(p, idx) {
         <div class="card-prices">
           ${priceOld?`<span class="price-old">R$ ${priceOld}</span>`:''}
           <span class="price-new">R$ ${priceNew}</span>
+          ${parcelaHtml(p.price)}
         </div>
         <a class="btn-buy" href="${isEsg?'#':waLink}" target="${isEsg?'':'_blank'}" rel="noopener"
            ${isEsg?'onclick="return false" style="pointer-events:none;background:var(--border2);color:var(--grey)"':''}>
@@ -484,6 +485,24 @@ function parseArr(val) {
 
 function formatPrice(n) { return Number(n).toFixed(2).replace('.',','); }
 
+// Calcula parcela com taxa do cartão
+function calcParcela(price, parcelas, taxa) {
+  if (!parcelas || parcelas <= 1) return null;
+  const taxaDecimal = (taxa || 0) / 100;
+  const total = price * Math.pow(1 + taxaDecimal, parcelas);
+  const parcela = total / parcelas;
+  return { parcela, total };
+}
+
+function parcelaHtml(price) {
+  const parcelas   = window._cfg_parcelas   || 10;
+  const taxa       = window._cfg_taxa       || 0;
+  if (parcelas <= 1) return '';
+  const calc = calcParcela(price, parcelas, taxa);
+  if (!calc) return '';
+  return `<div class="card-parcela">ou <strong>${parcelas}x de R$ ${formatPrice(calc.parcela)}</strong>${taxa > 0 ? ' no cartão' : ' sem juros'}</div>`;
+}
+
 function showMsg(id, text, isError) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -683,6 +702,9 @@ window.loadProducts = loadProductsWithSidebar;
       const promoEl = document.querySelector('.hero-promo strong');
       if (promoEl) promoEl.textContent = data.promo;
     }
+    // salva globalmente para cálculo de parcelas
+    window._cfg_parcelas = data.parcelas || 10;
+    window._cfg_taxa     = parseFloat(data.taxa_cartao) || 0;
   }
 })();
 
@@ -725,6 +747,19 @@ function openProduct(id) {
   document.getElementById('detail-desc').style.display  = p.description ? 'block' : 'none';
 
   document.getElementById('detail-price-new').textContent = `R$ ${formatPrice(p.price)}`;
+  // parcelas no modal
+  const parcelaEl = document.getElementById('detail-parcela');
+  if (parcelaEl) {
+    const parcelas = window._cfg_parcelas || 10;
+    const taxa     = window._cfg_taxa     || 0;
+    if (parcelas > 1) {
+      const calc = calcParcela(p.price, parcelas, taxa);
+      parcelaEl.innerHTML = `ou <strong>${parcelas}x de R$ ${formatPrice(calc.parcela)}</strong>${taxa > 0 ? ' no cartão' : ' sem juros'}`;
+      parcelaEl.style.display = 'block';
+    } else {
+      parcelaEl.style.display = 'none';
+    }
+  }
   const oldEl = document.getElementById('detail-price-old');
   oldEl.textContent = p.price_old ? `R$ ${formatPrice(p.price_old)}` : '';
   oldEl.style.display = p.price_old ? 'inline' : 'none';
