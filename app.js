@@ -9,9 +9,8 @@ let currentFilter = 'all';
 let isAdmin       = false;
 let editingId     = null;
 
-// fotos selecionadas para upload (add e edit)
-let addPhotos  = []; // { file, url } ou { url }
-let editPhotos = []; // { file, url } ou { url }
+let addPhotos  = [];
+let editPhotos = [];
 
 /* ── DOM REFS ────────────────────────────── */
 const grid     = document.getElementById('products-grid');
@@ -29,6 +28,7 @@ async function loadProducts() {
   allProducts = data || [];
   buildFilters();
   renderProducts();
+  updateSideBrands();
 }
 
 function setGridState(state, msg = '') {
@@ -41,10 +41,22 @@ function setGridState(state, msg = '') {
   }
 }
 
+/* ── NORMALIZA MARCA ─────────────────────── */
+// Garante que "new balance", "New Balance", "NEW BALANCE" viram "New Balance"
+function normalizeBrand(brand) {
+  if (!brand) return '';
+  return brand.trim().replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+}
+
 /* ── BUILD FILTER BUTTONS ────────────────── */
 function buildFilters() {
-  const brands = [...new Set(allProducts.map(p => p.brand).filter(Boolean))];
+  // normaliza todas as marcas antes de deduplicar
+  const brands = [...new Set(
+    allProducts.map(p => normalizeBrand(p.brand)).filter(Boolean)
+  )].sort();
+
   filterBar.querySelectorAll('[data-dynamic]').forEach(el => el.remove());
+
   brands.forEach(brand => {
     const btn = document.createElement('button');
     btn.className = 'filter-btn';
@@ -59,11 +71,14 @@ function buildFilters() {
 /* ── RENDER PRODUCTS ─────────────────────── */
 function renderProducts() {
   let list = [...allProducts];
-  if (currentFilter === 'available')        list = list.filter(p => p.status === 'available');
-  else if (currentFilter === 'esgotado')    list = list.filter(p => p.status === 'esgotado');
-  else if (currentFilter.startsWith('brand:')) {
+  if (currentFilter === 'available') {
+    list = list.filter(p => p.status === 'available');
+  } else if (currentFilter === 'esgotado') {
+    list = list.filter(p => p.status === 'esgotado');
+  } else if (currentFilter.startsWith('brand:')) {
     const brand = currentFilter.replace('brand:', '');
-    list = list.filter(p => p.brand === brand);
+    // compara normalizando para evitar duplicatas por capitalização
+    list = list.filter(p => normalizeBrand(p.brand) === brand);
   }
   countEl.textContent = `${list.length} produto${list.length !== 1 ? 's' : ''}`;
   if (list.length === 0) { setGridState('empty'); return; }
@@ -98,7 +113,7 @@ function buildCard(p, idx) {
     <span class="card-badge ${isEsg?'esgotado':'available'}">${isEsg?'ESGOTADO':'● DISPONÍVEL'}</span>
     <div class="card-img-wrap">${imgEl}${dots}</div>
     <div class="card-body">
-      ${p.brand?`<div class="card-brand">${p.brand}</div>`:''}
+      ${p.brand?`<div class="card-brand">${normalizeBrand(p.brand)}</div>`:''}
       <div class="card-name">${p.name}</div>
       ${p.reference?`<div class="card-ref">REF: ${p.reference}</div>`:''}
       ${sizeChips?`<div class="card-sizes">${sizeChips}</div>`:''}
@@ -155,7 +170,6 @@ async function uploadPhoto(file, productRef) {
   return data.publicUrl;
 }
 
-/* ── Subir todas as fotos pendentes ─────── */
 async function resolvePhotos(photos, ref) {
   const urls = [];
   for (const p of photos) {
@@ -178,23 +192,17 @@ function buildPhotoUploader(containerId, photoArr) {
 
   function render() {
     container.innerHTML = '';
-
-    // slots de foto (máx 3)
     for (let i = 0; i < 3; i++) {
       const slot = document.createElement('div');
       slot.className = 'photo-slot';
-
       if (photoArr[i]) {
-        // tem foto
         const preview = photoArr[i].file
           ? URL.createObjectURL(photoArr[i].file)
           : photoArr[i].url;
-
         slot.innerHTML = `
           <img src="${preview}" onerror="this.src=''" />
           <button class="photo-slot-remove" onclick="removePhoto('${containerId}',${i})" aria-label="Remover foto">✕</button>`;
       } else {
-        // slot vazio
         slot.innerHTML = `
           <label class="photo-slot-add" for="file-input-${containerId}-${i}">
             <span style="font-size:1.4rem;color:var(--border2)">+</span>
@@ -206,7 +214,6 @@ function buildPhotoUploader(containerId, photoArr) {
       container.appendChild(slot);
     }
   }
-
   render();
 }
 
@@ -241,7 +248,6 @@ function openAdminModal() {
   else { loginSection.style.display='block'; adminPanel.style.display='none'; }
 }
 
-/* ── LOGIN ───────────────────────────────── */
 document.getElementById('btn-login').addEventListener('click', doLogin);
 document.getElementById('input-password').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
 
@@ -273,10 +279,12 @@ document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click
 
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
-  document.getElementById('tab-add').style.display  = tab==='add'  ? 'block' : 'none';
-  document.getElementById('tab-list').style.display = tab==='list' ? 'block' : 'none';
-  if (tab==='add')  { addPhotos = []; buildPhotoUploader('add-photo-uploader', addPhotos); }
-  if (tab==='list') loadAdminList();
+  document.getElementById('tab-add').style.display      = tab==='add'      ? 'block' : 'none';
+  document.getElementById('tab-list').style.display     = tab==='list'     ? 'block' : 'none';
+  document.getElementById('tab-settings').style.display = tab==='settings' ? 'block' : 'none';
+  if (tab==='add')      { addPhotos = []; buildPhotoUploader('add-photo-uploader', addPhotos); }
+  if (tab==='list')     loadAdminList();
+  if (tab==='settings') loadSettings();
 }
 
 /* ── MARGIN CALCULATOR ───────────────────── */
@@ -314,7 +322,7 @@ async function addProduct() {
 
     const { error } = await db.from('products').insert([{
       name, price,
-      brand:       v('add-brand')    || null,
+      brand:       normalizeBrand(v('add-brand')) || null,
       reference:   v('add-ref')      || null,
       price_old:   parseFloat(v('add-price-old'))||null,
       cost:        parseFloat(v('add-cost'))||null,
@@ -376,7 +384,6 @@ async function loadAdminList() {
   }).join('');
 }
 
-/* ── DELETE ──────────────────────────────── */
 async function deleteProduct(id) {
   if (!confirm('Excluir este produto permanentemente?')) return;
   const { error } = await db.from('products').delete().eq('id',id);
@@ -405,7 +412,6 @@ function openEdit(id) {
   setField('edit-desc',      p.description||'');
   document.getElementById('edit-status').value = p.status||'available';
 
-  // carregar fotos existentes
   editPhotos = parseArr(p.photos).map(url=>({ url }));
   buildPhotoUploader('edit-photo-uploader', editPhotos);
   updateEditMargin();
@@ -442,7 +448,7 @@ async function saveEdit() {
 
     const { error } = await db.from('products').update({
       name, price,
-      brand:       v('edit-brand')   ||null,
+      brand:       normalizeBrand(v('edit-brand')) || null,
       reference:   v('edit-ref')     ||null,
       price_old:   parseFloat(v('edit-price-old'))||null,
       cost:        parseFloat(v('edit-cost'))||null,
@@ -485,7 +491,6 @@ function parseArr(val) {
 
 function formatPrice(n) { return Number(n).toFixed(2).replace('.',','); }
 
-// Calcula parcela com taxa do cartão
 function calcParcela(price, parcelas, taxa) {
   if (!parcelas || parcelas <= 1) return null;
   const taxaDecimal = (taxa || 0) / 100;
@@ -495,8 +500,8 @@ function calcParcela(price, parcelas, taxa) {
 }
 
 function parcelaHtml(price) {
-  const parcelas   = window._cfg_parcelas   || 10;
-  const taxa       = window._cfg_taxa       || 0;
+  const parcelas = window._cfg_parcelas || 10;
+  const taxa     = window._cfg_taxa     || 0;
   if (parcelas <= 1) return '';
   const calc = calcParcela(price, parcelas, taxa);
   if (!calc) return '';
@@ -516,10 +521,6 @@ function svgWA() {
 
 /* ── INIT ────────────────────────────────── */
 loadProducts();
-
-/* ══════════════════════════════════════════
-   ANO AUTOMÁTICO NO RODAPÉ
-══════════════════════════════════════════ */
 document.getElementById('footer-year').textContent = new Date().getFullYear();
 
 /* ══════════════════════════════════════════
@@ -527,34 +528,29 @@ document.getElementById('footer-year').textContent = new Date().getFullYear();
 ══════════════════════════════════════════ */
 const sideOverlay = document.getElementById('side-menu-overlay');
 
-document.getElementById('btn-menu').addEventListener('click', () => {
-  sideOverlay.classList.add('open');
-});
+document.getElementById('btn-menu').addEventListener('click', () => sideOverlay.classList.add('open'));
 document.getElementById('close-side-menu').addEventListener('click', closeSideMenu);
 sideOverlay.addEventListener('click', e => { if (e.target === sideOverlay) closeSideMenu(); });
 
-function closeSideMenu() {
-  sideOverlay.classList.remove('open');
-}
+function closeSideMenu() { sideOverlay.classList.remove('open'); }
 
-// Atualiza marcas no menu lateral
 function updateSideBrands() {
-  const brands = [...new Set(allProducts.map(p => p.brand).filter(Boolean))];
+  const brands = [...new Set(
+    allProducts.map(p => normalizeBrand(p.brand)).filter(Boolean)
+  )].sort();
+
   const container = document.getElementById('side-brands');
   if (!container) return;
 
-  // ícones por marca
-  // botão Todos
-  const todosCount = allProducts.length;
   let html = `
     <button class="side-brand-btn ${currentFilter==='all'?'active':''}" 
       data-filter="all" onclick="sideFilter('all',this)">
       Todos
-      <span class="side-brand-count">${todosCount}</span>
+      <span class="side-brand-count">${allProducts.length}</span>
     </button>`;
 
   brands.forEach(brand => {
-    const count = allProducts.filter(p => p.brand === brand).length;
+    const count = allProducts.filter(p => normalizeBrand(p.brand) === brand).length;
     const isActive = currentFilter === 'brand:' + brand;
     html += `
     <button class="side-brand-btn ${isActive?'active':''}" 
@@ -568,18 +564,15 @@ function updateSideBrands() {
 }
 
 function sideFilter(filter, btn) {
-  // atualiza filtro principal
   currentFilter = filter;
   filterBar.querySelectorAll('.filter-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.filter === filter);
   });
-  // atualiza visual do menu lateral
   document.querySelectorAll('.side-brand-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.filter === filter);
   });
   renderProducts();
   closeSideMenu();
-  // scroll para o catálogo
   document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -589,7 +582,6 @@ function sideFilter(filter, btn) {
 async function loadSettings() {
   const { data } = await db.from('settings').select('*').eq('id', 1).single();
   if (!data) return;
-
   setField('cfg-whatsapp', data.whatsapp || '');
   setField('cfg-prazo',    data.prazo    || '');
   setField('cfg-parcelas', data.parcelas || '');
@@ -608,7 +600,6 @@ async function saveSettings() {
   const promo   = v('cfg-promo');
   const wa      = v('cfg-whatsapp');
 
-  // Tenta UPDATE primeiro, se falhar tenta INSERT
   let error = null;
 
   const updateResult = await db.from('settings').update({
@@ -623,16 +614,13 @@ async function saveSettings() {
 
   error = updateResult.error;
 
-  // Se update falhou, tenta insert
   if (error) {
     const insertResult = await db.from('settings').insert({
-      id:           1,
-      whatsapp:     wa      || WHATSAPP,
-      prazo:        v('cfg-prazo')    || '7 dias úteis',
-      parcelas:     parseInt(v('cfg-parcelas')) || 10,
-      taxa_cartao:  parseFloat(v('cfg-taxa'))   || 2.99,
-      promo:        promo   || '',
-      hero_img:     heroImg || '',
+      id: 1, whatsapp: wa || WHATSAPP,
+      prazo: v('cfg-prazo') || '7 dias úteis',
+      parcelas: parseInt(v('cfg-parcelas')) || 10,
+      taxa_cartao: parseFloat(v('cfg-taxa')) || 2.99,
+      promo: promo || '', hero_img: heroImg || '',
     });
     error = insertResult.error;
   }
@@ -640,76 +628,32 @@ async function saveSettings() {
   btn.disabled = false; btn.textContent = 'Salvar Configurações';
 
   if (error) {
-    // Salva localmente no navegador como fallback
     localStorage.setItem('dam_settings', JSON.stringify({
-      whatsapp: wa || WHATSAPP,
-      prazo: v('cfg-prazo') || '7 dias úteis',
+      whatsapp: wa || WHATSAPP, prazo: v('cfg-prazo') || '7 dias úteis',
       parcelas: parseInt(v('cfg-parcelas')) || 10,
       taxa_cartao: parseFloat(v('cfg-taxa')) || 2.99,
-      promo: promo || '',
-      hero_img: heroImg || '',
+      promo: promo || '', hero_img: heroImg || '',
     }));
     showMsg('msg-settings', 'Configurações salvas localmente!', false);
   } else {
     showMsg('msg-settings', 'Configurações salvas!', false);
   }
 
-  // Aplica mudanças em tempo real independente de erro
-  if (heroImg) {
-    const heroEl = document.querySelector('.hero-img');
-    if (heroEl) heroEl.src = heroImg;
-  }
-  if (promo) {
-    const promoEl = document.querySelector('.hero-promo strong');
-    if (promoEl) promoEl.textContent = promo;
-  }
+  if (heroImg) { const heroEl = document.querySelector('.hero-img'); if (heroEl) heroEl.src = heroImg; }
+  if (promo)   { const promoEl = document.querySelector('.hero-promo strong'); if (promoEl) promoEl.textContent = promo; }
   setTimeout(() => showMsg('msg-settings', '', false), 3000);
 }
 
-// carrega configurações ao abrir aba
-const origSwitchTab = switchTab;
-// patch switchTab para carregar settings
-const _origSwitch = switchTab;
-window.switchTabPatched = function(tab) {
-  _origSwitch(tab);
-  document.getElementById('tab-settings').style.display = tab === 'settings' ? 'block' : 'none';
-  if (tab === 'settings') loadSettings();
-};
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.onclick = () => window.switchTabPatched(btn.dataset.tab);
-});
-
-// atualiza sidebar quando produtos carregam
-const _origRender = renderProducts;
-// hook after render
-const origLoadProducts = loadProducts;
-async function loadProductsWithSidebar() {
-  await origLoadProducts();
-  updateSideBrands();
-}
-// override
-window.loadProducts = loadProductsWithSidebar;
-
-// também atualiza as settings ao iniciar
+// Carrega settings ao iniciar
 (async () => {
   const { data } = await db.from('settings').select('*').eq('id', 1).single();
   if (data) {
-    if (data.hero_img) {
-      const heroEl = document.querySelector('.hero-img');
-      if (heroEl) heroEl.src = data.hero_img;
-    }
-    if (data.promo) {
-      const promoEl = document.querySelector('.hero-promo strong');
-      if (promoEl) promoEl.textContent = data.promo;
-    }
-    // salva globalmente para cálculo de parcelas
+    if (data.hero_img) { const heroEl = document.querySelector('.hero-img'); if (heroEl) heroEl.src = data.hero_img; }
+    if (data.promo)    { const promoEl = document.querySelector('.hero-promo strong'); if (promoEl) promoEl.textContent = data.promo; }
     window._cfg_parcelas = data.parcelas || 10;
     window._cfg_taxa     = parseFloat(data.taxa_cartao) || 0;
   }
 })();
-
-// adiciona coluna promo e hero_img na tabela settings se não existir
-// (rodado silenciosamente, falha sem problema)
 
 /* ══════════════════════════════════════════
    MODAL VISUALIZAÇÃO DO PRODUTO
@@ -719,14 +663,9 @@ let galleryPhotos  = [];
 let galleryIndex   = 0;
 let selectedSize   = null;
 
-document.getElementById('close-product').addEventListener('click', () => {
-  productOverlay.classList.remove('open');
-});
-productOverlay.addEventListener('click', e => {
-  if (e.target === productOverlay) productOverlay.classList.remove('open');
-});
+document.getElementById('close-product').addEventListener('click', () => productOverlay.classList.remove('open'));
+productOverlay.addEventListener('click', e => { if (e.target === productOverlay) productOverlay.classList.remove('open'); });
 
-// Abre o modal ao clicar no card
 function openProduct(id) {
   const p = allProducts.find(x => x.id == id);
   if (!p) return;
@@ -739,15 +678,13 @@ function openProduct(id) {
   galleryIndex  = 0;
   selectedSize  = null;
 
-  // Preenche informações
-  document.getElementById('detail-brand').textContent   = p.brand || '';
+  document.getElementById('detail-brand').textContent   = normalizeBrand(p.brand) || '';
   document.getElementById('detail-name').textContent    = p.name;
   document.getElementById('detail-ref').textContent     = p.reference ? `REF: ${p.reference}` : '';
   document.getElementById('detail-desc').textContent    = p.description || '';
   document.getElementById('detail-desc').style.display  = p.description ? 'block' : 'none';
-
   document.getElementById('detail-price-new').textContent = `R$ ${formatPrice(p.price)}`;
-  // parcelas no modal
+
   const parcelaEl = document.getElementById('detail-parcela');
   if (parcelaEl) {
     const parcelas = window._cfg_parcelas || 10;
@@ -760,17 +697,16 @@ function openProduct(id) {
       parcelaEl.style.display = 'none';
     }
   }
+
   const oldEl = document.getElementById('detail-price-old');
   oldEl.textContent = p.price_old ? `R$ ${formatPrice(p.price_old)}` : '';
   oldEl.style.display = p.price_old ? 'inline' : 'none';
 
-  // Status
   const statusEl = document.getElementById('detail-status');
   statusEl.textContent = isEsg ? '○ Indisponível' : '● Disponível';
   statusEl.style.color = isEsg ? 'var(--grey)' : 'var(--success)';
 
-  // Numerações
-  const sizesEl = document.getElementById('detail-sizes');
+  const sizesEl  = document.getElementById('detail-sizes');
   const sizeWrap = document.querySelector('.product-detail-sizes-wrap');
   if (sizes.length > 0) {
     sizesEl.innerHTML = sizes.map(s =>
@@ -781,10 +717,8 @@ function openProduct(id) {
     sizeWrap.style.display = 'none';
   }
 
-  // Galeria
   updateGallery();
 
-  // Botão WhatsApp
   const waBtn = document.getElementById('detail-wa-btn');
   if (isEsg) {
     waBtn.className = 'btn-buy-detail disabled';
@@ -796,7 +730,6 @@ function openProduct(id) {
     updateWaLink(p);
   }
 
-  // guarda produto atual para atualizar link ao selecionar tamanho
   productOverlay._currentProduct = p;
   productOverlay.classList.add('open');
 }
@@ -811,9 +744,7 @@ function selectSize(el, size) {
 
 function updateWaLink(p) {
   const sizeText = selectedSize ? `Numeração: ${selectedSize}` : 'Numeração desejada: ';
-  const msg = encodeURIComponent(
-    `Olá! Tenho interesse no produto:\n*${p.name}*\nReferência: ${p.reference || 'N/A'}\n${sizeText}`
-  );
+  const msg = encodeURIComponent(`Olá! Tenho interesse no produto:\n*${p.name}*\nReferência: ${p.reference || 'N/A'}\n${sizeText}`);
   const waBtn = document.getElementById('detail-wa-btn');
   if (waBtn && !waBtn.classList.contains('disabled')) {
     waBtn.href = `https://wa.me/${WHATSAPP}?text=${msg}`;
@@ -828,12 +759,9 @@ function updateGallery() {
   const nextBtn = document.getElementById('gallery-next');
 
   if (galleryPhotos.length === 0) {
-    mainImg.src = '';
-    mainImg.style.display = 'none';
-    counter.style.display = 'none';
-    thumbs.innerHTML = '';
-    prevBtn.classList.add('hidden');
-    nextBtn.classList.add('hidden');
+    mainImg.src = ''; mainImg.style.display = 'none';
+    counter.style.display = 'none'; thumbs.innerHTML = '';
+    prevBtn.classList.add('hidden'); nextBtn.classList.add('hidden');
     return;
   }
 
@@ -841,7 +769,6 @@ function updateGallery() {
   mainImg.src = galleryPhotos[galleryIndex];
   counter.textContent = `${galleryIndex + 1} / ${galleryPhotos.length}`;
   counter.style.display = galleryPhotos.length > 1 ? 'block' : 'none';
-
   prevBtn.classList.toggle('hidden', galleryPhotos.length <= 1);
   nextBtn.classList.toggle('hidden', galleryPhotos.length <= 1);
 
@@ -853,26 +780,19 @@ function updateGallery() {
   thumbs.style.display = galleryPhotos.length > 1 ? 'flex' : 'none';
 }
 
-function goGallery(idx) {
-  galleryIndex = idx;
-  updateGallery();
-}
+function goGallery(idx) { galleryIndex = idx; updateGallery(); }
 
 document.getElementById('gallery-prev').addEventListener('click', () => {
   galleryIndex = (galleryIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
   updateGallery();
 });
-
 document.getElementById('gallery-next').addEventListener('click', () => {
   galleryIndex = (galleryIndex + 1) % galleryPhotos.length;
   updateGallery();
 });
 
-// Swipe touch para mobile
 let touchStartX = 0;
-document.querySelector('.gallery-main')?.addEventListener('touchstart', e => {
-  touchStartX = e.changedTouches[0].clientX;
-});
+document.querySelector('.gallery-main')?.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; });
 document.querySelector('.gallery-main')?.addEventListener('touchend', e => {
   const diff = touchStartX - e.changedTouches[0].clientX;
   if (Math.abs(diff) > 40) {
