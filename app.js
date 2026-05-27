@@ -42,7 +42,6 @@ function setGridState(state, msg = '') {
 }
 
 /* ── NORMALIZA MARCA ─────────────────────── */
-// Garante que "new balance", "New Balance", "NEW BALANCE" viram "New Balance"
 function normalizeBrand(brand) {
   if (!brand) return '';
   return brand.trim().replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
@@ -50,7 +49,6 @@ function normalizeBrand(brand) {
 
 /* ── BUILD FILTER BUTTONS ────────────────── */
 function buildFilters() {
-  // normaliza todas as marcas antes de deduplicar
   const brands = [...new Set(
     allProducts.map(p => normalizeBrand(p.brand)).filter(Boolean)
   )].sort();
@@ -77,7 +75,6 @@ function renderProducts() {
     list = list.filter(p => p.status === 'esgotado');
   } else if (currentFilter.startsWith('brand:')) {
     const brand = currentFilter.replace('brand:', '');
-    // compara normalizando para evitar duplicatas por capitalização
     list = list.filter(p => normalizeBrand(p.brand) === brand);
   }
   countEl.textContent = `${list.length} produto${list.length !== 1 ? 's' : ''}`;
@@ -251,14 +248,28 @@ function openAdminModal() {
 document.getElementById('btn-login').addEventListener('click', doLogin);
 document.getElementById('input-password').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
 
-function doLogin() {
-  const pw = document.getElementById('input-password').value;
-  if (pw === ADMIN_PASSWORD) {
+/* ── LOGIN VIA SUPABASE AUTH ─────────────── */
+async function doLogin() {
+  const btn = document.getElementById('btn-login');
+  const pw  = document.getElementById('input-password').value;
+
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+
+  const { error } = await db.auth.signInWithPassword({
+    email:    'damshoes99@gmail.com',
+    password: pw
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Entrar';
+
+  if (error) {
+    showMsg('msg-login', 'Senha incorreta.', true);
+  } else {
     isAdmin = true;
     showMsg('msg-login', '', false);
     showAdminPanel();
-  } else {
-    showMsg('msg-login', 'Senha incorreta.', true);
   }
 }
 
@@ -268,7 +279,9 @@ function showAdminPanel() {
   switchTab('add');
 }
 
-document.getElementById('btn-logout').addEventListener('click', () => {
+/* ── LOGOUT VIA SUPABASE AUTH ────────────── */
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await db.auth.signOut();
   isAdmin = false;
   adminOverlay.classList.remove('open');
   document.getElementById('input-password').value = '';
@@ -628,13 +641,7 @@ async function saveSettings() {
   btn.disabled = false; btn.textContent = 'Salvar Configurações';
 
   if (error) {
-    localStorage.setItem('dam_settings', JSON.stringify({
-      whatsapp: wa || WHATSAPP, prazo: v('cfg-prazo') || '7 dias úteis',
-      parcelas: parseInt(v('cfg-parcelas')) || 10,
-      taxa_cartao: parseFloat(v('cfg-taxa')) || 2.99,
-      promo: promo || '', hero_img: heroImg || '',
-    }));
-    showMsg('msg-settings', 'Configurações salvas localmente!', false);
+    showMsg('msg-settings', 'Erro ao salvar: ' + error.message, true);
   } else {
     showMsg('msg-settings', 'Configurações salvas!', false);
   }
