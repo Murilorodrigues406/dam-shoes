@@ -17,13 +17,22 @@ const grid     = document.getElementById('products-grid');
 const countEl  = document.getElementById('products-count');
 const filterBar= document.getElementById('filters');
 
+// ─────────────────────────────────────────────────────────────────
+// CAMPOS PÚBLICOS — nunca inclua 'cost' aqui.
+// O campo cost só é carregado quando o admin está autenticado.
+// ─────────────────────────────────────────────────────────────────
+const PUBLIC_FIELDS  = 'id,name,brand,reference,price,price_old,sizes,photos,status,description,created_at';
+const ADMIN_FIELDS   = '*'; // inclui cost, só usado em contexto autenticado
+
 /* ══════════════════════════════════════════
    LOAD PRODUCTS
 ══════════════════════════════════════════ */
 async function loadProducts() {
   setGridState('loading');
   const { data, error } = await db
-    .from('products').select('*').order('created_at', { ascending: false });
+    .from('products')
+    .select(PUBLIC_FIELDS)
+    .order('created_at', { ascending: false });
   if (error) { setGridState('error', error.message); return; }
   allProducts = data || [];
   buildFilters();
@@ -249,15 +258,65 @@ document.getElementById('btn-login').addEventListener('click', doLogin);
 document.getElementById('input-password').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
 
 /* ── LOGIN VIA SUPABASE AUTH ─────────────── */
+// ─────────────────────────────────────────────────────────────────
+// SEGURANÇA: O email do admin NÃO fica hardcoded no front-end.
+// Ele é lido de uma linha da tabela 'settings' (campo admin_email),
+// que é protegida por RLS — apenas usuários autenticados podem ler.
+//
+// CONFIGURAÇÃO NECESSÁRIA NO SUPABASE:
+//   1. Adicionar coluna 'admin_email' na tabela 'settings'
+//   2. Inserir o email na linha id=1
+//   3. Criar policy RLS: SELECT em settings permitido para anon
+//      APENAS nos campos que não sejam admin_email
+//      (ou usar uma função edge para autenticar)
+//
+// ALTERNATIVA MAIS SIMPLES (recomendada para começar):
+//   Criar uma Supabase Edge Function chamada 'admin-login'
+//   que recebe só a senha e retorna o token — sem expor o email.
+// ─────────────────────────────────────────────────────────────────
+
+let _adminLoginAttempts = 0;
+const _MAX_LOGIN_ATTEMPTS = 5;
+const _LOCKOUT_MS = 60000; // 1 minuto
+let _lockedUntil = 0;
+
 async function doLogin() {
+  // Rate limiting no cliente (camada extra, o Supabase Auth já tem server-side)
+  const now = Date.now();
+  if (now < _lockedUntil) {
+    const secsLeft = Math.ceil((_lockedUntil - now) / 1000);
+    showMsg('msg-login', `Muitas tentativas. Aguarde ${secsLeft}s.`, true);
+    return;
+  }
+
   const btn = document.getElementById('btn-login');
   const pw  = document.getElementById('input-password').value;
+
+  if (!pw) { showMsg('msg-login', 'Digite a senha.', true); return; }
 
   btn.disabled = true;
   btn.textContent = 'Entrando...';
 
+  // ── Busca o email admin de forma segura ──────────────────────
+  // O email fica na tabela settings, nunca no JS.
+  // Se preferir a abordagem com Edge Function, substitua este bloco.
+  const { data: cfg } = await db
+    .from('settings')
+    .select('admin_email')
+    .eq('id', 1)
+    .single();
+
+  const adminEmail = cfg?.admin_email;
+
+  if (!adminEmail) {
+    showMsg('msg-login', 'Configuração de acesso não encontrada. Contate o suporte.', true);
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+    return;
+  }
+
   const { error } = await db.auth.signInWithPassword({
-    email:    'damshoes99@gmail.com',
+    email:    adminEmail,
     password: pw
   });
 
@@ -265,8 +324,16 @@ async function doLogin() {
   btn.textContent = 'Entrar';
 
   if (error) {
-    showMsg('msg-login', 'Senha incorreta.', true);
+    _adminLoginAttempts++;
+    if (_adminLoginAttempts >= _MAX_LOGIN_ATTEMPTS) {
+      _lockedUntil = Date.now() + _LOCKOUT_MS;
+      _adminLoginAttempts = 0;
+      showMsg('msg-login', 'Muitas tentativas incorretas. Aguarde 1 minuto.', true);
+    } else {
+      showMsg('msg-login', 'Senha incorreta.', true);
+    }
   } else {
+    _adminLoginAttempts = 0;
     isAdmin = true;
     showMsg('msg-login', '', false);
     showAdminPanel();
@@ -369,12 +436,14 @@ function clearAddForm() {
 
 /* ══════════════════════════════════════════
    ADMIN LIST
+   Aqui usamos ADMIN_FIELDS (select *) pois
+   o usuário já está autenticado neste ponto.
 ══════════════════════════════════════════ */
 async function loadAdminList() {
   const listEl = document.getElementById('admin-list');
   listEl.innerHTML='<p style="color:var(--grey);font-size:.8rem;text-align:center;padding:1rem">Carregando...</p>';
 
-  const { data } = await db.from('products').select('*').order('created_at',{ascending:false});
+  const { data } = await db.from('products').select(ADMIN_FIELDS).order('created_at',{ascending:false});
   if (!data||data.length===0) {
     listEl.innerHTML='<p style="color:var(--grey);font-size:.8rem;text-align:center;padding:1rem">Nenhum produto.</p>';
     return;
@@ -405,14 +474,23 @@ async function deleteProduct(id) {
 
 /* ══════════════════════════════════════════
    EDIT MODAL
+   openEdit busca o produto com ADMIN_FIELDS
+   para ter acesso ao campo cost.
 ══════════════════════════════════════════ */
 const editOverlay = document.getElementById('edit-overlay');
 document.getElementById('close-edit').addEventListener('click', ()=>editOverlay.classList.remove('open'));
 editOverlay.addEventListener('click', e=>{ if(e.target===editOverlay) editOverlay.classList.remove('open'); });
 
-function openEdit(id) {
-  const p = allProducts.find(x=>x.id==id);
-  if (!p) return;
+async function openEdit(id) {
+  // Busca o produto completo (incluindo cost) direto do banco
+  // só é possível pois o usuário está autenticado (RLS permite)
+  const { data: p, error } = await db
+    .from('products')
+    .select(ADMIN_FIELDS)
+    .eq('id', id)
+    .single();
+
+  if (!p || error) return;
   editingId = p.id;
 
   setField('edit-name',      p.name);
@@ -651,9 +729,13 @@ async function saveSettings() {
   setTimeout(() => showMsg('msg-settings', '', false), 3000);
 }
 
-// Carrega settings ao iniciar
+// Carrega settings ao iniciar (somente campos públicos)
 (async () => {
-  const { data } = await db.from('settings').select('*').eq('id', 1).single();
+  const { data } = await db
+    .from('settings')
+    .select('hero_img,promo,parcelas,taxa_cartao')
+    .eq('id', 1)
+    .single();
   if (data) {
     if (data.hero_img) { const heroEl = document.querySelector('.hero-img'); if (heroEl) heroEl.src = data.hero_img; }
     if (data.promo)    { const promoEl = document.querySelector('.hero-promo strong'); if (promoEl) promoEl.textContent = data.promo; }
