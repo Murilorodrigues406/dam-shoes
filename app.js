@@ -29,15 +29,20 @@ const ADMIN_FIELDS   = '*'; // inclui cost, só usado em contexto autenticado
 ══════════════════════════════════════════ */
 async function loadProducts() {
   setGridState('loading');
-  const { data, error } = await db
-    .from('products')
-    .select(PUBLIC_FIELDS)
-    .order('created_at', { ascending: false });
-  if (error) { setGridState('error', error.message); return; }
-  allProducts = data || [];
-  buildFilters();
-  renderProducts();
-  updateSideBrands();
+  try {
+    const { data, error } = await db
+      .from('products')
+      .select(PUBLIC_FIELDS)
+      .order('created_at', { ascending: false });
+    if (error) { setGridState('error', error.message); return; }
+    allProducts = data || [];
+    if (allProducts.length === 0) { setGridState('empty'); }
+    buildFilters();
+    renderProducts();
+    updateSideBrands();
+  } catch (err) {
+    setGridState('error', 'Não foi possível carregar os produtos. Verifique sua conexão e tente novamente.');
+  }
 }
 
 function setGridState(state, msg = '') {
@@ -106,16 +111,16 @@ function buildCard(p, idx) {
 
   const dots = photos.length > 1
     ? `<div class="card-dots">${photos.map((_, i) =>
-        `<button class="card-dot ${i===0?'active':''}" onclick="goPhoto('${p.id}',${i})" aria-label="Foto ${i+1}"></button>`
+        `<button class="card-dot ${i===0?'active':''}" onclick="event.stopPropagation();goPhoto('${p.id}',${i})" aria-label="Foto ${i+1}"></button>`
       ).join('')}</div>` : '';
 
   const sizeChips = sizes.slice(0,8).map(s => `<span class="size-tag">${s.trim()}</span>`).join('');
 
   const waMsg  = encodeURIComponent(`Olá! Tenho interesse no produto:\n*${p.name}*\nReferência: ${p.reference || 'N/A'}\nNumeração desejada: `);
-  const waLink = `https://wa.me/${WHATSAPP}?text=${waMsg}`;
+  const waLink = `https://wa.me/${CONFIG.whatsapp}?text=${waMsg}`;
 
   return `
-  <div class="card${isEsg?' esgotado':''}" style="animation-delay:${idx*0.05}s" onclick="openProduct('${p.id}')" style="cursor:pointer">
+  <div class="card${isEsg?' esgotado':''}" style="animation-delay:${idx*0.05}s;cursor:pointer" onclick="openProduct('${p.id}')">
     <span class="card-badge ${isEsg?'esgotado':'available'}">${isEsg?'ESGOTADO':'● DISPONÍVEL'}</span>
     <div class="card-img-wrap">${imgEl}${dots}</div>
     <div class="card-body">
@@ -130,7 +135,8 @@ function buildCard(p, idx) {
           ${parcelaHtml(p.price)}
         </div>
         <a class="btn-buy" href="${isEsg?'#':waLink}" target="${isEsg?'':'_blank'}" rel="noopener"
-           ${isEsg?'onclick="return false" style="pointer-events:none;background:var(--border2);color:var(--grey)"':''}>
+           onclick="event.stopPropagation()"
+           ${isEsg?'onclick="event.stopPropagation();return false" style="pointer-events:none;background:var(--border2);color:var(--grey)"':''}>
           ${svgWA()} ${isEsg?'Esgotado':'Comprar'}
         </a>
       </div>
@@ -206,7 +212,7 @@ function buildPhotoUploader(containerId, photoArr) {
           ? URL.createObjectURL(photoArr[i].file)
           : photoArr[i].url;
         slot.innerHTML = `
-          <img src="${preview}" onerror="this.src=''" />
+          <img src="${preview}" onerror="this.src=''" alt="Pré-visualização da foto" />
           <button class="photo-slot-remove" onclick="removePhoto('${containerId}',${i})" aria-label="Remover foto">✕</button>`;
       } else {
         slot.innerHTML = `
@@ -244,9 +250,20 @@ const adminOverlay = document.getElementById('admin-overlay');
 const loginSection = document.getElementById('login-section');
 const adminPanel   = document.getElementById('admin-panel');
 
-document.getElementById('btn-admin-header').addEventListener('click', openAdminModal);
-document.getElementById('close-admin').addEventListener('click', () => adminOverlay.classList.remove('open'));
-adminOverlay.addEventListener('click', e => { if (e.target===adminOverlay) adminOverlay.classList.remove('open'); });
+// ── ACESSO ADMIN POR HASH ──────────────────────────────
+// O botão "Admin" foi removido do site público.
+// Para acessar o painel, digite na barra de endereços:
+//   dam-shoes.netlify.app/#admin
+// ────────────────────────────────────────────────────────
+function checkAdminHash() {
+  if (window.location.hash === '#admin') {
+    openAdminModal();
+  }
+}
+window.addEventListener('hashchange', checkAdminHash);
+
+document.getElementById('close-admin').addEventListener('click', closeAdminModal);
+adminOverlay.addEventListener('click', e => { if (e.target===adminOverlay) closeAdminModal(); });
 
 function openAdminModal() {
   adminOverlay.classList.add('open');
@@ -254,34 +271,24 @@ function openAdminModal() {
   else { loginSection.style.display='block'; adminPanel.style.display='none'; }
 }
 
+function closeAdminModal() {
+  adminOverlay.classList.remove('open');
+  // Limpa o hash para não reabrir ao recarregar
+  if (window.location.hash === '#admin') {
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+}
+
 document.getElementById('btn-login').addEventListener('click', doLogin);
 document.getElementById('input-password').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
 
 /* ── LOGIN VIA SUPABASE AUTH ─────────────── */
-// ─────────────────────────────────────────────────────────────────
-// SEGURANÇA: O email do admin NÃO fica hardcoded no front-end.
-// Ele é lido de uma linha da tabela 'settings' (campo admin_email),
-// que é protegida por RLS — apenas usuários autenticados podem ler.
-//
-// CONFIGURAÇÃO NECESSÁRIA NO SUPABASE:
-//   1. Adicionar coluna 'admin_email' na tabela 'settings'
-//   2. Inserir o email na linha id=1
-//   3. Criar policy RLS: SELECT em settings permitido para anon
-//      APENAS nos campos que não sejam admin_email
-//      (ou usar uma função edge para autenticar)
-//
-// ALTERNATIVA MAIS SIMPLES (recomendada para começar):
-//   Criar uma Supabase Edge Function chamada 'admin-login'
-//   que recebe só a senha e retorna o token — sem expor o email.
-// ─────────────────────────────────────────────────────────────────
-
 let _adminLoginAttempts = 0;
 const _MAX_LOGIN_ATTEMPTS = 5;
 const _LOCKOUT_MS = 60000; // 1 minuto
 let _lockedUntil = 0;
 
 async function doLogin() {
-  // Rate limiting no cliente (camada extra, o Supabase Auth já tem server-side)
   const now = Date.now();
   if (now < _lockedUntil) {
     const secsLeft = Math.ceil((_lockedUntil - now) / 1000);
@@ -297,16 +304,17 @@ async function doLogin() {
   btn.disabled = true;
   btn.textContent = 'Entrando...';
 
-  // ── Busca o email admin de forma segura ──────────────────────
-  // O email fica na tabela settings, nunca no JS.
-  // Se preferir a abordagem com Edge Function, substitua este bloco.
-  const { data: cfg } = await db
-    .from('settings')
-    .select('admin_email')
-    .eq('id', 1)
-    .single();
-
-  const adminEmail = cfg?.admin_email;
+  let adminEmail;
+  try {
+    const { data: cfg } = await db
+      .from('settings')
+      .select('admin_email')
+      .eq('id', 1)
+      .single();
+    adminEmail = cfg?.admin_email;
+  } catch (err) {
+    adminEmail = null;
+  }
 
   if (!adminEmail) {
     showMsg('msg-login', 'Configuração de acesso não encontrada. Contate o suporte.', true);
@@ -350,7 +358,7 @@ function showAdminPanel() {
 document.getElementById('btn-logout').addEventListener('click', async () => {
   await db.auth.signOut();
   isAdmin = false;
-  adminOverlay.classList.remove('open');
+  closeAdminModal();
   document.getElementById('input-password').value = '';
 });
 
@@ -367,18 +375,22 @@ function switchTab(tab) {
   if (tab==='settings') loadSettings();
 }
 
-/* ── MARGIN CALCULATOR ───────────────────── */
-['add-price','add-cost'].forEach(id => document.getElementById(id)?.addEventListener('input', updateMargin));
-function updateMargin() {
-  const price = parseFloat(document.getElementById('add-price').value)||0;
-  const cost  = parseFloat(document.getElementById('add-cost').value)||0;
+/* ── MARGIN CALCULATOR (unificada) ───────── */
+function calcMargin(priceId, costId, lucroId, pctId) {
+  const price = parseFloat(document.getElementById(priceId).value)||0;
+  const cost  = parseFloat(document.getElementById(costId).value)||0;
   const lucro = price - cost;
   const pct   = price>0 ? ((lucro/price)*100).toFixed(1) : '0.0';
-  const elL   = document.getElementById('margin-lucro');
-  const elP   = document.getElementById('margin-pct');
+  const elL   = document.getElementById(lucroId);
+  const elP   = document.getElementById(pctId);
   if (elL) { elL.textContent=`R$ ${formatPrice(lucro)}`; elL.className=`margin-value ${lucro>=0?'positive':'negative'}`; }
   if (elP) { elP.textContent=`${pct}%`; elP.className=`margin-value ${lucro>=0?'positive':'negative'}`; }
 }
+function updateMargin()     { calcMargin('add-price','add-cost','margin-lucro','margin-pct'); }
+function updateEditMargin() { calcMargin('edit-price','edit-cost','edit-margin-lucro','edit-margin-pct'); }
+
+['add-price','add-cost'].forEach(id => document.getElementById(id)?.addEventListener('input', updateMargin));
+['edit-price','edit-cost'].forEach(id => document.getElementById(id)?.addEventListener('input', updateEditMargin));
 
 /* ══════════════════════════════════════════
    ADD PRODUCT
@@ -436,8 +448,6 @@ function clearAddForm() {
 
 /* ══════════════════════════════════════════
    ADMIN LIST
-   Aqui usamos ADMIN_FIELDS (select *) pois
-   o usuário já está autenticado neste ponto.
 ══════════════════════════════════════════ */
 async function loadAdminList() {
   const listEl = document.getElementById('admin-list');
@@ -453,7 +463,7 @@ async function loadAdminList() {
     const photos = parseArr(p.photos);
     return `
     <div class="admin-item">
-      <img src="${photos[0]||''}" onerror="this.src=''" alt="${p.name}" />
+      <img src="${photos[0]||''}" onerror="this.src=''" alt="${p.name}" loading="lazy" />
       <div class="admin-item-info">
         <strong>${p.name}</strong>
         <small>R$ ${formatPrice(p.price)} · ${p.brand||'–'} · ${p.status==='esgotado'?'✗ Esgotado':'✓ Disponível'}</small>
@@ -474,16 +484,12 @@ async function deleteProduct(id) {
 
 /* ══════════════════════════════════════════
    EDIT MODAL
-   openEdit busca o produto com ADMIN_FIELDS
-   para ter acesso ao campo cost.
 ══════════════════════════════════════════ */
 const editOverlay = document.getElementById('edit-overlay');
 document.getElementById('close-edit').addEventListener('click', ()=>editOverlay.classList.remove('open'));
 editOverlay.addEventListener('click', e=>{ if(e.target===editOverlay) editOverlay.classList.remove('open'); });
 
 async function openEdit(id) {
-  // Busca o produto completo (incluindo cost) direto do banco
-  // só é possível pois o usuário está autenticado (RLS permite)
   const { data: p, error } = await db
     .from('products')
     .select(ADMIN_FIELDS)
@@ -508,18 +514,6 @@ async function openEdit(id) {
   updateEditMargin();
   showMsg('msg-edit','',false);
   editOverlay.classList.add('open');
-}
-
-['edit-price','edit-cost'].forEach(id => document.getElementById(id)?.addEventListener('input', updateEditMargin));
-function updateEditMargin() {
-  const price = parseFloat(document.getElementById('edit-price').value)||0;
-  const cost  = parseFloat(document.getElementById('edit-cost').value)||0;
-  const lucro = price-cost;
-  const pct   = price>0?((lucro/price)*100).toFixed(1):'0.0';
-  const elL   = document.getElementById('edit-margin-lucro');
-  const elP   = document.getElementById('edit-margin-pct');
-  if (elL) { elL.textContent=`R$ ${formatPrice(lucro)}`; elL.className=`margin-value ${lucro>=0?'positive':'negative'}`; }
-  if (elP) { elP.textContent=`${pct}%`; elP.className=`margin-value ${lucro>=0?'positive':'negative'}`; }
 }
 
 document.getElementById('btn-save-edit').addEventListener('click', saveEdit);
@@ -564,7 +558,7 @@ async function saveEdit() {
 
 /* ── HEADER WHATSAPP ─────────────────────── */
 document.getElementById('btn-wa-header').addEventListener('click', () => {
-  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Olá! Quero ver os produtos da DAM Shoes.')}`, '_blank');
+  window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá! Quero ver os produtos da DAM Shoes.')}`, '_blank');
 });
 
 /* ══════════════════════════════════════════
@@ -591,8 +585,8 @@ function calcParcela(price, parcelas, taxa) {
 }
 
 function parcelaHtml(price) {
-  const parcelas = window._cfg_parcelas || 10;
-  const taxa     = window._cfg_taxa     || 0;
+  const parcelas = CONFIG.parcelas || 10;
+  const taxa     = CONFIG.taxa     || 0;
   if (parcelas <= 1) return '';
   const calc = calcParcela(price, parcelas, taxa);
   if (!calc) return '';
@@ -607,12 +601,17 @@ function showMsg(id, text, isError) {
 }
 
 function svgWA() {
-  return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+  return `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
 }
 
-/* ── INIT ────────────────────────────────── */
-loadProducts();
-document.getElementById('footer-year').textContent = new Date().getFullYear();
+/* ── ESC FECHA QUALQUER MODAL ────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (adminOverlay.classList.contains('open')) closeAdminModal();
+  if (editOverlay.classList.contains('open')) editOverlay.classList.remove('open');
+  if (productOverlay.classList.contains('open')) productOverlay.classList.remove('open');
+  if (sideOverlay.classList.contains('open')) closeSideMenu();
+});
 
 /* ══════════════════════════════════════════
    MENU LATERAL
@@ -673,12 +672,14 @@ function sideFilter(filter, btn) {
 async function loadSettings() {
   const { data } = await db.from('settings').select('*').eq('id', 1).single();
   if (!data) return;
-  setField('cfg-whatsapp', data.whatsapp || '');
-  setField('cfg-prazo',    data.prazo    || '');
-  setField('cfg-parcelas', data.parcelas || '');
-  setField('cfg-taxa',     data.taxa_cartao || '');
-  setField('cfg-promo',    data.promo    || '');
-  setField('cfg-hero-img', data.hero_img || '');
+  setField('cfg-whatsapp',      data.whatsapp || '');
+  setField('cfg-prazo',         data.prazo    || '');
+  setField('cfg-parcelas',      data.parcelas || '');
+  setField('cfg-taxa',          data.taxa_cartao || '');
+  setField('cfg-promo',         data.promo    || '');
+  setField('cfg-hero-img',      data.hero_img || '');
+  setField('cfg-hero-title',    data.hero_title || '');
+  setField('cfg-hero-subtitle', data.hero_subtitle || '');
 }
 
 document.getElementById('btn-save-settings')?.addEventListener('click', saveSettings);
@@ -687,32 +688,22 @@ async function saveSettings() {
   const btn = document.getElementById('btn-save-settings');
   btn.disabled = true; btn.textContent = 'Salvando...';
 
-  const heroImg = v('cfg-hero-img');
-  const promo   = v('cfg-promo');
-  const wa      = v('cfg-whatsapp');
+  const payload = {
+    whatsapp:      v('cfg-whatsapp')  || CONFIG.whatsapp,
+    prazo:         v('cfg-prazo')     || '7 dias úteis',
+    parcelas:      parseInt(v('cfg-parcelas')) || 10,
+    taxa_cartao:   parseFloat(v('cfg-taxa'))   || 2.99,
+    promo:         v('cfg-promo')     || '',
+    hero_img:      v('cfg-hero-img')  || '',
+    hero_title:    v('cfg-hero-title') || '',
+    hero_subtitle: v('cfg-hero-subtitle') || '',
+    updated_at:    new Date().toISOString(),
+  };
 
-  let error = null;
-
-  const updateResult = await db.from('settings').update({
-    whatsapp:     wa      || WHATSAPP,
-    prazo:        v('cfg-prazo')    || '7 dias úteis',
-    parcelas:     parseInt(v('cfg-parcelas')) || 10,
-    taxa_cartao:  parseFloat(v('cfg-taxa'))   || 2.99,
-    promo:        promo   || '',
-    hero_img:     heroImg || '',
-    updated_at:   new Date().toISOString(),
-  }).eq('id', 1);
-
-  error = updateResult.error;
+  let { error } = await db.from('settings').update(payload).eq('id', 1);
 
   if (error) {
-    const insertResult = await db.from('settings').insert({
-      id: 1, whatsapp: wa || WHATSAPP,
-      prazo: v('cfg-prazo') || '7 dias úteis',
-      parcelas: parseInt(v('cfg-parcelas')) || 10,
-      taxa_cartao: parseFloat(v('cfg-taxa')) || 2.99,
-      promo: promo || '', hero_img: heroImg || '',
-    });
+    const insertResult = await db.from('settings').insert({ id: 1, ...payload });
     error = insertResult.error;
   }
 
@@ -722,27 +713,80 @@ async function saveSettings() {
     showMsg('msg-settings', 'Erro ao salvar: ' + error.message, true);
   } else {
     showMsg('msg-settings', 'Configurações salvas!', false);
+    // Atualiza a tela na hora
+    applyHeroConfig(payload);
+    CONFIG.whatsapp = payload.whatsapp;
+    CONFIG.parcelas = payload.parcelas;
+    CONFIG.taxa     = payload.taxa_cartao;
+    renderProducts();
   }
-
-  if (heroImg) { const heroEl = document.querySelector('.hero-img'); if (heroEl) heroEl.src = heroImg; }
-  if (promo)   { const promoEl = document.querySelector('.hero-promo strong'); if (promoEl) promoEl.textContent = promo; }
   setTimeout(() => showMsg('msg-settings', '', false), 3000);
 }
 
-// Carrega settings ao iniciar (somente campos públicos)
-(async () => {
-  const { data } = await db
-    .from('settings')
-    .select('hero_img,promo,parcelas,taxa_cartao')
-    .eq('id', 1)
-    .single();
-  if (data) {
-    if (data.hero_img) { const heroEl = document.querySelector('.hero-img'); if (heroEl) heroEl.src = data.hero_img; }
-    if (data.promo)    { const promoEl = document.querySelector('.hero-promo strong'); if (promoEl) promoEl.textContent = data.promo; }
-    window._cfg_parcelas = data.parcelas || 10;
-    window._cfg_taxa     = parseFloat(data.taxa_cartao) || 0;
+/* ── APLICA CONFIG DA HERO NA TELA ───────── */
+function applyHeroConfig(data) {
+  if (data.hero_img) {
+    const heroEl = document.querySelector('.hero-img');
+    if (heroEl) heroEl.src = data.hero_img;
   }
+  if (data.hero_title) {
+    const titleEl = document.getElementById('hero-title');
+    // | vira quebra de linha, segunda parte fica em destaque laranja
+    const parts = data.hero_title.split('|');
+    if (titleEl) {
+      titleEl.innerHTML = parts.length > 1
+        ? `${parts[0]}<br><span class="highlight">${parts.slice(1).join(' ')}</span>`
+        : data.hero_title;
+    }
+  }
+  if (data.hero_subtitle) {
+    const subEl = document.getElementById('hero-subtitle');
+    if (subEl) subEl.textContent = data.hero_subtitle;
+  }
+  if (data.promo) {
+    const promoEl = document.querySelector('.hero-promo strong');
+    if (promoEl) promoEl.textContent = data.promo;
+  }
+}
+
+/* ── ATUALIZA LINKS DE WHATSAPP FIXOS ────── */
+function applyWhatsappLinks() {
+  const num = CONFIG.whatsapp;
+  // botão flutuante
+  const float = document.getElementById('wa-float');
+  if (float) float.href = `https://wa.me/${num}?text=${encodeURIComponent('Olá! Vi o site da DAM Shoes e quero saber mais.')}`;
+}
+
+/* ══════════════════════════════════════════
+   INIT — carrega config pública e produtos
+══════════════════════════════════════════ */
+(async () => {
+  try {
+    const { data } = await db
+      .from('settings')
+      .select('hero_img,hero_title,hero_subtitle,promo,parcelas,taxa_cartao,whatsapp,prazo')
+      .eq('id', 1)
+      .single();
+    if (data) {
+      CONFIG.whatsapp      = data.whatsapp || WHATSAPP_FALLBACK;
+      CONFIG.parcelas      = data.parcelas || 10;
+      CONFIG.taxa          = parseFloat(data.taxa_cartao) || 0;
+      CONFIG.prazo         = data.prazo || '7 dias úteis';
+      CONFIG.hero_img      = data.hero_img || '';
+      CONFIG.hero_title    = data.hero_title || '';
+      CONFIG.hero_subtitle = data.hero_subtitle || '';
+      CONFIG.promo         = data.promo || '';
+      applyHeroConfig(data);
+    }
+  } catch (err) {
+    // mantém os valores padrão do CONFIG
+  }
+  applyWhatsappLinks();
+  loadProducts();
+  checkAdminHash();
 })();
+
+document.getElementById('footer-year').textContent = new Date().getFullYear();
 
 /* ══════════════════════════════════════════
    MODAL VISUALIZAÇÃO DO PRODUTO
@@ -774,10 +818,11 @@ function openProduct(id) {
   document.getElementById('detail-desc').style.display  = p.description ? 'block' : 'none';
   document.getElementById('detail-price-new').textContent = `R$ ${formatPrice(p.price)}`;
 
+  // PARCELAMENTO NO MODAL (corrigido — elemento agora existe no HTML)
   const parcelaEl = document.getElementById('detail-parcela');
   if (parcelaEl) {
-    const parcelas = window._cfg_parcelas || 10;
-    const taxa     = window._cfg_taxa     || 0;
+    const parcelas = CONFIG.parcelas || 10;
+    const taxa     = CONFIG.taxa     || 0;
     if (parcelas > 1) {
       const calc = calcParcela(p.price, parcelas, taxa);
       parcelaEl.innerHTML = `ou <strong>${parcelas}x de R$ ${formatPrice(calc.parcela)}</strong>${taxa > 0 ? ' no cartão' : ' sem juros'}`;
@@ -815,7 +860,7 @@ function openProduct(id) {
     waBtn.href = '#';
   } else {
     waBtn.className = 'btn-buy-detail';
-    waBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Comprar pelo WhatsApp`;
+    waBtn.innerHTML = `${svgWA()} Comprar pelo WhatsApp`;
     updateWaLink(p);
   }
 
@@ -836,7 +881,7 @@ function updateWaLink(p) {
   const msg = encodeURIComponent(`Olá! Tenho interesse no produto:\n*${p.name}*\nReferência: ${p.reference || 'N/A'}\n${sizeText}`);
   const waBtn = document.getElementById('detail-wa-btn');
   if (waBtn && !waBtn.classList.contains('disabled')) {
-    waBtn.href = `https://wa.me/${WHATSAPP}?text=${msg}`;
+    waBtn.href = `https://wa.me/${CONFIG.whatsapp}?text=${msg}`;
   }
 }
 
@@ -863,7 +908,7 @@ function updateGallery() {
 
   thumbs.innerHTML = galleryPhotos.map((url, i) => `
     <div class="gallery-thumb ${i === galleryIndex ? 'active' : ''}" onclick="goGallery(${i})">
-      <img src="${url}" onerror="this.parentElement.style.display='none'" />
+      <img src="${url}" onerror="this.parentElement.style.display='none'" alt="Miniatura ${i+1}" />
     </div>`
   ).join('');
   thumbs.style.display = galleryPhotos.length > 1 ? 'flex' : 'none';
