@@ -896,12 +896,12 @@ select option { background: var(--white); color: var(--light); }
   }
   .hero-content {
     order: 1;
-    padding: 1.5rem 1.25rem 1rem;
+    padding: 1.25rem 1.1rem 0.85rem;
   }
   .hero-img {
     position: relative;
     order: 2;
-    height: 200px;
+    height: 130px;
     object-fit: cover;
     object-position: center center;
     opacity: 1;
