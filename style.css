@@ -611,8 +611,8 @@ input, select, textarea { font-family: var(--font-body); }
 .overlay.open { display: flex; }
 
 .modal {
-  background: var(--dark);
-  border: 1px solid var(--border2);
+  background: var(--white);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 540px;
@@ -621,6 +621,7 @@ input, select, textarea { font-family: var(--font-body); }
   padding: clamp(1.5rem, 4vw, 2rem);
   position: relative;
   animation: modalIn 0.25s ease;
+  box-shadow: var(--shadow);
 }
 .modal-wide { max-width: 680px; }
 
@@ -668,7 +669,7 @@ label {
 }
 
 input, select, textarea {
-  background: #1e1e1e;
+  background: var(--dark);
   border: 1px solid var(--border2);
   border-radius: var(--radius);
   color: var(--light);
@@ -676,12 +677,12 @@ input, select, textarea {
   padding: 0.65rem 0.85rem;
   width: 100%;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
 }
-input:focus, select:focus, textarea:focus { border-color: var(--orange); }
+input:focus, select:focus, textarea:focus { border-color: var(--orange); background: var(--white); }
 input::placeholder, textarea::placeholder { color: var(--grey); }
 textarea { resize: vertical; min-height: 70px; }
-select option { background: var(--dark); }
+select option { background: var(--white); color: var(--light); }
 
 .form-hint {
   font-size: 0.62rem;
@@ -761,7 +762,7 @@ select option { background: var(--dark); }
   display: flex;
   gap: 0.4rem;
   margin-bottom: 1.5rem;
-  background: #1e1e1e;
+  background: var(--dark);
   padding: 0.3rem;
   border-radius: var(--radius);
 }
@@ -785,7 +786,7 @@ select option { background: var(--dark); }
 .admin-list { display: flex; flex-direction: column; gap: 0.65rem; }
 
 .admin-item {
-  background: #1e1e1e;
+  background: var(--dark);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0.85rem;
@@ -813,7 +814,7 @@ select option { background: var(--dark); }
 
 /* ── MARGIN DISPLAY ──────────────────────── */
 .margin-box {
-  background: #1e1e1e;
+  background: var(--dark);
   border: 1px solid var(--border2);
   border-radius: var(--radius);
   padding: 0.85rem;
@@ -907,7 +908,7 @@ select option { background: var(--dark); }
   border-radius: var(--radius);
   overflow: hidden;
   position: relative;
-  background: #1e1e1e;
+  background: var(--dark);
   border: 1px solid var(--border2);
 }
 
@@ -982,7 +983,7 @@ select option { background: var(--dark); }
   top: 0; left: 0;
   width: min(320px, 85vw);
   height: 100%;
-  background: #0f0f0f;
+  background: var(--white);
   border-right: 1px solid var(--border2);
   display: flex;
   flex-direction: column;
@@ -1063,7 +1064,7 @@ select option { background: var(--dark); }
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  background: #1a1a1a;
+  background: var(--dark);
   border: 1px solid var(--border2);
   color: var(--mid);
   font-family: var(--font-body);
@@ -1141,7 +1142,7 @@ select option { background: var(--dark); }
 .product-gallery {
   width: 48%;
   flex-shrink: 0;
-  background: #0d0d0d;
+  background: var(--dark);
   display: flex;
   flex-direction: column;
 }
@@ -1149,7 +1150,7 @@ select option { background: var(--dark); }
 .gallery-main {
   position: relative;
   aspect-ratio: 1/1;
-  background: #111;
+  background: var(--dark);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -1197,7 +1198,7 @@ select option { background: var(--dark); }
   gap: 0.4rem;
   padding: 0.75rem;
   overflow-x: auto;
-  background: #0d0d0d;
+  background: var(--dark);
 }
 
 .gallery-thumb {
@@ -1269,7 +1270,7 @@ select option { background: var(--dark); }
   color: var(--mid);
   line-height: 1.7;
   padding: 0.75rem;
-  background: #1a1a1a;
+  background: var(--dark);
   border-radius: var(--radius);
   border-left: 3px solid var(--orange);
 }
