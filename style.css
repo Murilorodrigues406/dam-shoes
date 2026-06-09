@@ -889,26 +889,32 @@ select option { background: var(--white); color: var(--light); }
   .form-cols { grid-template-columns: 1fr; }
   .footer-inner { flex-direction: column; text-align: center; }
 
-  /* HERO MOBILE — texto em cima, imagem do tênis embaixo (não corta) */
+  /* HERO MOBILE — imagem de fundo atrás do texto (compacto) */
   #hero {
-    min-height: auto;
-    flex-direction: column;
-    align-items: stretch;
+    min-height: clamp(340px, 70vw, 440px);
+    flex-direction: row;
+    align-items: center;
   }
   .hero-content {
     order: 1;
-    padding: 1.25rem 1.1rem 0.85rem;
+    padding: 1.5rem 1.25rem;
   }
   .hero-img {
-    position: relative;
-    order: 2;
-    height: 130px;
+    position: absolute;
+    inset: 0;
+    order: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    object-position: center center;
-    opacity: 1;
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    object-position: right center;
+    opacity: 0.85;
+    border-radius: var(--radius-lg);
   }
-  .hero-bg, .hero-pattern { display: none; }
+  .hero-bg {
+    display: block;
+    background: linear-gradient(100deg, rgba(17,17,17,0.97) 0%, rgba(17,17,17,0.8) 50%, rgba(17,17,17,0.35) 100%);
+  }
+  .hero-pattern { display: none; }
 }
 
 @media (max-width: 400px) {
