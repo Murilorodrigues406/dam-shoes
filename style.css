@@ -887,6 +887,27 @@ select option { background: var(--white); color: var(--light); }
   .btn-buy { font-size: 0.62rem; padding: 0.5rem 0.65rem; }
   .form-cols { grid-template-columns: 1fr; }
   .footer-inner { flex-direction: column; text-align: center; }
+
+  /* HERO MOBILE — texto em cima, imagem do tênis embaixo (não corta) */
+  #hero {
+    min-height: auto;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-content {
+    order: 1;
+    padding: 1.5rem 1.25rem 1rem;
+  }
+  .hero-img {
+    position: relative;
+    order: 2;
+    height: 200px;
+    object-fit: cover;
+    object-position: center center;
+    opacity: 1;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
+  .hero-bg, .hero-pattern { display: none; }
 }
 
 @media (max-width: 400px) {
