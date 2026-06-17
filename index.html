@@ -1,2131 +1,283 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Inteligente · Gestão e Vendas · MR Solutions</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
-  --grafite:#1F2022;
-  --cinza-medio:#6B6F72;
-  --cinza-claro:#E7E8EA;
-  --branco:#FFFFFF;
-  --salvia:#7C846B;
-  --salvia-light:#c8cdb8;
-  --cinza-quente:#F2F2EF;
-  --danger:#b94040;
-  --warn:#8a6f3a;
-  --bg:var(--cinza-quente);
-  --surface:var(--branco);
-  --card:var(--branco);
-  --border:var(--cinza-claro);
-  --border2:#d4d5d2;
-  --accent:var(--grafite);
-  --accent2:var(--salvia);
-  --muted:var(--cinza-medio);
-  --text:var(--grafite);
-  --text2:var(--cinza-medio);
-  --ink:var(--grafite);
-  --sb:var(--grafite);
-  --sb-active:var(--salvia);
-  --sans:'Inter',-apple-system,sans-serif;
-  --display:'Poppins','Inter',sans-serif;
-  --shadow-sm:0 1px 2px rgba(31,32,34,.05),0 1px 4px rgba(31,32,34,.04);
-  --shadow-md:0 2px 8px rgba(31,32,34,.06),0 6px 20px rgba(31,32,34,.06);
-  --shadow-lg:0 8px 32px rgba(31,32,34,.12);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;font-feature-settings:'cv01','cv02','tnum'}
-.num{font-weight:800;letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
-.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
-.sidebar{background:var(--grafite);border-right:none;padding:24px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
-.logo{display:flex;align-items:center;gap:10px;padding:0 8px 22px;margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,.08)}
-.logo-ico{width:36px;height:36px;border-radius:8px;background:var(--salvia);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-ico svg{width:18px;height:18px}
-.logo-txt{font-family:var(--display);font-size:12px;font-weight:700;line-height:1.2;letter-spacing:.04em;color:var(--branco)}
-.logo-txt .logo-sub{color:var(--salvia-light);font-weight:400;font-family:var(--sans);font-size:9px;letter-spacing:.1em;display:block;margin-top:2px}
-.nav{display:flex;flex-direction:column;gap:2px;flex:1;margin-top:14px}
-.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.45);font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--sans);letter-spacing:.01em}
-.nav-item svg{width:17px;height:17px;flex-shrink:0;stroke-width:1.7}
-.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.8)}
-.nav-item.active{background:var(--salvia);color:var(--branco);font-weight:600;box-shadow:0 4px 14px rgba(124,132,107,.35)}
-.sb-foot{display:flex;align-items:center;gap:10px;padding:13px 9px;border-top:1px solid rgba(255,255,255,.08);margin-top:8px}
-.sb-avatar{width:33px;height:33px;border-radius:8px;background:var(--salvia);display:flex;align-items:center;justify-content:center;color:var(--branco);font-size:11px;font-weight:800;flex-shrink:0;font-family:var(--display)}
-.sb-foot-t{font-size:11px;font-weight:700;color:var(--branco);letter-spacing:.03em;font-family:var(--display)}
-.sb-foot-s{font-size:9px;color:var(--salvia-light);letter-spacing:.08em;margin-top:1px}
-.sb-dot{width:7px;height:7px;border-radius:50%;background:#6fcf6f;margin-left:auto}
-.main{padding:28px 36px;max-width:1500px}
-.head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;flex-wrap:wrap;gap:16px}
-.greet h1{font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--grafite);margin-bottom:4px;font-family:var(--display)}
-.greet p{font-size:14px;color:var(--text2)}
-.head-right{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.period{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:10px 16px;box-shadow:var(--shadow-sm)}
-.period svg{width:18px;height:18px;color:var(--salvia)}
-.period-t{font-size:13px;font-weight:700;color:var(--ink)}
-.period-s{font-size:11px;color:var(--text2);margin-top:1px}
-.btn-export{display:flex;align-items:center;gap:8px;background:var(--grafite);color:var(--branco);border:none;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .2s;box-shadow:0 4px 14px rgba(31,32,34,.25)}
-.btn-export:hover{filter:brightness(1.05);transform:translateY(-1px)}
-.btn-export:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none}
-.btn-export svg{width:16px;height:16px}
-.insert-row{display:flex;gap:10px;flex-wrap:wrap}
-.ibtn{display:flex;align-items:center;gap:7px;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .2s;border:1px solid var(--border2);background:var(--card);color:var(--text2)}
-.ibtn:hover{border-color:var(--accent);color:var(--accent)}
-.ibtn.demo{background:var(--grafite);color:var(--branco);border:none}
-/* ── SELETOR DE MÊS (NOVO) ── */
-.month-bar{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:8px 10px 8px 16px;box-shadow:var(--shadow-sm)}
-.month-bar svg{width:17px;height:17px;color:var(--salvia);flex-shrink:0}
-.month-sel{background:var(--cinza-quente);border:1px solid var(--border2);color:var(--ink);font-family:var(--sans);font-size:13px;font-weight:600;border-radius:9px;padding:8px 10px;outline:none;cursor:pointer}
-.month-sel:focus{border-color:var(--salvia);background:#fff}
-.month-active-tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--salvia);background:rgba(124,132,107,.12);padding:5px 10px;border-radius:7px;white-space:nowrap}
-.month-saved-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.month-saved-dot.has{background:#6fae6f}
-.month-saved-dot.empty{background:#cbd0c4}
-.save-warn{display:flex;align-items:center;gap:10px;background:#f5f0df;border:1px solid #e4dcc0;border-radius:12px;padding:11px 16px;margin-bottom:18px;font-size:13px;color:#7a6a3a}
-.save-warn b{color:#5e5226}
-.save-warn svg{width:17px;height:17px;flex-shrink:0;color:#8a7a3a}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin-bottom:28px}
-.kpi-ritmo-txt{font-size:11px;margin-top:8px;font-weight:600;line-height:1.4}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;box-shadow:var(--shadow-sm);transition:all .25s}
-.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--salvia)}
-.kpi-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.kpi-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.kpi-ico svg{width:20px;height:20px}
-.kpi-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--cinza-medio);text-transform:uppercase}
-.kpi-val{font-size:29px;line-height:1;color:var(--grafite);margin-bottom:10px;font-family:var(--display)}
-.kpi-foot{font-size:12px;color:var(--text2)}
-.kpi-pct{font-size:12px;font-weight:700;display:block;text-align:right;margin-bottom:6px}
-.kpi-bar{height:6px;background:var(--cinza-claro);border-radius:3px;overflow:hidden}
-.kpi-bar-fill{height:7px;border-radius:4px}
-.sec-title{font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--cinza-medio);text-transform:uppercase;margin-bottom:15px}
-.lojas{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px}
-.loja{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;box-shadow:var(--shadow-sm);transition:all .25s}
-.loja:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
-.loja-top{display:flex;align-items:center;gap:13px;margin-bottom:16px}
-.loja-ico{width:46px;height:46px;border-radius:12px;background:#eff4ff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.loja-ico svg{width:22px;height:22px;color:var(--accent)}
-.loja-name{font-size:16px;font-weight:700;color:var(--ink);flex:1}
-.badge{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 11px;border-radius:7px}
-.badge-ok{background:#dcfce7;color:#15803d}
-.badge-at{background:#fef9c3;color:#854d0e}
-.badge-cr{background:#fee2e2;color:#991b1b}
-.loja-val{font-size:26px;line-height:1;color:var(--grafite);margin-bottom:7px;font-family:var(--display)}
-.loja-meta{font-size:12px;color:var(--text2);margin-bottom:16px}
-.loja-bar{height:8px;background:var(--cinza-claro);border-radius:5px;overflow:hidden;margin-bottom:11px}
-.loja-bar-fill{height:8px;border-radius:5px}
-.loja-foot{display:flex;justify-content:space-between;font-size:12px}
-.loja-foot .at{font-weight:700}
-.loja-foot .gap{color:var(--text2)}
-.fill-ok{background:#16a34a}.fill-at{background:#ca8a04}.fill-cr{background:#dc2626}.fill-nt{background:#cbd5e1}
-.txt-ok{color:#16a34a}.txt-at{color:#ca8a04}.txt-cr{color:#dc2626}.txt-nt{color:var(--muted)}
-.bottom{display:grid;grid-template-columns:1fr 1.3fr;gap:18px;margin-bottom:28px}
-.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:var(--shadow-sm)}
-.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.panel-title{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--cinza-medio);text-transform:uppercase}
-.panel-link{font-size:12px;font-weight:600;color:var(--salvia);cursor:pointer}
-.pie-wrap{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
-.pie-svg{flex-shrink:0;filter:drop-shadow(0 6px 16px rgba(15,23,42,.1))}
-.pie-leg{display:flex;flex-direction:column;gap:16px;flex:1;min-width:160px}
-.pie-leg-item{display:flex;align-items:flex-start;gap:11px}
-.pie-dot{width:13px;height:13px;border-radius:4px;flex-shrink:0;margin-top:3px}
-.pie-leg-name{font-size:13px;font-weight:600;color:var(--grafite)}
-.pie-leg-val{font-size:12px;color:var(--text2);font-variant-numeric:tabular-nums;margin-top:1px}
-.rk{display:flex;flex-direction:column;gap:2px}
-.rk-row{display:grid;grid-template-columns:30px 38px 1fr auto;gap:13px;align-items:center;padding:13px 8px;border-radius:12px;transition:background .15s}
-.rk-row:hover{background:var(--cinza-quente)}
-.rk-row+.rk-row{border-top:1px solid var(--border)}
-.rk-pos{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;border:2px solid}
-.rk-pos.p1{background:rgba(124,132,107,.15);border-color:var(--salvia);color:var(--salvia)}
-.rk-pos.p2{background:rgba(107,111,114,.1);border-color:var(--cinza-medio);color:var(--cinza-medio)}
-.rk-pos.p3{background:rgba(107,111,114,.08);border-color:#9aa0a8;color:#9aa0a8}
-.rk-pos.po{background:#f8fafc;border-color:#e2e8f0;color:#94a3b8}
-.rk-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:-.02em}
-.rk-mid{min-width:0}
-.rk-name-row{display:flex;align-items:center;gap:9px;margin-bottom:3px;flex-wrap:wrap}
-.rk-name{font-size:14px;font-weight:700;color:var(--ink)}
-.rk-store{font-size:11px;color:var(--text2)}
-.rk-sb{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.04em;text-transform:uppercase}
-.rk-sb-bom{background:#dcfce7;color:#15803d}
-.rk-sb-at{background:#fef9c3;color:#854d0e}
-.rk-sb-cr{background:#fee2e2;color:#991b1b}
-.rk-sb-fer{background:#e4e8ed;color:#3a4a5c}
-.rk-sb-ates{background:#f1f5f9;color:#475569}
-.rk-sb-agu{background:#f1f5f9;color:#64748b}
-.rk-kpis{font-size:11px;color:var(--text2);font-variant-numeric:tabular-nums}
-.rk-kpis b{color:var(--text);font-weight:600}
-.rk-prog{height:5px;background:var(--cinza-claro);border-radius:3px;overflow:hidden;margin-top:7px}
-.rk-prog-fill{height:5px;border-radius:3px}
-.rk-right{text-align:right;min-width:110px}
-.rk-val{font-size:15px;color:var(--grafite);font-family:var(--display)}
-.rk-pct{font-size:12px;font-weight:600;margin-top:2px}
-.totalbar{background:var(--grafite);border-radius:18px;padding:22px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;box-shadow:var(--shadow-lg);margin-bottom:8px}
-.tb-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8}
-.tb-val{font-size:20px;color:var(--branco);margin-top:3px;font-family:var(--display)}
-.tb-sub{font-size:10px;color:#94a3b8;margin-top:2px;font-variant-numeric:tabular-nums}
-.tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
-.tab{background:var(--card);border:1px solid var(--cinza-claro);color:var(--cinza-medio);font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 18px;border-radius:10px;cursor:pointer;transition:all .2s}
-.tab.active{background:var(--grafite);border-color:var(--grafite);color:var(--branco)}
-.tab-panel{display:none}.tab-panel.active{display:block}
-.ribbon{display:none;background:var(--cinza-claro);border:1px solid var(--border2);border-radius:14px;padding:13px 18px;margin-bottom:22px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.ribbon.show{display:flex}
-.ribbon-t{font-size:13px;color:var(--text2)}
-.ribbon-t b{color:var(--salvia)}
-.ribbon-x{background:none;border:1px solid var(--border2);color:var(--text2);border-radius:8px;padding:6px 13px;font-size:12px;cursor:pointer;font-family:var(--sans)}
-.ribbon-x:hover{border-color:var(--danger);color:var(--danger)}
-/* ── COMPARAÇÃO (NOVO) ── */
-.cmp-controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;box-shadow:var(--shadow-sm)}
-.cmp-controls .fgroup{min-width:150px}
-.cmp-vs{font-family:var(--display);font-weight:700;color:var(--salvia);font-size:15px;align-self:flex-end;padding-bottom:9px}
-.cmp-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:stretch;margin-bottom:24px}
-.cmp-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:var(--shadow-sm)}
-.cmp-card-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza-medio);margin-bottom:6px}
-.cmp-card-month{font-family:var(--display);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:16px}
-.cmp-card-val{font-size:30px;font-family:var(--display);color:var(--grafite);margin-bottom:6px}
-.cmp-card-sub{font-size:12px;color:var(--text2)}
-.cmp-delta{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--grafite);border-radius:16px;padding:22px 26px;min-width:150px;box-shadow:var(--shadow-lg)}
-.cmp-delta-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px}
-.cmp-delta-val{font-size:30px;font-family:var(--display);font-weight:800;line-height:1}
-.cmp-delta-sub{font-size:11px;color:#94a3b8;margin-top:8px;text-align:center}
-.cmp-up{color:#6fcf6f}.cmp-down{color:#e06a6a}.cmp-flat{color:#cbd0c4}
-.cmp-table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm)}
-.cmp-table th{background:var(--cinza-quente);color:var(--cinza-medio);font-size:10px;letter-spacing:.07em;text-transform:uppercase;padding:12px 16px;text-align:left;font-weight:700}
-.cmp-table td{padding:12px 16px;border-top:1px solid var(--border);font-variant-numeric:tabular-nums}
-.cmp-table td.lbl{font-weight:600;color:var(--ink)}
-.cmp-table .delta-cell{font-weight:700}
-.cmp-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:34vh;gap:14px;text-align:center}
-.cmp-empty-ico{font-size:42px;opacity:.3}
-.cmp-empty-t{font-size:17px;font-weight:700;color:var(--text2)}
-.cmp-empty-s{font-size:13px;color:var(--muted);max-width:380px;line-height:1.7}
-.toast-wrap{position:fixed;top:24px;right:24px;z-index:600;display:flex;flex-direction:column;gap:10px}
-.toast{background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:12px;padding:14px 18px;min-width:240px;max-width:340px;box-shadow:var(--shadow-lg);animation:slideIn .25s ease}
-.toast.err{border-left-color:var(--danger)}.toast.ok{border-left-color:var(--accent2)}.toast.warn{border-left-color:var(--warn)}
-.toast-t{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:2px}
-.toast-m{font-size:12px;color:var(--text2);line-height:1.5}
-@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes slideOut{to{transform:translateX(120%);opacity:0}}
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:16px;text-align:center}
-.empty-ico{font-size:48px;opacity:.3}
-.empty-t{font-size:20px;font-weight:700;color:var(--text2)}
-.empty-s{font-size:13px;color:var(--muted);max-width:380px;line-height:1.7}
-.overlay{position:fixed;inset:0;background:rgba(11,18,32,.6);z-index:400;display:flex;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
-.modal{background:var(--surface);border-radius:18px;padding:28px;width:100%;max-width:800px;position:relative;box-shadow:var(--shadow-lg)}
-.modal-title{font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;color:var(--ink)}
-.modal-sub{font-size:12px;color:var(--text2);margin-bottom:22px}
-.close-btn{position:absolute;top:20px;right:20px;background:#f1f5f9;border:none;color:var(--text2);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:15px}
-.close-btn:hover{background:#fee2e2;color:var(--danger)}
-.params-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--border2)}
-.fgroup{display:flex;flex-direction:column;gap:5px}
-.flbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2)}
-.finput{background:#f8fafc;border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:14px;border-radius:9px;padding:9px 12px;width:100%;outline:none}
-.finput:focus{border-color:var(--salvia);background:#fff}
-.vhdr,.vrow{display:grid;grid-template-columns:84px 96px 110px 110px 80px 78px 96px;gap:8px;align-items:center;margin-bottom:8px}
-.vhdr-lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);text-align:center}
-.vrow{background:#f8fafc;border:1px solid var(--border2);border-radius:10px;padding:9px}
-.vrow .floja{font-size:12px;font-weight:700;color:var(--accent);text-align:center}
-.vrow .fnome{font-size:12px;font-weight:600;text-align:center;color:var(--ink)}
-.status-sel{background:#fff;border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:12px;border-radius:8px;padding:8px 6px;width:100%;outline:none;cursor:pointer}
-.modal-btns{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border2)}
-.btn-cancel{background:#fff;border:1px solid var(--border2);color:var(--text2);font-family:var(--sans);font-weight:600;font-size:13px;padding:11px 22px;border-radius:10px;cursor:pointer}
-.btn-cancel:hover{border-color:var(--danger);color:var(--danger)}
-.btn-apply{background:var(--grafite);border:none;color:var(--branco);font-family:var(--sans);font-weight:700;font-size:13px;padding:11px 22px;border-radius:10px;cursor:pointer}
-.btn-apply:hover{filter:brightness(1.05)}
-.ptabs{display:flex;gap:8px;margin-bottom:16px}
-.ptab{background:#f1f5f9;border:1px solid var(--border2);color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:600;padding:8px 16px;border-radius:9px;cursor:pointer}
-.ptab.active{background:var(--grafite);border-color:var(--grafite);color:var(--branco)}
-.ptab-panel{display:none}.ptab-panel.active{display:block}
-.ptextarea{width:100%;min-height:200px;background:#f8fafc;border:1px solid var(--border2);color:var(--text);font-family:'Inter',monospace;font-size:12px;border-radius:10px;padding:12px;resize:vertical;outline:none;line-height:1.6}
-.ptextarea:focus{border-color:var(--accent);background:#fff}
-.paste-hint{font-size:11px;color:var(--text2);margin-top:8px;line-height:1.7}
-.paste-hint strong{color:var(--ink)}
-.parse-status{font-size:11px;margin-top:6px;min-height:18px;font-weight:600}
-.ps-ok{color:#16a34a}.ps-err{color:#b91c1c}.ps-warn{color:#c2410c}
-.preview-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:12px;font-variant-numeric:tabular-nums}
-.preview-table th{background:#f1f5f9;color:var(--text2);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;text-align:left}
-.preview-table td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text2)}
-.view{display:none}.view.active{display:block}
-.view-title{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--grafite);margin-bottom:6px;font-family:var(--display)}
-.view-sub{font-size:14px;color:var(--text2);margin-bottom:24px}
-.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
-.metric-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)}
-.metric-lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
-.metric-val{font-size:26px;color:var(--grafite);margin-bottom:4px;font-family:var(--display)}
-.metric-sub{font-size:12px;color:var(--text2)}
-.chart-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:var(--shadow-sm);margin-bottom:18px}
-.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.bar-lbl{font-size:13px;font-weight:600;color:var(--ink);width:130px;flex-shrink:0}
-.bar-track{flex:1;height:26px;background:#f1f5f9;border-radius:8px;overflow:hidden;position:relative}
-.bar-fill{height:26px;border-radius:8px;display:flex;align-items:center;padding-left:10px;transition:width .9s ease}
-.bar-fill span{font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
-.bar-val{font-size:13px;font-weight:700;color:var(--ink);width:110px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
-.loja-detail{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
-.loja-detail-head{display:flex;align-items:center;gap:16px;margin-bottom:20px}
-.loja-detail-ico{width:52px;height:52px;border-radius:14px;background:#eff4ff;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.loja-detail-info{flex:1}
-.loja-detail-name{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--grafite);font-family:var(--display)}
-.loja-detail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.loja-stat{background:#f8fafc;border-radius:10px;padding:12px}
-.loja-stat-l{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:4px}
-.loja-stat-v{font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
-.loja-vends{display:flex;flex-direction:column;gap:8px}
-.loja-vend-row{display:flex;align-items:center;gap:12px;padding:10px;background:#f8fafc;border-radius:10px}
-.loja-vend-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
-.loja-vend-name{font-size:13px;font-weight:600;color:var(--ink);flex:1}
-.loja-vend-val{font-size:13px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-.loja-vend-pct{font-size:11px;font-weight:600}
-.vend-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.vend-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)}
-.vend-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-.vend-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
-.vend-name{font-size:16px;font-weight:700;color:var(--ink)}
-.vend-store{font-size:12px;color:var(--text2);margin-top:2px}
-.vend-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-.vend-stat{background:#f8fafc;border-radius:9px;padding:10px}
-.vend-stat-l{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text2);margin-bottom:3px}
-.vend-stat-v{font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
-.vend-prog{height:8px;background:var(--cinza-claro);border-radius:5px;overflow:hidden;margin-bottom:8px}
-.vend-prog-fill{height:8px;border-radius:5px}
-.vend-foot{display:flex;justify-content:space-between;font-size:12px}
-.meta-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
-.meta-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.meta-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
-.meta-name{font-size:14px;font-weight:700;color:var(--ink)}
-.meta-store{font-size:11px;color:var(--text2)}
-.meta-vals{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
-.meta-v{text-align:center}
-.meta-v-l{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:3px}
-.meta-v-n{font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
-.meta-track{height:10px;background:var(--cinza-claro);border-radius:5px;overflow:hidden;margin-bottom:6px}
-.meta-fill{height:10px;border-radius:5px}
-.meta-foot{display:flex;justify-content:space-between;font-size:12px}
-.meta-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
-.meta-sum-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;box-shadow:var(--shadow-sm)}
-.meta-sum-n{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;font-family:var(--display)}
-.meta-sum-l{font-size:12px;color:var(--text2)}
-.report-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
-.report-title{font-size:14px;font-weight:700;color:var(--grafite);font-family:var(--display);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.report-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
-.report-row:last-child{border-bottom:none}
-.report-row-l{font-size:13px;color:var(--text2)}
-.report-row-v{font-size:14px;font-weight:700;color:var(--grafite);font-variant-numeric:tabular-nums}
-.export-big{display:flex;align-items:center;justify-content:center;gap:12px;background:var(--grafite);color:#fff;border:none;border-radius:14px;padding:18px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--sans);width:100%;transition:all .2s;box-shadow:0 6px 20px rgba(31,32,34,.25)}
-.export-big:hover{filter:brightness(1.05);transform:translateY(-2px)}
-.export-big svg{width:20px;height:20px}
-.config-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
-.config-title{font-size:14px;font-weight:700;color:var(--grafite);font-family:var(--display);margin-bottom:18px}
-.config-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.config-info{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;color:var(--text2);line-height:1.6}
-.config-info b{color:var(--ink)}
-.hist-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
-.hist-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--cinza-quente);border-radius:10px}
-.hist-item-month{font-family:var(--display);font-weight:700;font-size:13px;color:var(--ink);min-width:130px}
-.hist-item-val{font-size:13px;color:var(--text2);flex:1;font-variant-numeric:tabular-nums}
-.hist-item-del{background:none;border:none;color:var(--cinza-medio);font-size:16px;cursor:pointer;padding:4px 9px;border-radius:6px}
-.hist-item-del:hover{background:#fee2e2;color:#b91c1c}
-#setup{position:fixed;inset:0;z-index:2000;background:rgba(31,32,34,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px 16px;overflow-y:auto}
-#setup.show{display:flex}
-.setup-wrap{background:var(--branco);border-radius:20px;width:100%;max-width:680px;box-shadow:0 24px 60px rgba(31,32,34,.25);overflow:hidden}
-.setup-head{background:var(--grafite);padding:28px 32px;display:flex;align-items:center;gap:16px}
-.setup-head-ico{width:46px;height:46px;border-radius:12px;background:var(--salvia);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.setup-head-ico svg{width:22px;height:22px}
-.setup-head-t{font-family:var(--display);font-size:18px;font-weight:700;color:var(--branco);letter-spacing:-.01em}
-.setup-head-s{font-size:12px;color:var(--salvia-light);margin-top:3px}
-.setup-body{padding:28px 32px}
-.wz-steps{display:flex;align-items:center;gap:0;margin-bottom:26px}
-.wz-step{display:flex;align-items:center;gap:9px;flex:1}
-.wz-step-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;font-family:var(--display);background:var(--cinza-claro);color:var(--cinza-medio);transition:all .25s;border:2px solid transparent}
-.wz-step.active .wz-step-num{background:var(--salvia);color:#fff;box-shadow:0 4px 12px rgba(124,132,107,.35)}
-.wz-step.done .wz-step-num{background:var(--grafite);color:#fff}
-.wz-step-lbl{font-size:11px;font-weight:600;color:var(--cinza-medio);letter-spacing:.02em;white-space:nowrap}
-.wz-step.active .wz-step-lbl{color:var(--grafite)}
-.wz-step-line{flex:1;height:2px;background:var(--cinza-claro);margin:0 8px;min-width:14px}
-.wz-step.done+.wz-step .wz-step-line,.wz-step.done .wz-step-line{background:var(--salvia)}
-.wz-panel{display:none}.wz-panel.active{display:block;animation:wzfade .25s ease}
-@keyframes wzfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.wz-intro{font-size:13px;color:var(--cinza-medio);line-height:1.6;margin-bottom:18px}
-.wz-data-opts{display:flex;flex-direction:column;gap:10px}
-.wz-data-opt{display:flex;align-items:center;gap:13px;padding:15px 16px;border:1px solid var(--cinza-claro);border-radius:12px;cursor:pointer;transition:all .18s;background:var(--cinza-quente);text-align:left;width:100%;font-family:var(--sans)}
-.wz-data-opt:hover{border-color:var(--salvia);background:#fff;transform:translateY(-1px)}
-.wz-data-opt-ico{width:40px;height:40px;border-radius:10px;background:var(--salvia);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.wz-data-opt-t{font-size:14px;font-weight:700;color:var(--grafite)}
-.wz-data-opt-s{font-size:12px;color:var(--cinza-medio);margin-top:2px}
-.setup-section{margin-bottom:24px}
-.setup-section-title{font-family:var(--display);font-size:13px;font-weight:700;color:var(--grafite);letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--cinza-claro)}
-.setup-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.setup-fgroup{display:flex;flex-direction:column;gap:5px}
-.setup-lbl{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--cinza-medio)}
-.setup-input{background:var(--cinza-quente);border:1px solid var(--cinza-claro);color:var(--grafite);font-family:var(--sans);font-size:14px;border-radius:9px;padding:11px 14px;width:100%;outline:none;transition:border-color .2s}
-.setup-input:focus{border-color:var(--salvia);background:var(--branco)}
-.vend-table{width:100%;border-collapse:collapse;margin-bottom:12px}
-.vend-table th{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cinza-medio);padding:8px 10px;text-align:left;border-bottom:2px solid var(--cinza-claro)}
-.vend-table td{padding:6px 6px}
-.vi{background:var(--cinza-quente);border:1px solid var(--cinza-claro);color:var(--grafite);font-family:var(--sans);font-size:13px;border-radius:8px;padding:9px 10px;width:100%;outline:none;transition:border-color .2s}
-.vi:focus{border-color:var(--salvia);background:var(--branco)}
-.vi-meta{font-variant-numeric:tabular-nums}
-.vend-del{background:none;border:none;color:var(--cinza-medio);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1;transition:all .15s}
-.vend-del:hover{background:#fee2e2;color:#b91c1c}
-.btn-add-vend{display:flex;align-items:center;gap:8px;background:none;border:1px dashed var(--salvia);color:var(--salvia);font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 16px;border-radius:9px;cursor:pointer;transition:all .2s;margin-top:4px}
-.btn-add-vend:hover{background:rgba(124,132,107,.08)}
-.setup-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--cinza-claro)}
-.setup-btn-cancel{background:none;border:1px solid var(--cinza-claro);color:var(--cinza-medio);font-family:var(--sans);font-weight:600;font-size:13px;padding:12px 22px;border-radius:10px;cursor:pointer;transition:all .2s}
-.setup-btn-cancel:hover{border-color:#b91c1c;color:#b91c1c}
-.setup-btn-save{background:var(--grafite);color:var(--branco);border:none;font-family:var(--display);font-weight:700;font-size:14px;padding:12px 28px;border-radius:10px;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(31,32,34,.2);letter-spacing:.01em}
-.setup-btn-save:hover{background:#2d2f31;transform:translateY(-1px)}
-.setup-demo-link{text-align:center;font-size:12px;color:var(--cinza-medio);margin-top:16px}
-.setup-demo-link a{color:var(--salvia);font-weight:600;cursor:pointer;text-decoration:underline}
-.cfg-empresa-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:14px 0;border-bottom:1px solid var(--cinza-claro)}
-.cfg-empresa-name{font-size:18px;font-weight:700;color:var(--grafite);font-family:var(--display)}
-.cfg-vend-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
-.cfg-vend-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--cinza-quente);border-radius:10px}
-.cfg-vend-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--branco);flex-shrink:0;font-family:var(--display)}
-.cfg-vend-name{font-size:13px;font-weight:600;color:var(--grafite);flex:1}
-.cfg-vend-loja{font-size:11px;color:var(--cinza-medio)}
-.cfg-vend-meta{font-size:13px;font-weight:600;color:var(--grafite);font-variant-numeric:tabular-nums}
-#landing{position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#eef2fb 0%,#f5f7fc 55%,#eaf3f1 100%);overflow-y:auto;display:flex;align-items:center}
-#landing.hidden{display:none}
-.lp-wrap{max-width:1200px;margin:0 auto;padding:40px;display:grid;grid-template-columns:1fr 1.05fr;gap:48px;align-items:center;width:100%}
-.lp-brand{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.7);border:1px solid rgba(203,213,225,.7);border-radius:30px;padding:8px 18px;margin-bottom:32px}
-.lp-brand .bdot{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#1F2022,#7C846B)}
-.lp-brand span{font-size:11px;font-weight:700;letter-spacing:.14em;color:#475569}
-.lp-h1{font-size:60px;font-weight:800;line-height:1.02;letter-spacing:-.04em;color:#0b1220;margin-bottom:24px}
-.lp-h1 .grad{background:linear-gradient(100deg,#1F2022,#7C846B);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.lp-sub{font-size:21px;line-height:1.5;color:#475569;margin-bottom:30px;max-width:520px}
-.lp-tag{display:flex;align-items:center;gap:14px;margin-bottom:38px}
-.lp-tag-ico{width:48px;height:48px;border-radius:14px;background:rgba(124,132,107,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.lp-tag-ico svg{width:24px;height:24px}
-.lp-tag-txt{font-size:17px;color:#475569}
-.lp-btns{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:44px}
-.lp-btn-primary{background:#1F2022;color:#fff;border:none;border-radius:14px;padding:18px 34px;font-family:var(--sans);font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;box-shadow:0 8px 24px rgba(31,32,34,.25)}
-.lp-btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(31,32,34,.35)}
-.lp-btn-ghost{background:#fff;color:#1F2022;border:1px solid #d4d5d2;border-radius:14px;padding:18px 34px;font-family:var(--sans);font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;box-shadow:var(--shadow-sm)}
-.lp-btn-ghost:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.lp-feats{display:flex;gap:24px;flex-wrap:wrap}
-.lp-feat{display:flex;align-items:center;gap:11px}
-.lp-feat-ico{width:38px;height:38px;border-radius:11px;background:rgba(124,132,107,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.lp-feat-ico svg{width:19px;height:19px}
-.lp-feat-t{font-size:13px;font-weight:700;color:#0b1220}
-.lp-feat-s{font-size:11px;color:#94a3b8}
-.lp-visual{position:relative}
-.lp-mock{background:#fff;border-radius:20px;box-shadow:0 30px 70px rgba(15,23,42,.16);border:1px solid #eef2f7;overflow:hidden}
-.lp-mock-top{background:#0b1220;padding:10px 16px;display:flex;align-items:center;gap:7px}
-.lp-mock-top i{width:11px;height:11px;border-radius:50%;display:block}
-.lp-mock-body{padding:22px}
-.lp-mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.lp-mh-t{font-size:15px;font-weight:800;color:#0b1220;letter-spacing:-.01em}
-.lp-mh-s{font-size:8px;color:#7C846B;letter-spacing:.1em;margin-top:2px}
-.lp-mh-pill{font-size:10px;color:#64748b;background:#f1f5f9;border-radius:8px;padding:6px 12px}
-.lp-mkpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.lp-mkpi-c{background:#f8fafc;border:1px solid #eef2f7;border-radius:11px;padding:12px}
-.lp-mkpi-l{font-size:8px;font-weight:700;letter-spacing:.06em;color:#94a3b8;text-transform:uppercase;margin-bottom:5px}
-.lp-mkpi-v{font-size:16px;font-weight:800;color:#0b1220;letter-spacing:-.02em}
-.lp-mkpi-d{font-size:8px;color:#7C846B;margin-top:3px}
-.lp-mcols{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
-.lp-mcard{background:#f8fafc;border:1px solid #eef2f7;border-radius:11px;padding:14px}
-.lp-mcard-t{font-size:11px;font-weight:700;color:#475569;margin-bottom:12px}
-.lp-spark{height:90px;display:flex;align-items:flex-end}
-.lp-bars{display:flex;flex-direction:column;gap:10px}
-.lp-bar-row{display:flex;align-items:center;gap:8px}
-.lp-bar-lbl{font-size:9px;color:#64748b;width:62px;flex-shrink:0}
-.lp-bar-track{flex:1;height:8px;background:var(--cinza-claro);border-radius:4px;overflow:hidden}
-.lp-bar-fill{height:8px;border-radius:4px}
-.lp-bar-val{font-size:8px;color:#475569;width:54px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
-.lp-float{position:absolute;background:#fff;border-radius:14px;box-shadow:0 18px 44px rgba(15,23,42,.15);border:1px solid #eef2f7;padding:16px 18px}
-.lp-float-proj{bottom:-26px;left:-26px;width:190px}
-.lp-float-rank{bottom:-50px;right:-20px;width:230px}
-.lp-fl-t{font-size:11px;color:#64748b;margin-bottom:6px}
-.lp-fl-v{font-size:22px;font-weight:800;color:#1F2022;letter-spacing:-.02em}
-.lp-fl-d{font-size:10px;color:#7C846B;margin-top:3px}
-.lp-rk-row{display:flex;align-items:center;gap:10px;margin-top:10px}
-.lp-rk-pos{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
-.lp-rk-name{font-size:12px;font-weight:600;color:#0b1220;flex:1}
-.lp-rk-val{font-size:11px;color:#475569;font-variant-numeric:tabular-nums}
-@media(max-width:1100px){
-  .app{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .kpis{grid-template-columns:repeat(2,1fr)}
-  .lojas{grid-template-columns:1fr}
-  .bottom{grid-template-columns:1fr}
-  .cmp-cards{grid-template-columns:1fr}
-  .main{padding:20px 16px}
-}
-@media(max-width:980px){
-  .lp-wrap{grid-template-columns:1fr;gap:60px;padding:32px 24px}
-  .lp-h1{font-size:44px}.lp-sub{font-size:18px}.lp-visual{margin-bottom:40px}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAM Shoes — Urban Style. Every Step.</title>
+  <meta name="description" content="DAM Shoes — Catálogo de tênis premium e casual. Urban Style. Every Step." />
+  <meta property="og:type"         content="website" />
+  <meta property="og:site_name"    content="DAM Shoes" />
+  <meta property="og:title"        content="DAM Shoes — Urban Style. Every Step." />
+  <meta property="og:description"  content="Tênis premium e casual. Compre pelo WhatsApp. Até 10x no cartão. Entrega em até 7 dias úteis." />
+  <meta property="og:image"        content="https://bblnkvvygaofgqmpdbvf.supabase.co/storage/v1/object/public/dam-shoes-assets/og-cover.png" />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url"          content="https://dam-shoes.netlify.app" />
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="DAM Shoes — Urban Style. Every Step." />
+  <meta name="twitter:description" content="Tênis premium e casual. Compre pelo WhatsApp." />
+  <meta name="twitter:image"       content="https://bblnkvvygaofgqmpdbvf.supabase.co/storage/v1/object/public/dam-shoes-assets/og-cover.png" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- ══════════ LANDING ══════════ -->
-<div id="landing">
-  <div class="lp-wrap">
-    <div class="lp-left">
-      <div class="lp-brand"><span class="bdot"></span><span>MR SOLUTIONS · DADOS PARA VAREJO</span></div>
-      <h1 class="lp-h1">Painel Inteligente<br>de Vendas <span class="grad">PIV</span></h1>
-      <p class="lp-sub">Pare de adivinhar. Veja faturamento, metas, projeção e quem está vendendo mais — num painel que você abre do celular em segundos.</p>
-      <div class="lp-tag"><div class="lp-tag-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#7C846B" stroke-width="1.8"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 22v-6h6v6"/></svg></div><div class="lp-tag-txt">Feito para varejo: lojas, óticas, equipes comerciais.</div></div>
-      <div class="lp-btns">
-        <button class="lp-btn-primary" onclick="enterDemo()">▶ Ver exemplo ao vivo</button>
-        <button class="lp-btn-ghost" onclick="enterBlank()">Começar agora →</button>
-      </div>
-      <div class="lp-feats">
-        <div class="lp-feat"><div class="lp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#7C846B" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg></div><div><div class="lp-feat-t">Decisão na hora</div><div class="lp-feat-s">Faturamento, metas e ritmo</div></div></div>
-        <div class="lp-feat"><div class="lp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#7C846B" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><div><div class="lp-feat-t">Seus dados, só seus</div><div class="lp-feat-s">Tudo roda no seu navegador</div></div></div>
-        <div class="lp-feat"><div class="lp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#7C846B" stroke-width="1.8"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div><div><div class="lp-feat-t">Histórico que fica</div><div class="lp-feat-s">Compare mês a mês</div></div></div>
-      </div>
-    </div>
-    <div class="lp-visual">
-      <div class="lp-mock">
-        <div class="lp-mock-top"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
-        <div class="lp-mock-body">
-          <div class="lp-mh"><div><div class="lp-mh-t">PAINEL DE VENDAS</div><div class="lp-mh-s">MR SOLUTIONS · DADOS PARA VAREJO</div></div><div class="lp-mh-pill">Maio de 2024 ▾</div></div>
-          <div class="lp-mkpi">
-            <div class="lp-mkpi-c"><div class="lp-mkpi-l">Faturamento</div><div class="lp-mkpi-v">R$ 1.250.000</div><div class="lp-mkpi-d">+12,5% vs Abril</div></div>
-            <div class="lp-mkpi-c"><div class="lp-mkpi-l">Meta do Mês</div><div class="lp-mkpi-v">85%</div><div class="lp-mkpi-d">1.250 / 1.470 mil</div></div>
-            <div class="lp-mkpi-c"><div class="lp-mkpi-l">Ticket Médio</div><div class="lp-mkpi-v">R$ 245,80</div><div class="lp-mkpi-d">+8,3% vs Abril</div></div>
-            <div class="lp-mkpi-c"><div class="lp-mkpi-l">Pedidos</div><div class="lp-mkpi-v">5.842</div><div class="lp-mkpi-d">+15,2% vs Abril</div></div>
-          </div>
-          <div class="lp-mcols">
-            <div class="lp-mcard"><div class="lp-mcard-t">Faturamento ao longo do tempo</div>
-              <div class="lp-spark"><svg width="100%" height="90" viewBox="0 0 320 90" preserveAspectRatio="none"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F2022" stop-opacity=".25"/><stop offset="1" stop-color="#1F2022" stop-opacity="0"/></linearGradient></defs><path d="M0,72 L24,60 L48,66 L72,48 L96,54 L120,38 L144,44 L168,30 L192,36 L216,22 L240,28 L264,16 L288,20 L320,10 L320,90 L0,90 Z" fill="url(#sg)"/><path d="M0,72 L24,60 L48,66 L72,48 L96,54 L120,38 L144,44 L168,30 L192,36 L216,22 L240,28 L264,16 L288,20 L320,10" fill="none" stroke="#7C846B" stroke-width="2.5"/></svg></div>
-            </div>
-            <div class="lp-mcard"><div class="lp-mcard-t">Desempenho por Loja</div>
-              <div class="lp-bars">
-                <div class="lp-bar-row"><span class="lp-bar-lbl">Loja Centro</span><span class="lp-bar-track"><span class="lp-bar-fill" style="width:100%;background:#1F2022"></span></span><span class="lp-bar-val">R$ 620 mil</span></div>
-                <div class="lp-bar-row"><span class="lp-bar-lbl">Loja Shopping</span><span class="lp-bar-track"><span class="lp-bar-fill" style="width:58%;background:#7C846B"></span></span><span class="lp-bar-val">R$ 360 mil</span></div>
-                <div class="lp-bar-row"><span class="lp-bar-lbl">Loja Norte</span><span class="lp-bar-track"><span class="lp-bar-fill" style="width:29%;background:#ea7a3c"></span></span><span class="lp-bar-val">R$ 180 mil</span></div>
-                <div class="lp-bar-row"><span class="lp-bar-lbl">Loja Sul</span><span class="lp-bar-track"><span class="lp-bar-fill" style="width:15%;background:#e0584f"></span></span><span class="lp-bar-val">R$ 90 mil</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="lp-float lp-float-proj"><div class="lp-fl-t">Projeção do Mês</div><div class="lp-fl-v">R$ 1.580.000</div><div class="lp-fl-d">+18,7% vs meta</div></div>
-      <div class="lp-float lp-float-rank"><div class="lp-fl-t">Ranking de Vendedores</div>
-        <div class="lp-rk-row"><span class="lp-rk-pos" style="background:#f59e0b">1</span><span class="lp-rk-name">Ana Souza</span><span class="lp-rk-val">R$ 245.000</span></div>
-        <div class="lp-rk-row"><span class="lp-rk-pos" style="background:#7C846B">2</span><span class="lp-rk-name">João Lima</span><span class="lp-rk-val">R$ 198.000</span></div>
-        <div class="lp-rk-row"><span class="lp-rk-pos" style="background:#ea7a3c">3</span><span class="lp-rk-name">Carla Mendes</span><span class="lp-rk-val">R$ 176.000</span></div>
-      </div>
-    </div>
+<header id="header">
+  <div class="logo">DAM<span class="dot">.</span>SHOES</div>
+  <span class="header-tagline">Urban Style. Every Step.</span>
+  <div class="header-actions">
+    <button id="btn-wa-header" class="btn-whatsapp-header" aria-label="Falar no WhatsApp">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </button>
+    <button id="btn-menu" class="btn-menu-header" aria-label="Abrir menu">&#9776;</button>
   </div>
-</div>
+</header>
 
-<!-- ══════════ SETUP SCREEN ══════════ -->
-<div id="setup">
-  <div class="setup-wrap">
-    <div class="setup-head">
-      <div class="setup-head-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      </div>
-      <div>
-        <div class="setup-head-t">Vamos configurar seu painel</div>
-        <div class="setup-head-s">3 passos rápidos — leva menos de 2 minutos</div>
-      </div>
+<section id="hero">
+  <div class="hero-pattern"></div>
+  <img class="hero-img" src="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=1400&q=80" alt="DAM Shoes — Tênis Premium" loading="eager" />
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <span class="hero-badge">Coleção Atual</span>
+    <h1 class="hero-title" id="hero-title">Seu estilo.<br><span class="highlight">Seu passo.</span></h1>
+    <p class="hero-subtitle" id="hero-subtitle">Tênis premium com entrega rápida e até 10x no cartão. Fale no WhatsApp e garanta o seu.</p>
+    <div class="hero-promo"><strong>COMPRE 1 PAR E GANHE 30% OFF NO SEGUNDO</strong><span>Válido para produtos selecionados · Consulte via WhatsApp</span></div>
+    <div class="hero-benefits">
+      <span class="benefit-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Até 7 dias úteis</span>
+      <span class="benefit-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>10x no cartão</span>
+      <span class="benefit-chip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Via WhatsApp</span>
     </div>
-    <div class="setup-body">
-      <div class="wz-steps">
-        <div class="wz-step active" id="wz-s1"><span class="wz-step-num">1</span><span class="wz-step-lbl">Empresa</span></div>
-        <span class="wz-step-line"></span>
-        <div class="wz-step" id="wz-s2"><span class="wz-step-num">2</span><span class="wz-step-lbl">Vendedores</span></div>
-        <span class="wz-step-line"></span>
-        <div class="wz-step" id="wz-s3"><span class="wz-step-num">3</span><span class="wz-step-lbl">Dados</span></div>
-      </div>
-
-      <div class="wz-panel active" id="wz-p1">
-        <div class="setup-section">
-          <div class="setup-section-title">Qual o nome da sua empresa?</div>
-          <div class="wz-intro">É o nome que vai aparecer no painel e nos relatórios. Você só preenche uma vez.</div>
-          <div class="setup-row">
-            <div class="setup-fgroup" style="grid-column:1/-1">
-              <label class="setup-lbl">Nome da empresa</label>
-              <input class="setup-input" id="cfg-empresa" placeholder="Ex: Ótica Central" maxlength="60">
-            </div>
-          </div>
-        </div>
-        <div class="setup-actions">
-          <button class="setup-btn-cancel" id="setup-cancel-btn" onclick="wzExit()">← Voltar</button>
-          <button class="setup-btn-save" onclick="wzNext(2)">Continuar →</button>
-        </div>
-        <div class="setup-demo-link">Quer explorar antes? <a onclick="setupSkipToDemo()">Ver demonstração</a></div>
-      </div>
-
-      <div class="wz-panel" id="wz-p2">
-        <div class="setup-section">
-          <div class="setup-section-title">Cadastre sua equipe e as metas</div>
-          <div class="wz-intro">Adicione cada vendedor, a loja onde trabalha e a meta mensal em reais. Pode editar depois quando quiser.</div>
-          <table class="vend-table">
-            <thead>
-              <tr>
-                <th style="width:28%">Nome</th>
-                <th style="width:28%">Loja / Setor</th>
-                <th style="width:28%">Meta Mensal (R$)</th>
-                <th style="width:16%"></th>
-              </tr>
-            </thead>
-            <tbody id="setup-vend-rows"></tbody>
-          </table>
-          <button class="btn-add-vend" onclick="setupAddRow()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            Adicionar vendedor
-          </button>
-        </div>
-        <div class="setup-actions">
-          <button class="setup-btn-cancel" onclick="wzBack(1)">← Voltar</button>
-          <button class="setup-btn-save" onclick="wzNext(3)">Continuar →</button>
-        </div>
-      </div>
-
-      <div class="wz-panel" id="wz-p3">
-        <div class="setup-section">
-          <div class="setup-section-title">Tudo pronto! Como quer inserir os dados?</div>
-          <div class="wz-intro">Sua empresa e equipe estão salvas. Agora escolha como carregar os números de vendas — ou veja um exemplo primeiro.</div>
-          <div class="wz-data-opts">
-            <button class="wz-data-opt" onclick="wzFinish('planilha')">
-              <span class="wz-data-opt-ico">↑</span>
-              <span><span class="wz-data-opt-t">Carregar planilha (.xlsx)</span><span class="wz-data-opt-s">Importar de qualquer ERP — Bling, Tiny, Omie</span></span>
-            </button>
-            <button class="wz-data-opt" onclick="wzFinish('colar')">
-              <span class="wz-data-opt-ico">⌘</span>
-              <span><span class="wz-data-opt-t">Colar do Excel / Sheets</span><span class="wz-data-opt-s">Copiar e colar direto da sua planilha</span></span>
-            </button>
-            <button class="wz-data-opt" onclick="wzFinish('manual')">
-              <span class="wz-data-opt-ico">✏</span>
-              <span><span class="wz-data-opt-t">Digitar manualmente</span><span class="wz-data-opt-s">Preencher os valores na tela</span></span>
-            </button>
-            <button class="wz-data-opt" onclick="wzFinish('demo')">
-              <span class="wz-data-opt-ico">▶</span>
-              <span><span class="wz-data-opt-t">Ver exemplo primeiro</span><span class="wz-data-opt-s">Explorar com dados fictícios</span></span>
-            </button>
-          </div>
-        </div>
-        <div class="setup-actions">
-          <button class="setup-btn-cancel" onclick="wzBack(2)">← Voltar</button>
-          <button class="setup-btn-save" onclick="wzFinish('skip')">Concluir e abrir painel →</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="toast-wrap" id="toast-wrap"></div>
-
-<!-- ══════════ APP ══════════ -->
-<div class="app">
-  <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3 13h4v8H3zM10 8h4v13h-4zM17 3h4v18h-4z" fill="#fff"/></svg></div>
-      <div class="logo-txt">MR SOLUTIONS<span class="logo-sub">DADOS · AUTOMAÇÃO · VENDAS</span></div>
-    </div>
-    <nav class="nav">
-      <button class="nav-item active"    onclick="switchView('geral')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>Visão Geral</button>
-      <button class="nav-item"            onclick="switchView('vendas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>Vendas</button>
-      <button class="nav-item"            onclick="switchView('lojas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 22v-6h6v6"/></svg>Lojas</button>
-      <button class="nav-item"            onclick="switchView('vendedores')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="7" r="3"/><path d="M2 21v-2a5 5 0 015-5h4a5 5 0 015 5v2M16 7a3 3 0 010 6"/></svg>Vendedores</button>
-      <button class="nav-item"            onclick="switchView('metas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>Metas</button>
-      <button class="nav-item"            onclick="switchView('comparar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>Comparar Meses</button>
-      <button class="nav-item"            onclick="switchView('relatorios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>Relatórios</button>
-      <button class="nav-item"            onclick="switchView('config')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 00-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 00-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 000 2l-2 1.5 2 3.5 2.4-1a7 7 0 001.7 1l.3 2.5h4l.3-2.5a7 7 0 001.7-1l2.4 1 2-3.5-2-1.5a7 7 0 00.1-1z"/></svg>Configurações</button>
-    </nav>
-    <div class="sb-foot">
-      <div class="sb-avatar">MR</div>
-      <div><div class="sb-foot-t">MR SOLUTIONS</div><div class="sb-foot-s">DADOS · AUTOMAÇÃO · RESULTADOS</div></div>
-      <div class="sb-dot"></div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <div class="head">
-      <div class="greet">
-        <h1>Olá, MR Solutions 👋</h1>
-        <p>Aqui está o resumo das suas vendas</p>
-      </div>
-      <div class="head-right" id="head-actions">
-        <div class="month-bar" id="month-bar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          <select class="month-sel" id="month-sel" onchange="onMonthChange()"></select>
-          <span class="month-saved-dot empty" id="month-saved-dot" title="Mês sem dados salvos"></span>
-        </div>
-        <div class="period" id="period-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          <div><div class="period-t" id="period-t">— dias corridos</div><div class="period-s" id="period-s">aguardando dados</div></div>
-        </div>
-        <button class="btn-export" id="pdf-btn" onclick="exportPDF()" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Exportar
-        </button>
-      </div>
-    </div>
-
-    <div id="empty-state">
-      <div class="ribbon show" style="display:flex">
-        <div class="ribbon-t">Escolha como inserir os dados — ou veja um exemplo completo.</div>
-        <div class="insert-row">
-          <button class="ibtn demo" onclick="loadDemo()">▶ Ver exemplo</button>
-          <label class="ibtn">↑ Planilha<input type="file" id="file-input-empty" accept=".xlsx,.xls" style="display:none" onchange="handleFileInput(this)"></label>
-          <button class="ibtn" onclick="openPasteModal()">⌘ Colar</button>
-          <button class="ibtn" onclick="openModal()">✏ Inserir</button>
-        </div>
-      </div>
-      <div class="empty">
-        <div class="empty-ico">📊</div>
-        <div class="empty-t">Nenhum dado carregado</div>
-        <div class="empty-s">Use os botões acima para inserir os dados do período ou ver um exemplo.</div>
-      </div>
-    </div>
-
-    <div id="dashboard" style="display:none">
-      <div class="ribbon" id="demo-ribbon">
-        <div class="ribbon-t">▶ Você está vendo <b>dados de demonstração</b> — fictícios, apenas para ilustrar. Eles não são salvos.</div>
-        <button class="ribbon-x" onclick="clearAll()">Limpar e usar meus dados</button>
-      </div>
-
-      <!-- aviso de mês ativo de gravação (opção B) -->
-      <div class="save-warn" id="save-warn" style="display:none">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
-        <div id="save-warn-txt"></div>
-      </div>
-
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('mensal')">Visão Mensal</button>
-        <button class="tab" onclick="switchTab('semanal')">Semana Atual</button>
-      </div>
-
-      <div id="capture-zone">
-      <div class="tab-panel active" id="tab-mensal">
-        <div class="kpis" id="kpis"></div>
-        <div class="sec-title">Desempenho por Loja</div>
-        <div class="lojas" id="lojas"></div>
-        <div class="bottom">
-          <div class="panel">
-            <div class="panel-head"><div class="panel-title">Distribuição do Faturamento</div></div>
-            <div class="pie-wrap" id="pie-wrap"></div>
-          </div>
-          <div class="panel">
-            <div class="panel-head"><div class="panel-title">Ranking de Vendedores</div><div class="panel-link">Ver todos</div></div>
-            <div class="rk" id="ranking"></div>
-          </div>
-        </div>
-        <div class="totalbar" id="totalbar"></div>
-      </div>
-      <div class="tab-panel" id="tab-semanal">
-        <div class="panel"><div class="rk" id="semanal"></div>
-          <div id="sem-empty" style="display:none"><div class="empty" style="min-height:30vh"><div class="empty-ico">📅</div><div class="empty-t">Sem dados semanais</div><div class="empty-s">Insira manualmente ou carregue planilha com a aba META SEMANAL.</div></div></div>
-        </div>
-      </div>
-      </div>
-
-      <div class="view" id="view-vendas">
-        <div class="view-title">Vendas</div>
-        <div class="view-sub">Desempenho de vendas no período</div>
-        <div class="metrics-grid" id="v-metrics"></div>
-        <div class="chart-bar-wrap"><div class="sec-title">Faturamento por loja</div><div id="v-bars"></div></div>
-      </div>
-      <div class="view" id="view-lojas">
-        <div class="view-title">Lojas</div>
-        <div class="view-sub">Detalhamento completo por unidade</div>
-        <div id="v-lojas-detail"></div>
-      </div>
-      <div class="view" id="view-vendedores">
-        <div class="view-title">Vendedores</div>
-        <div class="view-sub">Desempenho individual de cada vendedor</div>
-        <div class="vend-grid" id="v-vend-grid"></div>
-      </div>
-      <div class="view" id="view-metas">
-        <div class="view-title">Metas</div>
-        <div class="view-sub">Progresso em relação à meta mensal</div>
-        <div class="meta-summary" id="v-meta-summary"></div>
-        <div id="v-meta-list"></div>
-      </div>
-
-      <!-- ══ VIEW COMPARAR (NOVO) ══ -->
-      <div class="view" id="view-comparar">
-        <div class="view-title">Comparar Meses</div>
-        <div class="view-sub">Evolução do faturamento entre dois meses salvos</div>
-        <div id="cmp-body"></div>
-      </div>
-
-      <div class="view" id="view-relatorios">
-        <div class="view-title">Relatórios</div>
-        <div class="view-sub">Resumo executivo e exportação</div>
-        <div class="report-section" id="v-report-geral"></div>
-        <div class="report-section" id="v-report-lojas"></div>
-        <div class="report-section" id="v-report-top"></div>
-        <button class="export-big" onclick="exportPDF()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Exportar Relatório Completo em PDF
-        </button>
-      </div>
-      <div class="view" id="view-config">
-        <div class="view-title">Configurações</div>
-        <div class="view-sub">Parâmetros do período atual</div>
-        <div class="config-section">
-          <div class="config-title">Período</div>
-          <div class="config-row">
-            <div class="fgroup"><label class="flbl">Dias corridos</label><input class="finput" id="cfg-dias-cor" type="number" min="1" max="31"></div>
-            <div class="fgroup"><label class="flbl">Dias úteis no mês</label><input class="finput" id="cfg-dias-mes" type="number" min="1" max="31"></div>
-          </div>
-          <div class="config-info" id="cfg-info">Configure os dias e clique em Atualizar para recalcular as projeções.</div>
-          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn-apply" onclick="applyConfig()">Atualizar Dashboard</button>
-            <button class="btn-cancel" onclick="clearAll()">Limpar e reinserir dados</button>
-          </div>
-        </div>
-        <div class="config-section">
-          <div class="config-title">Histórico mensal salvo</div>
-          <div class="config-info">Cada mês que você salva fica guardado no seu navegador. Use o seletor no topo para abrir um mês, ou remova um registro abaixo.</div>
-          <div class="hist-list" id="cfg-hist-list"></div>
-        </div>
-        <div class="config-section">
-          <div class="config-title">Empresa e Vendedores</div>
-          <div class="config-info" id="cfg-empresa-info">Carregando...</div>
-          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn-apply" onclick="openSetup(true)">✏ Editar empresa e vendedores</button>
-            <button class="btn-cancel" onclick="cfgExport()">⤓ Exportar configuração</button>
-            <button class="btn-cancel" onclick="cfgImport()">↑ Importar configuração</button>
-          </div>
-        </div>
-        <div class="config-section">
-          <div class="config-title">Sobre</div>
-          <div class="config-info"><b>MR Solutions · Painel Inteligente · Gestão e Vendas v3.0</b><br><br>Formas de inserir dados: planilha .xlsx (qualquer ERP), colar do Excel/Sheets, ou inserção manual.<br>Histórico mensal persistente · Comparação entre meses · Exportação em PDF.</div>
-        </div>
-      </div>
-
-    </div>
-</div>
-
-<!-- MODAL MANUAL -->
-<div class="overlay" id="modal" style="display:none" onclick="overlayClick(event)">
-<div class="modal"><button class="close-btn" onclick="closeModal()">✕</button>
-  <div class="modal-title">Inserir dados manualmente</div>
-  <div class="modal-sub" id="modal-manual-sub">Preencha os campos. Deixe em 0 se não tiver valor.</div>
-  <div class="params-row">
-    <div class="fgroup"><label class="flbl">Dias corridos</label><input class="finput" id="m-dias-cor" type="number" value="20"></div>
-    <div class="fgroup"><label class="flbl">Dias úteis</label><input class="finput" id="m-dias-mes" type="number" value="24"></div>
-    <div class="fgroup"><label class="flbl">Semana atual</label><input class="finput" id="m-sem-atual" type="number" value="4"></div>
-    <div class="fgroup"><label class="flbl">Semanas no mês</label><input class="finput" id="m-sem-total" type="number" value="4"></div>
-  </div>
-  <div class="vhdr"><div class="vhdr-lbl">Loja</div><div class="vhdr-lbl">Vendedor</div><div class="vhdr-lbl">Vendido R$</div><div class="vhdr-lbl">Meta R$</div><div class="vhdr-lbl">Nº vendas</div><div class="vhdr-lbl">Desc %</div><div class="vhdr-lbl">Status</div></div>
-  <div id="vrows"></div>
-  <div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">Cancelar</button><button class="btn-apply" onclick="applyManual()">Aplicar e salvar no mês</button></div>
-</div></div>
-
-<!-- MODAL COLAR -->
-<div class="overlay" id="paste-modal" style="display:none" onclick="overlayPasteClick(event)">
-<div class="modal" style="max-width:860px"><button class="close-btn" onclick="closePasteModal()">✕</button>
-  <div class="modal-title">Colar planilha</div>
-  <div class="modal-sub">Selecione a aba, copie no Excel (Ctrl+C) e cole abaixo (Ctrl+V). As colunas são reconhecidas automaticamente.</div>
-  <div class="ptabs"><button class="ptab active" onclick="switchPTab('dados')">Aba DADOS</button><button class="ptab" onclick="switchPTab('semanal')">Aba META SEMANAL</button></div>
-  <div class="ptab-panel active" id="ptab-dados">
-    <textarea class="ptextarea" id="paste-dados" placeholder="Cole aqui (Ctrl+V)..." oninput="previewPaste('dados')"></textarea>
-    <div class="parse-status" id="status-dados"></div>
-    <div class="paste-hint"><strong>Colunas reconhecidas:</strong> LOJA · VENDEDOR/NOME · VALOR/FATURAMENTO · Nº VENDAS/PEDIDOS · DESCONTO · META — em qualquer ordem.</div>
-    <div id="preview-dados-wrap" style="overflow-x:auto"></div>
-  </div>
-  <div class="ptab-panel" id="ptab-semanal">
-    <textarea class="ptextarea" id="paste-semanal" placeholder="Cole aqui (Ctrl+V)..." oninput="previewPaste('semanal')"></textarea>
-    <div class="parse-status" id="status-semanal"></div>
-    <div class="paste-hint"><strong>Colunas:</strong> LOJA · VENDEDOR · META MENSAL · SEM1 · SEM2 · SEM3 · SEM4 · VENDIDO SEMANA</div>
-    <div id="preview-semanal-wrap" style="overflow-x:auto"></div>
-  </div>
-  <div class="params-row" style="margin-top:18px;margin-bottom:0;padding-top:16px;border-bottom:none">
-    <div class="fgroup"><label class="flbl">Dias corridos</label><input class="finput" id="p-dias-cor" type="number" value="20"></div>
-    <div class="fgroup"><label class="flbl">Dias úteis</label><input class="finput" id="p-dias-mes" type="number" value="24"></div>
-    <div class="fgroup"><label class="flbl">Semana atual</label><input class="finput" id="p-sem-atual" type="number" value="4"></div>
-    <div class="fgroup"><label class="flbl">Semanas no mês</label><input class="finput" id="p-sem-total" type="number" value="4"></div>
-  </div>
-  <div class="modal-btns"><button class="btn-cancel" onclick="closePasteModal()">Cancelar</button><button class="btn-apply" onclick="applyPaste()">Aplicar e salvar no mês</button></div>
-</div></div>
-
-<script>
-// ═══════════════════════════════════════════════════════════════════
-//  PIV · Painel Inteligente de Vendas · MR Solutions v3.0
-//  Novidades v3: persistência mensal, seletor de mês (opção B),
-//  comparação entre meses, findCol unificado (XLSX + colar),
-//  demo isolada (nunca grava), PDF fundo claro.
-// ═══════════════════════════════════════════════════════════════════
-
-const STORAGE_KEY   = 'mr_solutions_config';   // empresa + vendedores
-const DATA_PREFIX   = 'mr_piv_data_';          // + AAAA-MM  → dados do mês
-const PDF_BG        = '#F2F2EF';               // fundo claro do relatório
-const PDF_INK       = '#1F2022';               // texto grafite
-
-// ── CONFIG (empresa/vendedores) ──────────────────────────────────────
-function cfgLoad(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); }
-  catch(e){ return null; }
-}
-function cfgSave(cfg){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg)); }
-  catch(e){ console.warn('localStorage indisponível'); }
-}
-function cfgExport(){
-  const cfg = cfgLoad();
-  if(!cfg || !cfg.empresa){ toast('Sem configuração','Configure a empresa primeiro.','warn'); return; }
-  const blob = new Blob([JSON.stringify(cfg, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `config-${(cfg.empresa||'empresa').replace(/\s+/g,'-').toLowerCase()}.json`;
-  a.click(); URL.revokeObjectURL(a.href);
-  toast('Configuração exportada', 'Arquivo JSON salvo.','ok');
-}
-function cfgImport(){
-  const input = document.createElement('input');
-  input.type='file'; input.accept='.json';
-  input.onchange = function(){
-    const f=this.files[0]; if(!f) return;
-    const r=new FileReader();
-    r.onload = ev => {
-      try{
-        const cfg = JSON.parse(ev.target.result);
-        if(!cfg.empresa) throw new Error('Arquivo inválido: campo empresa ausente.');
-        cfgSave(cfg);
-        applyEmpresaNome(cfg.empresa);
-        toast('Configuração restaurada', `Empresa "${cfg.empresa}" e ${(cfg.vendedores||[]).length} vendedor(es) importados.`,'ok',5000);
-        if(_lastData) renderConfig(_lastData);
-      }catch(e){ toast('Erro ao importar', String(e.message||e), 'err', 6000); }
-    };
-    r.readAsText(f);
-  };
-  input.click();
-}
-function getVendedores(){
-  const cfg = cfgLoad();
-  return (cfg && cfg.vendedores && cfg.vendedores.length > 0) ? cfg.vendedores : VENDEDORES_DEFAULT;
-}
-function getEmpresaNome(){
-  const cfg = cfgLoad();
-  return (cfg && cfg.empresa) ? cfg.empresa : 'MR Solutions';
-}
-function applyEmpresaNome(nome){
-  const targets = [
-    { sel: '.greet h1',  val: `Olá, ${nome} 👋` },
-    { sel: '.sb-foot-t', val: nome.toUpperCase() },
-    { sel: '.logo-txt',  html: `${nome.toUpperCase()}<span class="logo-sub">DADOS · AUTOMAÇÃO · VENDAS</span>` },
-  ];
-  targets.forEach(t=>{
-    const el = document.querySelector(t.sel);
-    if(!el) return;
-    if(t.html) el.innerHTML = t.html; else el.textContent = t.val;
-  });
-  document.title = `PIV · ${nome}`;
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  PERSISTÊNCIA MENSAL
-//  Cada mês é salvo sob a chave mr_piv_data_AAAA-MM.
-//  _activeMonth = mês selecionado no seletor (opção B): é AONDE salva.
-// ═══════════════════════════════════════════════════════════════════
-let _activeMonth = currentMonthKey();   // 'AAAA-MM'
-const MESES_PT = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-
-function currentMonthKey(){
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-}
-function monthLabel(key){
-  if(!key) return '—';
-  const [y,m] = key.split('-').map(Number);
-  return `${MESES_PT[m-1]} de ${y}`;
-}
-function monthLabelShort(key){
-  if(!key) return '—';
-  const [y,m] = key.split('-').map(Number);
-  const nome = MESES_PT[m-1];
-  return `${nome.charAt(0).toUpperCase()+nome.slice(1,3)}/${String(y).slice(2)}`;
-}
-// lista de meses salvos (chaves AAAA-MM), mais recente primeiro
-function listSavedMonths(){
-  const out=[];
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k && k.startsWith(DATA_PREFIX)){ out.push(k.slice(DATA_PREFIX.length)); }
-  }
-  return out.sort().reverse();
-}
-function loadMonthData(key){
-  try{ return JSON.parse(localStorage.getItem(DATA_PREFIX+key)||'null'); }
-  catch(e){ return null; }
-}
-function saveMonthData(key, data){
-  // nunca salva demo
-  if(IS_DEMO){ return false; }
-  try{
-    const payload = {
-      diasCorridos: data.diasCorridos, diasMes: data.diasMes,
-      vendedores: data.vendedores, semanalData: data.semanalData||null,
-      savedAt: new Date().toISOString()
-    };
-    localStorage.setItem(DATA_PREFIX+key, JSON.stringify(payload));
-    return true;
-  }catch(e){ console.warn('Falha ao salvar mês', e); toast('Não foi possível salvar','O armazenamento do navegador recusou os dados.','err'); return false; }
-}
-function deleteMonthData(key){
-  localStorage.removeItem(DATA_PREFIX+key);
-}
-
-// ── SELETOR DE MÊS (UI) ──────────────────────────────────────────────
-// Popula o <select> com: meses salvos + o mês atual + alguns meses recentes,
-// sempre incluindo o _activeMonth selecionado.
-function buildMonthOptions(){
-  const sel = document.getElementById('month-sel');
-  if(!sel) return;
-  const saved = listSavedMonths();
-  const set = new Set(saved);
-  set.add(currentMonthKey());
-  set.add(_activeMonth);
-  // adiciona os 11 meses anteriores ao atual para permitir lançar retroativo
-  const d = new Date();
-  for(let i=0;i<12;i++){
-    const dd = new Date(d.getFullYear(), d.getMonth()-i, 1);
-    set.add(`${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}`);
-  }
-  const keys = [...set].sort().reverse();
-  sel.innerHTML = keys.map(k=>{
-    const has = saved.includes(k);
-    const lbl = monthLabel(k).replace(/^\w/, c=>c.toUpperCase());
-    return `<option value="${k}" ${k===_activeMonth?'selected':''}>${lbl}${has?'  •':''}</option>`;
-  }).join('');
-  updateMonthDot();
-}
-function updateMonthDot(){
-  const dot = document.getElementById('month-saved-dot');
-  if(!dot) return;
-  const has = listSavedMonths().includes(_activeMonth);
-  dot.className = 'month-saved-dot ' + (has?'has':'empty');
-  dot.title = has ? 'Este mês tem dados salvos' : 'Mês ainda sem dados salvos';
-}
-// aviso visível de qual mês receberá os próximos dados (opção B)
-function updateSaveWarn(){
-  const box = document.getElementById('save-warn');
-  const txt = document.getElementById('save-warn-txt');
-  if(!box||!txt) return;
-  if(IS_DEMO){ box.style.display='none'; return; }
-  const atual = currentMonthKey();
-  if(_activeMonth === atual){
-    box.style.display='none';
-  }else{
-    box.style.display='flex';
-    txt.innerHTML = `Você está no mês de <b>${monthLabel(_activeMonth)}</b>. Os dados que você inserir agora serão salvos <b>neste mês</b>, não no mês atual.`;
-  }
-}
-
-function onMonthChange(){
-  const sel = document.getElementById('month-sel');
-  if(!sel) return;
-  const novo = sel.value;
-  _activeMonth = novo;
-  IS_DEMO = false;
-  updateSaveWarn();
-  updateMonthDot();
-  const data = loadMonthData(novo);
-  if(data){
-    // reconstrói campos derivados que não são salvos
-    const vendedores = (data.vendedores||[]).map(v=>{
-      const proj = v.proj!=null ? v.proj : (data.diasCorridos>0?(v.vendido/data.diasCorridos)*data.diasMes:0);
-      const pct  = v.meta>0 ? v.vendido/v.meta : null;
-      return {...v, proj, ticket: v.ticket!=null?v.ticket:(v.nVendas>0?v.vendido/v.nVendas:0), pct,
-        status: v.status || (pct==null?'SEM META':pct>=.85?'BOM':pct>=.6?'ATENÇÃO':'CRÍTICO')};
-    });
-    renderDashboard({diasCorridos:data.diasCorridos, diasMes:data.diasMes, vendedores, semanalData:data.semanalData});
-    toast('Mês carregado', `${monthLabel(novo)} · ${vendedores.length} vendedor(es).`, 'ok');
-  }else{
-    // mês vazio → mostra empty-state mas mantém o mês ativo selecionado
-    document.getElementById('dashboard').style.display='none';
-    document.getElementById('empty-state').style.display='block';
-    document.getElementById('pdf-btn').disabled=true;
-    toast('Mês sem dados', `${monthLabel(novo)} ainda não tem registro. Insira os dados para salvar aqui.`, 'warn', 5000);
-  }
-}
-
-// ── SETUP / WIZARD ───────────────────────────────────────────────────
-let _setupEditMode = false;
-let _wzStep = 1;
-function openSetup(editMode=false){
-  _setupEditMode = editMode;
-  document.getElementById('setup').classList.add('show');
-  const cfg = cfgLoad();
-  const nomeInput = document.getElementById('cfg-empresa');
-  if(nomeInput) nomeInput.value = cfg ? (cfg.empresa||'') : '';
-  const vends = cfg ? (cfg.vendedores||[]) : [];
-  const tbody = document.getElementById('setup-vend-rows');
-  tbody.innerHTML = '';
-  if(vends.length > 0){ vends.forEach(v => setupAddRow(v.nome, v.loja, v.meta)); }
-  else { setupAddRow(); setupAddRow(); setupAddRow(); }
-  const cancelBtn = document.getElementById('setup-cancel-btn');
-  if(cancelBtn) cancelBtn.style.display = editMode ? 'block' : 'none';
-  wzGoto(1);
-}
-function wzGoto(step){
-  _wzStep = step;
-  [1,2,3].forEach(n=>{ const p=document.getElementById('wz-p'+n); if(p) p.classList.toggle('active', n===step); });
-  [1,2,3].forEach(n=>{ const s=document.getElementById('wz-s'+n); if(!s) return; s.classList.toggle('active', n===step); s.classList.toggle('done', n<step); });
-}
-function wzNext(target){
-  if(_wzStep===1){
-    const empresa=(document.getElementById('cfg-empresa').value||'').trim();
-    if(!empresa){ toast('Nome obrigatório','Digite o nome da empresa para continuar.','warn'); document.getElementById('cfg-empresa').focus(); return; }
-  }
-  if(_wzStep===2){
-    const rows=document.querySelectorAll('#setup-vend-rows tr'); let ok=false;
-    rows.forEach(tr=>{ if(tr.querySelectorAll('input')[0].value.trim()) ok=true; });
-    if(!ok){ toast('Sem vendedores','Cadastre pelo menos um vendedor para continuar.','warn'); return; }
-    _persistSetup();
-  }
-  wzGoto(target);
-}
-function wzBack(target){ wzGoto(target); }
-function wzExit(){
-  closeSetup();
-  if(!_setupEditMode){ const l=document.getElementById('landing'); if(l) l.classList.remove('hidden'); }
-}
-function _persistSetup(){
-  const empresa=(document.getElementById('cfg-empresa').value||'').trim();
-  const rows=document.querySelectorAll('#setup-vend-rows tr');
-  const vendedores=[];
-  rows.forEach(tr=>{
-    const inputs=tr.querySelectorAll('input');
-    const nome=inputs[0].value.trim(); const loja=inputs[1].value.trim(); const meta=Number(inputs[2].value)||0;
-    if(nome) vendedores.push({nome, loja:loja||'Loja', meta});
-  });
-  if(empresa && vendedores.length){ cfgSave({empresa, vendedores}); applyEmpresaNome(empresa); }
-}
-function wzFinish(modo){
-  _persistSetup();
-  closeSetup();
-  document.getElementById('landing').classList.add('hidden');
-  const cfg=cfgLoad();
-  const n=(cfg&&cfg.vendedores)?cfg.vendedores.length:0;
-  if(modo==='demo'){ loadDemo(); return; }
-  IS_DEMO=false;
-  document.getElementById('dashboard').style.display='none';
-  document.getElementById('empty-state').style.display='block';
-  document.getElementById('demo-ribbon').classList.remove('show');
-  document.getElementById('pdf-btn').disabled=true;
-  toast('Configuração salva', `${n} vendedor(es) cadastrado(s).`, 'ok', 4000);
-  if(modo==='planilha'){ document.getElementById('file-input-empty').click(); }
-  else if(modo==='colar'){ openPasteModal(); }
-  else if(modo==='manual'){ openModal(); }
-}
-function closeSetup(){ document.getElementById('setup').classList.remove('show'); }
-function setupSkipToDemo(){ closeSetup(); document.getElementById('landing').classList.add('hidden'); loadDemo(); }
-
-let _rowId = 0;
-function setupAddRow(nome='', loja='', meta=''){
-  const id = ++_rowId;
-  const tr = document.createElement('tr');
-  tr.id = `svr-${id}`;
-  tr.innerHTML = `
-    <td><input class="vi" placeholder="Ex: Ana Martins" value="${nome}" maxlength="40"></td>
-    <td><input class="vi" placeholder="Ex: Centro" value="${loja}" maxlength="30"></td>
-    <td><input class="vi vi-meta" placeholder="75000" value="${meta||''}" type="number" min="0"></td>
-    <td><button class="vend-del" onclick="setupDelRow('svr-${id}')" title="Remover">×</button></td>`;
-  document.getElementById('setup-vend-rows').appendChild(tr);
-}
-function setupDelRow(id){
-  const el = document.getElementById(id);
-  if(el){
-    const tbody = document.getElementById('setup-vend-rows');
-    if(tbody.rows.length <= 1){ toast('Mínimo 1 vendedor','Mantenha pelo menos um vendedor cadastrado.','warn'); return; }
-    el.remove();
-  }
-}
-
-// ── INICIALIZAÇÃO ────────────────────────────────────────────────────
-function initApp(){
-  const cfg = cfgLoad();
-  if(cfg && cfg.empresa) applyEmpresaNome(cfg.empresa);
-  _activeMonth = currentMonthKey();
-  buildMonthOptions();
-  _silentDemo();          // pré-carrega a demo para a transição instantânea
-}
-
-// demo silenciosa: NÃO grava no localStorage, não mostra ribbon
-function _silentDemo(){
-  IS_DEMO = true;
-  const cfg = cfgLoad();
-  if(cfg && cfg.empresa) applyEmpresaNome(cfg.empresa);
-  const vendedores = DEMO.vendedores.map(v => {
-    const proj = DEMO.diasCorridos > 0 ? (v.vendido / DEMO.diasCorridos) * DEMO.diasMes : 0;
-    const pct  = v.meta > 0 ? v.vendido / v.meta : null;
-    return {...v, proj, ticket: v.nVendas > 0 ? v.vendido / v.nVendas : 0, pct,
-      status: pct == null ? 'SEM META' : pct >= .85 ? 'BOM' : pct >= .6 ? 'ATENÇÃO' : 'CRÍTICO'};
-  });
-  const sv = DEMO.semanal.rows.map(r => {
-    const ms = r.metas[DEMO.semanal.semAtual - 1] || 0;
-    const ps = ms > 0 ? r.vendidoSem / ms : null;
-    return {loja: r.loja, nome: r.nome, metaMensal: r.metaMensal, metas: r.metas,
-      metaSem: ms, vendidoSem: r.vendidoSem, pctSem: ps,
-      status: ps == null ? 'AGUARDANDO' : ps >= .85 ? 'BOM' : ps >= .6 ? 'ATENÇÃO' : 'CRÍTICO'};
-  });
-  renderDashboard({
-    diasCorridos: DEMO.diasCorridos, diasMes: DEMO.diasMes, vendedores,
-    semanalData: { semAtual: DEMO.semanal.semAtual, semTotal: DEMO.semanal.semTotal, vendedores: sv }
-  });
-  const rib = document.getElementById('demo-ribbon'); if(rib) rib.classList.remove('show');
-}
-
-function closeLanding(){ const l=document.getElementById('landing'); if(l) l.classList.add('hidden'); }
-function enterDemo(){
-  closeLanding();
-  const rib = document.getElementById('demo-ribbon'); if(rib) rib.classList.add('show');
-  toast('Exemplo carregado', 'Dados fictícios para você explorar. Eles não são salvos.', 'ok');
-}
-function enterBlank(){
-  const cfg = cfgLoad();
-  if(!cfg || !cfg.empresa){ openSetup(false); }
-  else {
-    closeLanding(); IS_DEMO=false;
-    document.getElementById('dashboard').style.display='none';
-    document.getElementById('empty-state').style.display='block';
-    document.getElementById('demo-ribbon').classList.remove('show');
-    document.getElementById('pdf-btn').disabled=true;
-  }
-}
-
-// ── DADOS DE DEMONSTRAÇÃO ─────────────────────────────────────────────
-const VENDEDORES_DEFAULT = [
-  {loja:'Centro',  nome:'Ana',     meta:75000},
-  {loja:'Centro',  nome:'Bruno',   meta:75000},
-  {loja:'Centro',  nome:'Carla',   meta:0},
-  {loja:'Centro',  nome:'Diego',   meta:75000},
-  {loja:'Shopping',nome:'Elaine',  meta:67500},
-  {loja:'Shopping',nome:'Felipe',  meta:60000},
-  {loja:'Bairro',  nome:'Gabriela',meta:58300},
-  {loja:'Bairro',  nome:'Heitor',  meta:21700},
-];
-const DEMO = {
-  diasCorridos: 18, diasMes: 24,
-  vendedores: [
-    {loja:'Centro',  nome:'Ana Martins',   vendido:71200, meta:75000, nVendas:142, desconto:.082},
-    {loja:'Centro',  nome:'Bruno Costa',   vendido:58400, meta:75000, nVendas:118, desconto:.115},
-    {loja:'Centro',  nome:'Carla Dias',    vendido:44900, meta:60000, nVendas:97,  desconto:.094},
-    {loja:'Centro',  nome:'Diego Alves',   vendido:39100, meta:75000, nVendas:88,  desconto:.142},
-    {loja:'Shopping',nome:'Elaine Rocha',  vendido:62800, meta:67500, nVendas:131, desconto:.071},
-    {loja:'Shopping',nome:'Felipe Nunes',  vendido:51300, meta:60000, nVendas:109, desconto:.103},
-    {loja:'Bairro',  nome:'Gabriela Lima', vendido:54600, meta:58300, nVendas:121, desconto:.066},
-    {loja:'Bairro',  nome:'Heitor Souza',  vendido:18200, meta:21700, nVendas:43,  desconto:.088},
-  ],
-  semanal: {
-    semAtual: 3, semTotal: 4,
-    rows: [
-      {loja:'Centro',  nome:'Ana Martins',   metaMensal:75000, metas:[18750,18750,18750,18750], vendidoSem:17900},
-      {loja:'Centro',  nome:'Bruno Costa',   metaMensal:75000, metas:[18750,18750,18750,18750], vendidoSem:12400},
-      {loja:'Centro',  nome:'Carla Dias',    metaMensal:60000, metas:[15000,15000,15000,15000], vendidoSem:11200},
-      {loja:'Centro',  nome:'Diego Alves',   metaMensal:75000, metas:[18750,18750,18750,18750], vendidoSem:8600},
-      {loja:'Shopping',nome:'Elaine Rocha',  metaMensal:67500, metas:[16875,16875,16875,16875], vendidoSem:16100},
-      {loja:'Shopping',nome:'Felipe Nunes',  metaMensal:60000, metas:[15000,15000,15000,15000], vendidoSem:13500},
-      {loja:'Bairro',  nome:'Gabriela Lima', metaMensal:58300, metas:[14575,14575,14575,14575], vendidoSem:14000},
-      {loja:'Bairro',  nome:'Heitor Souza',  metaMensal:21700, metas:[5425,5425,5425,5425],     vendidoSem:4100},
-    ]
-  }
-};
-let IS_DEMO = false;
-
-// ── UTILS ─────────────────────────────────────────────────────────────
-function fmtInt(n){
-  n = Math.round(Number(n)||0); const neg = n < 0; n = Math.abs(n);
-  return (neg?'-':'') + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}
-function fmtMoney(n){
-  const num = Number(n)||0; const neg = num < 0; const abs = Math.abs(num);
-  const inteiro = Math.floor(abs); const cent = Math.round((abs - inteiro) * 100);
-  let parteInt = inteiro, parteCent = cent;
-  if(parteCent === 100){ parteInt += 1; parteCent = 0; }
-  return (neg?'-':'') + String(parteInt).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + String(parteCent).padStart(2,'0');
-}
-const R = v => (v==null||isNaN(Number(v)))?'—':'R$ '+fmtMoney(v);
-const P = v => (Number(v)*100).toFixed(1).replace('.',',')+'%';
-const N = v => fmtInt(v);
-function sc(p){ return p>=.85?'ok':p>=.6?'at':'cr'; }
-function sl(p){ return p>=.85?'BOM':p>=.6?'ATENÇÃO':'CRÍTICO'; }
-function bclass(s){
-  const m={BOM:'bom','ATENÇÃO':'at',ATENCAO:'at','CRÍTICO':'cr',CRITICO:'cr',
-    'FÉRIAS':'fer',FERIAS:'fer',ATESTADO:'ates',AGUARDANDO:'agu','SEM META':'agu'};
-  return m[(s||'').toUpperCase().trim()]||'agu';
-}
-function initials(nome){
-  const p=String(nome||'').trim().split(/\s+/);
-  if(p.length===0)return '?'; if(p.length===1)return p[0].slice(0,2).toUpperCase();
-  return (p[0][0]+p[p.length-1][0]).toUpperCase();
-}
-const AV_COLORS=['#1F2022','#7C846B','#6B6F72','#3d4040','#8a9080','#4a4c3a','#5c5e50','#2a2b22'];
-function avColor(nome){ let h=0; for(const c of String(nome))h=(h*31+c.charCodeAt(0))>>>0; return AV_COLORS[h%AV_COLORS.length]; }
-
-// ── TOAST ─────────────────────────────────────────────────────────────
-function toast(title, msg, type='ok', ms=4000){
-  const w=document.getElementById('toast-wrap');
-  const el=document.createElement('div');
-  el.className='toast '+type;
-  el.innerHTML=`<div class="toast-t">${title}</div>${msg?`<div class="toast-m">${msg}</div>`:''}`;
-  w.appendChild(el);
-  setTimeout(()=>{ el.style.animation='slideOut .25s ease forwards'; setTimeout(()=>el.remove(),250); }, ms);
-}
-
-document.addEventListener('DOMContentLoaded', function(){ initApp(); });
-
-// loadDemo (botão dentro do empty-state) — também não grava
-function loadDemo(){
-  IS_DEMO=true;
-  const cfg = cfgLoad();
-  if(cfg && cfg.empresa) applyEmpresaNome(cfg.empresa);
-  const vendedores=DEMO.vendedores.map(v=>{
-    const proj=DEMO.diasCorridos>0?(v.vendido/DEMO.diasCorridos)*DEMO.diasMes:0;
-    const pct=v.meta>0?v.vendido/v.meta:null;
-    return {...v, proj, ticket:v.nVendas>0?v.vendido/v.nVendas:0, pct,
-      status:pct==null?'SEM META':pct>=.85?'BOM':pct>=.6?'ATENÇÃO':'CRÍTICO'};
-  });
-  const sv=DEMO.semanal.rows.map(r=>{
-    const ms=r.metas[DEMO.semanal.semAtual-1]||0; const ps=ms>0?r.vendidoSem/ms:null;
-    return {loja:r.loja,nome:r.nome,metaMensal:r.metaMensal,metas:r.metas,
-      metaSem:ms,vendidoSem:r.vendidoSem,pctSem:ps,
-      status:ps==null?'AGUARDANDO':ps>=.85?'BOM':ps>=.6?'ATENÇÃO':'CRÍTICO'};
-  });
-  renderDashboard({diasCorridos:DEMO.diasCorridos, diasMes:DEMO.diasMes, vendedores,
-    semanalData:{semAtual:DEMO.semanal.semAtual,semTotal:DEMO.semanal.semTotal,vendedores:sv}});
-  const rib=document.getElementById('demo-ribbon'); if(rib) rib.classList.add('show');
-  toast('Exemplo carregado','Dados fictícios — não são salvos.','ok');
-}
-
-function clearAll(){
-  IS_DEMO=false;
-  document.getElementById('dashboard').style.display='none';
-  document.getElementById('empty-state').style.display='block';
-  document.getElementById('demo-ribbon').classList.remove('show');
-  document.getElementById('pdf-btn').disabled=true;
-  const pt=document.getElementById('period-t'); if(pt) pt.textContent='— dias corridos';
-  const ps=document.getElementById('period-s'); if(ps) ps.textContent='aguardando dados';
-  updateSaveWarn();
-}
-
-let _lastData = null;
-
-// ── SWITCH VIEW ───────────────────────────────────────────────────────
-const VIEW_LABELS = {
-  geral:'Visão Geral', vendas:'Vendas', lojas:'Lojas', vendedores:'Vendedores',
-  metas:'Metas', comparar:'Comparar Meses', relatorios:'Relatórios', config:'Configurações'
-};
-function switchView(v){
-  document.querySelectorAll('.nav-item').forEach(btn=>{
-    btn.classList.toggle('active', btn.textContent.trim() === VIEW_LABELS[v]);
-  });
-  const h1 = document.querySelector('.greet h1');
-  if(h1) h1.textContent = v==='geral' ? `Olá, ${getEmpresaNome()} 👋` : VIEW_LABELS[v];
-  const sub = document.querySelector('.greet p');
-  if(sub){
-    const subs={geral:'Aqui está o resumo das suas vendas',vendas:'Análise de vendas no período',lojas:'Desempenho detalhado por unidade',vendedores:'Ficha individual de cada vendedor',metas:'Progresso em relação às metas mensais',comparar:'Evolução entre meses salvos',relatorios:'Resumo executivo e exportação',config:'Parâmetros e configurações'};
-    sub.textContent = subs[v]||'';
-  }
-  const tabs = document.querySelector('.tabs');
-  if(tabs) tabs.style.display = v==='geral'?'flex':'none';
-  const cz = document.getElementById('capture-zone');
-  if(cz) cz.style.display = v==='geral'?'block':'none';
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  if(v!=='geral'){ const el = document.getElementById('view-'+v); if(el) el.classList.add('active'); }
-  const rib = document.getElementById('demo-ribbon');
-  if(rib) rib.classList.toggle('show', v==='geral' && IS_DEMO);
-  // comparar funciona mesmo sem _lastData (lê do localStorage)
-  if(v==='comparar'){ renderComparar(); }
-  if(_lastData){
-    if(v==='vendas')     renderVendas(_lastData);
-    if(v==='lojas')      renderLojas(_lastData);
-    if(v==='vendedores') renderVendedores(_lastData);
-    if(v==='metas')      renderMetas(_lastData);
-    if(v==='relatorios') renderRelatorios(_lastData);
-    if(v==='config')     renderConfig(_lastData);
-  }
-  window.scrollTo(0,0);
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  COMPARAÇÃO ENTRE MESES
-// ═══════════════════════════════════════════════════════════════════
-function totalsOfMonth(key){
-  const d = loadMonthData(key);
-  if(!d) return null;
-  const vs = d.vendedores||[];
-  const tv = vs.reduce((s,v)=>s+(v.vendido||0),0);
-  const tm = vs.reduce((s,v)=>s+(v.meta||0),0);
-  const tn = vs.reduce((s,v)=>s+(v.nVendas||0),0);
-  return { tv, tm, tn, tick: tn>0?tv/tn:0, pg: tm>0?tv/tm:0, nVend: vs.length };
-}
-function deltaPct(atual, base){
-  if(base===0) return atual>0 ? null : 0;   // null = "novo" (sem base)
-  return (atual-base)/base;
-}
-function deltaTxt(atual, base){
-  const dp = deltaPct(atual, base);
-  if(dp===null) return {cls:'cmp-up', txt:'novo'};
-  if(Math.abs(dp) < 0.0005) return {cls:'cmp-flat', txt:'0,0%'};
-  const cls = dp>0?'cmp-up':'cmp-down';
-  const sign = dp>0?'+':'';
-  return {cls, txt: sign+P(dp)};
-}
-function renderComparar(){
-  const body = document.getElementById('cmp-body');
-  if(!body) return;
-  const saved = listSavedMonths();
-  if(saved.length < 2){
-    body.innerHTML = `<div class="cmp-empty"><div class="cmp-empty-ico">📈</div><div class="cmp-empty-t">Você precisa de pelo menos 2 meses salvos</div><div class="cmp-empty-s">Salve os dados de meses diferentes (usando o seletor de mês no topo) para comparar a evolução. Hoje há ${saved.length} mês salvo.</div></div>`;
-    return;
-  }
-  // defaults: mês mais recente vs o anterior
-  const defB = saved[0];      // mais recente
-  const defA = saved[1];      // anterior
-  const opts = (selVal)=> saved.map(k=>`<option value="${k}" ${k===selVal?'selected':''}>${monthLabel(k).replace(/^\w/,c=>c.toUpperCase())}</option>`).join('');
-  body.innerHTML = `
-    <div class="cmp-controls">
-      <div class="fgroup"><label class="flbl">Mês base (anterior)</label><select class="month-sel" id="cmp-a" onchange="drawComparar()" style="min-width:160px">${opts(defA)}</select></div>
-      <span class="cmp-vs">→</span>
-      <div class="fgroup"><label class="flbl">Mês comparado</label><select class="month-sel" id="cmp-b" onchange="drawComparar()" style="min-width:160px">${opts(defB)}</select></div>
-    </div>
-    <div id="cmp-result"></div>`;
-  drawComparar();
-}
-function drawComparar(){
-  const aKey = document.getElementById('cmp-a').value;
-  const bKey = document.getElementById('cmp-b').value;
-  const out = document.getElementById('cmp-result');
-  const A = totalsOfMonth(aKey), B = totalsOfMonth(bKey);
-  if(!A || !B){ out.innerHTML = `<div class="cmp-empty"><div class="cmp-empty-t">Dados indisponíveis para um dos meses.</div></div>`; return; }
-  if(aKey===bKey){ out.innerHTML = `<div class="cmp-empty"><div class="cmp-empty-ico">🟰</div><div class="cmp-empty-t">Selecione dois meses diferentes</div><div class="cmp-empty-s">Escolha um mês base e um mês comparado distintos.</div></div>`; return; }
-
-  const dFat = deltaTxt(B.tv, A.tv);
-  const dTick = deltaTxt(B.tick, A.tick);
-  const dPed = deltaTxt(B.tn, A.tn);
-
-  const linha = (lbl, valA, valB, fmt)=>{
-    const d = deltaTxt(typeof valB==='number'?valB:0, typeof valA==='number'?valA:0);
-    return `<tr><td class="lbl">${lbl}</td><td>${fmt(valA)}</td><td>${fmt(valB)}</td><td class="delta-cell ${d.cls}">${d.txt}</td></tr>`;
-  };
-
-  out.innerHTML = `
-    <div class="cmp-cards">
-      <div class="cmp-card">
-        <div class="cmp-card-lbl">Mês base</div>
-        <div class="cmp-card-month">${monthLabel(aKey).replace(/^\w/,c=>c.toUpperCase())}</div>
-        <div class="cmp-card-val num">${R(A.tv)}</div>
-        <div class="cmp-card-sub">${N(A.tn)} pedidos · ticket ${R(A.tick)}</div>
-      </div>
-      <div class="cmp-delta">
-        <div class="cmp-delta-lbl">Faturamento</div>
-        <div class="cmp-delta-val ${dFat.cls}">${dFat.txt}</div>
-        <div class="cmp-delta-sub">${monthLabelShort(aKey)} → ${monthLabelShort(bKey)}</div>
-      </div>
-      <div class="cmp-card">
-        <div class="cmp-card-lbl">Mês comparado</div>
-        <div class="cmp-card-month">${monthLabel(bKey).replace(/^\w/,c=>c.toUpperCase())}</div>
-        <div class="cmp-card-val num">${R(B.tv)}</div>
-        <div class="cmp-card-sub">${N(B.tn)} pedidos · ticket ${R(B.tick)}</div>
-      </div>
-    </div>
-    <table class="cmp-table">
-      <thead><tr><th>Indicador</th><th>${monthLabelShort(aKey)}</th><th>${monthLabelShort(bKey)}</th><th>Variação</th></tr></thead>
-      <tbody>
-        ${linha('Faturamento', A.tv, B.tv, R)}
-        ${linha('Meta do mês', A.tm, B.tm, R)}
-        ${linha('% da meta atingido', A.pg, B.pg, P)}
-        ${linha('Pedidos', A.tn, B.tn, N)}
-        ${linha('Ticket médio', A.tick, B.tick, R)}
-        ${linha('Vendedores ativos', A.nVend, B.nVend, N)}
-      </tbody>
-    </table>`;
-}
-
-// ── VIEWS (vendas/lojas/vendedores/metas/relatorios/config) ───────────
-function renderVendas(d){
-  const tv=d.vendedores.reduce((s,v)=>s+v.vendido,0);
-  const tm=d.vendedores.reduce((s,v)=>s+v.meta,0);
-  const tn=d.vendedores.reduce((s,v)=>s+v.nVendas,0);
-  const tp=d.vendedores.reduce((s,v)=>s+(v.proj||0),0);
-  const tick=tn>0?tv/tn:0; const pg=tm>0?tv/tm:0;
-  const m=document.getElementById('v-metrics');
-  if(m) m.innerHTML=`
-    <div class="metric-card"><div class="metric-lbl">Faturamento</div><div class="metric-val num">${R(tv)}</div><div class="metric-sub">Meta ${R(tm)}</div></div>
-    <div class="metric-card"><div class="metric-lbl">Total de Vendas</div><div class="metric-val num">${N(tn)}</div><div class="metric-sub">Pedidos no período</div></div>
-    <div class="metric-card"><div class="metric-lbl">Ticket Médio</div><div class="metric-val num">${R(tick)}</div><div class="metric-sub">Por venda</div></div>
-    <div class="metric-card"><div class="metric-lbl">Projeção</div><div class="metric-val num">${R(tp)}</div><div class="metric-sub txt-ok">${P(pg)} da meta</div></div>
-    <div class="metric-card"><div class="metric-lbl">% da Meta</div><div class="metric-val num txt-${sc(pg)}">${P(pg)}</div><div class="metric-sub">Atingido até hoje</div></div>
-    <div class="metric-card"><div class="metric-lbl">Gap para Meta</div><div class="metric-val num">${R(Math.max(tm-tv,0))}</div><div class="metric-sub">Falta para bater</div></div>`;
-  const lojas={};
-  d.vendedores.forEach(v=>{ if(!lojas[v.loja])lojas[v.loja]={vendido:0,meta:0}; lojas[v.loja].vendido+=v.vendido; lojas[v.loja].meta+=v.meta; });
-  const maxV=Math.max(...Object.values(lojas).map(l=>l.vendido),1);
-  const palette=['#1F2022','#7C846B','#6B6F72','#a0a894','#2d2f31','#9aaa90'];
-  const bars=document.getElementById('v-bars');
-  if(bars) bars.innerHTML=Object.entries(lojas).sort((a,b)=>b[1].vendido-a[1].vendido).map(([loja,info],i)=>{
-    const w=(info.vendido/maxV*100).toFixed(1);
-    return `<div class="bar-row"><span class="bar-lbl">Loja ${loja}</span><span class="bar-track"><span class="bar-fill" style="width:${w}%;background:${palette[i%palette.length]}"><span>${P(info.meta>0?info.vendido/info.meta:0)}</span></span></span><span class="bar-val">${R(info.vendido)}</span></div>`;
-  }).join('');
-}
-function renderLojas(d){
-  const lojas={};
-  d.vendedores.forEach(v=>{ if(!lojas[v.loja])lojas[v.loja]={vendido:0,meta:0,proj:0,nVendas:0,vends:[]};
-    lojas[v.loja].vendido+=v.vendido; lojas[v.loja].meta+=v.meta; lojas[v.loja].proj+=(v.proj||0); lojas[v.loja].nVendas+=v.nVendas; lojas[v.loja].vends.push(v); });
-  const el=document.getElementById('v-lojas-detail');
-  if(!el) return;
-  el.innerHTML=Object.entries(lojas).map(([loja,info])=>{
-    const p=info.meta>0?info.vendido/info.meta:0;
-    const tick=info.nVendas>0?info.vendido/info.nVendas:0;
-    const vendsHTML=info.vends.sort((a,b)=>b.vendido-a.vendido).map(v=>{
-      const vp=v.pct!=null?sc(v.pct):'nt';
-      return `<div class="loja-vend-row"><span class="loja-vend-av" style="background:${avColor(v.nome)}">${initials(v.nome)}</span><span class="loja-vend-name">${v.nome}</span><span class="rk-sb rk-sb-${bclass(v.status)}">${v.status}</span><span class="loja-vend-val">${R(v.vendido)}</span><span class="loja-vend-pct txt-${vp}">${v.pct!=null?P(v.pct):'-'}</span></div>`;
-    }).join('');
-    return `<div class="loja-detail"><div class="loja-detail-head"><div class="loja-detail-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#7C846B" stroke-width="1.8" style="width:26px;height:26px"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 20v-6h6v6"/></svg></div><div class="loja-detail-info"><div class="loja-detail-name">Loja ${loja}</div></div><span class="badge badge-${sc(p)}">${sl(p)}</span></div>
-      <div class="loja-detail-stats"><div class="loja-stat"><div class="loja-stat-l">Faturado</div><div class="loja-stat-v num">${R(info.vendido)}</div></div><div class="loja-stat"><div class="loja-stat-l">Meta</div><div class="loja-stat-v num">${R(info.meta)}</div></div><div class="loja-stat"><div class="loja-stat-l">Projeção</div><div class="loja-stat-v num">${R(info.proj)}</div></div><div class="loja-stat"><div class="loja-stat-l">Ticket</div><div class="loja-stat-v num">${R(tick)}</div></div></div>
-      <div class="loja-bar" style="margin-bottom:14px"><div class="loja-bar-fill fill-${sc(p)}" style="width:${Math.min(p*100,100).toFixed(1)}%"></div></div>
-      <div class="sec-title" style="margin-bottom:8px">Vendedores desta loja</div><div class="loja-vends">${vendsHTML}</div></div>`;
-  }).join('');
-}
-function renderVendedores(d){
-  const el=document.getElementById('v-vend-grid');
-  if(!el) return;
-  el.innerHTML=[...d.vendedores].sort((a,b)=>b.vendido-a.vendido).map(v=>{
-    const s=v.pct!=null?sc(v.pct):'nt'; const bw=v.pct!=null?Math.min(v.pct*100,100).toFixed(1):'0';
-    const ds=v.desconto!=null&&v.desconto!==''?(isNaN(Number(v.desconto))?v.desconto:(Number(v.desconto)*100).toFixed(1).replace('.',',')+'%'):'—';
-    return `<div class="vend-card"><div class="vend-head"><span class="vend-av" style="background:${avColor(v.nome)}">${initials(v.nome)}</span><div><div class="vend-name">${v.nome}</div><div class="vend-store">Loja ${v.loja}</div></div><span class="rk-sb rk-sb-${bclass(v.status)}" style="margin-left:auto">${v.status}</span></div>
-      <div class="vend-stats"><div class="vend-stat"><div class="vend-stat-l">Vendido</div><div class="vend-stat-v num">${R(v.vendido)}</div></div><div class="vend-stat"><div class="vend-stat-l">Meta</div><div class="vend-stat-v num">${R(v.meta)}</div></div><div class="vend-stat"><div class="vend-stat-l">Ticket</div><div class="vend-stat-v num">${R(v.ticket)}</div></div><div class="vend-stat"><div class="vend-stat-l">Projeção</div><div class="vend-stat-v num">${R(v.proj||0)}</div></div><div class="vend-stat"><div class="vend-stat-l">Nº Vendas</div><div class="vend-stat-v num">${v.nVendas}</div></div><div class="vend-stat"><div class="vend-stat-l">Desconto</div><div class="vend-stat-v num">${ds}</div></div></div>
-      <div class="vend-prog"><div class="vend-prog-fill fill-${s}" style="width:${bw}%"></div></div>
-      <div class="vend-foot"><span class="txt-${s}" style="font-weight:600">${v.pct!=null?P(v.pct)+' da meta':'sem meta'}</span><span style="color:var(--text2)">Gap ${R(Math.max((v.meta||0)-v.vendido,0))}</span></div></div>`;
-  }).join('');
-}
-function renderMetas(d){
-  const bom=d.vendedores.filter(v=>v.pct!=null&&v.pct>=.85).length;
-  const at=d.vendedores.filter(v=>v.pct!=null&&v.pct>=.6&&v.pct<.85).length;
-  const cr=d.vendedores.filter(v=>v.pct!=null&&v.pct<.6).length;
-  const sm=document.getElementById('v-meta-summary');
-  if(sm) sm.innerHTML=`<div class="meta-sum-card"><div class="meta-sum-n txt-ok">${bom}</div><div class="meta-sum-l">✅ BOM (≥85%)</div></div><div class="meta-sum-card"><div class="meta-sum-n txt-at">${at}</div><div class="meta-sum-l">⚠️ ATENÇÃO (60–84%)</div></div><div class="meta-sum-card"><div class="meta-sum-n txt-cr">${cr}</div><div class="meta-sum-l">🔴 CRÍTICO (&lt;60%)</div></div>`;
-  const ml=document.getElementById('v-meta-list');
-  if(!ml) return;
-  ml.innerHTML=[...d.vendedores].sort((a,b)=>(b.pct||0)-(a.pct||0)).map(v=>{
-    const s=v.pct!=null?sc(v.pct):'nt'; const bw=v.pct!=null?Math.min(v.pct*100,100).toFixed(1):'0';
-    const falta=Math.max((v.meta||0)-v.vendido,0);
-    const diasR=d.diasCorridos&&d.diasMes?(d.diasMes-d.diasCorridos):0;
-    const ritmoDia=d.diasCorridos>0?v.vendido/d.diasCorridos:0;
-    const projetado=ritmoDia*(d.diasMes||d.diasCorridos||1);
-    return `<div class="meta-card"><div class="meta-head"><span class="meta-av" style="background:${avColor(v.nome)}">${initials(v.nome)}</span><div><div class="meta-name">${v.nome}</div><div class="meta-store">Loja ${v.loja}</div></div><span class="rk-sb rk-sb-${bclass(v.status)}" style="margin-left:auto">${v.status}</span></div>
-      <div class="meta-vals"><div class="meta-v"><div class="meta-v-l">Vendido</div><div class="meta-v-n num">${R(v.vendido)}</div></div><div class="meta-v"><div class="meta-v-l">Meta</div><div class="meta-v-n num">${R(v.meta)}</div></div><div class="meta-v"><div class="meta-v-l">Falta</div><div class="meta-v-n num txt-${s}">${R(falta)}</div></div><div class="meta-v"><div class="meta-v-l">Projeção</div><div class="meta-v-n num">${R(projetado)}</div></div></div>
-      <div class="meta-track"><div class="meta-fill fill-${s}" style="width:${bw}%"></div></div>
-      <div class="meta-foot"><span class="txt-${s}" style="font-weight:700">${v.pct!=null?P(v.pct)+' atingido':'sem meta'}</span>${diasR>0?`<span style="color:var(--text2)">${diasR} dias úteis restantes</span>`:''}</div></div>`;
-  }).join('');
-}
-function renderRelatorios(d){
-  const tv=d.vendedores.reduce((s,v)=>s+v.vendido,0); const tm=d.vendedores.reduce((s,v)=>s+v.meta,0);
-  const tp=d.vendedores.reduce((s,v)=>s+(v.proj||0),0); const tn=d.vendedores.reduce((s,v)=>s+v.nVendas,0);
-  const tick=tn>0?tv/tn:0; const pg=tm>0?tv/tm:0; const now=new Date();
-  const g=document.getElementById('v-report-geral');
-  if(g) g.innerHTML=`<div class="report-title">📊 Resumo Geral — ${monthLabel(_activeMonth).replace(/^\w/,c=>c.toUpperCase())}</div>${[['Faturamento Total',R(tv)],['Meta Mensal',R(tm)],['% Atingido',P(pg)],['Projeção do Mês',R(tp)],['Total de Vendas',N(tn)+' pedidos'],['Ticket Médio',R(tick)],['Período',`${d.diasCorridos||'—'} de ${d.diasMes||'—'} dias úteis`]].map(([l,v])=>`<div class="report-row"><span class="report-row-l">${l}</span><span class="report-row-v">${v}</span></div>`).join('')}`;
-  const lojas={};
-  d.vendedores.forEach(v=>{ if(!lojas[v.loja])lojas[v.loja]={vendido:0,meta:0}; lojas[v.loja].vendido+=v.vendido; lojas[v.loja].meta+=v.meta; });
-  const rl=document.getElementById('v-report-lojas');
-  if(rl) rl.innerHTML=`<div class="report-title">🏪 Desempenho por Loja</div>`+Object.entries(lojas).map(([l,i])=>`<div class="report-row"><span class="report-row-l">Loja ${l}</span><span class="report-row-v">${R(i.vendido)} <span class="txt-${sc(i.meta>0?i.vendido/i.meta:0)}" style="font-size:12px;margin-left:8px">${P(i.meta>0?i.vendido/i.meta:0)}</span></span></div>`).join('');
-  const rt=document.getElementById('v-report-top');
-  if(rt) rt.innerHTML=`<div class="report-title">🏆 Top Vendedores</div>`+[...d.vendedores].sort((a,b)=>b.vendido-a.vendido).slice(0,5).map((v,i)=>`<div class="report-row"><span class="report-row-l">${i+1}° ${v.nome} · Loja ${v.loja}</span><span class="report-row-v">${R(v.vendido)} <span class="txt-${sc(v.pct||0)}" style="font-size:12px;margin-left:8px">${v.pct!=null?P(v.pct):'-'}</span></span></div>`).join('');
-}
-function renderConfig(d){
-  const dc=document.getElementById('cfg-dias-cor'); if(dc) dc.value=d.diasCorridos||20;
-  const dm=document.getElementById('cfg-dias-mes'); if(dm) dm.value=d.diasMes||24;
-  const inf=document.getElementById('cfg-info');
-  if(inf) inf.innerHTML=`Período atual: <b>${d.diasCorridos||'—'} dias corridos</b> de <b>${d.diasMes||'—'} dias úteis</b>. Mês ativo: <b>${monthLabel(_activeMonth)}</b>.`;
-  // histórico salvo
-  const hl=document.getElementById('cfg-hist-list');
-  if(hl){
-    const saved=listSavedMonths();
-    if(saved.length===0){ hl.innerHTML=`<div style="color:var(--cinza-medio);font-size:13px">Nenhum mês salvo ainda.</div>`; }
-    else hl.innerHTML=saved.map(k=>{
-      const t=totalsOfMonth(k);
-      return `<div class="hist-item"><span class="hist-item-month">${monthLabel(k).replace(/^\w/,c=>c.toUpperCase())}</span><span class="hist-item-val">${R(t.tv)} · ${N(t.tn)} pedidos · ${t.nVend} vend.</span><button class="hist-item-del" onclick="cfgDeleteMonth('${k}')" title="Remover este mês">🗑</button></div>`;
-    }).join('');
-  }
-  const cfg=cfgLoad(); const ei=document.getElementById('cfg-empresa-info');
-  if(ei){
-    if(cfg && cfg.empresa){
-      const vends=(cfg.vendedores||[]);
-      ei.innerHTML=`<div class="cfg-empresa-row"><div class="cfg-empresa-name">${cfg.empresa}</div><span style="font-size:12px;color:var(--cinza-medio)">${vends.length} vendedor(es)</span></div><div class="cfg-vend-list">${vends.map(v=>`<div class="cfg-vend-item"><span class="cfg-vend-av" style="background:${avColor(v.nome)}">${initials(v.nome)}</span><div style="flex:1"><div class="cfg-vend-name">${v.nome}</div><div class="cfg-vend-loja">Loja ${v.loja||'—'}</div></div><div class="cfg-vend-meta">${R(v.meta)}/mês</div></div>`).join('')}</div>`;
-    } else { ei.innerHTML=`<div style="color:var(--cinza-medio);font-size:13px">Nenhuma empresa configurada.</div>`; }
-  }
-}
-function cfgDeleteMonth(key){
-  if(!confirm(`Remover os dados de ${monthLabel(key)}? Esta ação não pode ser desfeita.`)) return;
-  deleteMonthData(key);
-  buildMonthOptions();
-  if(_lastData) renderConfig(_lastData);
-  toast('Mês removido', `${monthLabel(key)} foi excluído do histórico.`, 'ok');
-}
-function applyConfig(){
-  if(!_lastData){ toast('Sem dados','Carregue os dados primeiro.','warn'); return; }
-  const dc=Number(document.getElementById('cfg-dias-cor').value)||_lastData.diasCorridos;
-  const dm=Number(document.getElementById('cfg-dias-mes').value)||_lastData.diasMes;
-  _lastData.diasCorridos=dc; _lastData.diasMes=dm;
-  _lastData.vendedores=_lastData.vendedores.map(v=>({...v, proj:dc>0?(v.vendido/dc)*dm:0}));
-  renderDashboard(_lastData);
-  if(!IS_DEMO) saveMonthData(_activeMonth, _lastData);   // re-salva mês com novos parâmetros
-  toast('Atualizado','Projeções recalculadas e salvas.','ok');
-  switchView('geral');
-}
-
-// ── EXPORTAR PDF (fundo claro) ────────────────────────────────────────
-async function exportPDF(){
-  const btn=document.getElementById('pdf-btn'); const zone=document.getElementById('capture-zone');
-  if(!zone) return;
-  btn.disabled=true; const orig=btn.textContent; btn.textContent='⏳ Gerando…';
-  toast('Gerando PDF','Capturando o relatório, aguarde…','warn',6000);
-  try{
-    const canvas=await html2canvas(zone,{backgroundColor:PDF_BG,scale:2,useCORS:true,logging:false});
-    const img=canvas.toDataURL('image/png');
-    const {jsPDF}=window.jspdf;
-    const pdf=new jsPDF('p','mm','a4');
-    const pw=pdf.internal.pageSize.getWidth(); const ph=pdf.internal.pageSize.getHeight();
-    const margin=8; const usableW=pw-margin*2; const imgH=canvas.height*usableW/canvas.width;
-    // cabeçalho claro
-    pdf.setFillColor(242,242,239); pdf.rect(0,0,pw,ph,'F');           // #F2F2EF
-    pdf.setTextColor(31,32,34); pdf.setFontSize(13); pdf.setFont(undefined,'bold');
-    pdf.text(`Relatório de Vendas · ${monthLabel(_activeMonth)}`,margin,12);
-    pdf.setFontSize(8); pdf.setTextColor(124,132,107);               // sálvia
-    pdf.text(`${getEmpresaNome()} · MR Solutions`,margin,17);
-    pdf.setTextColor(107,111,114);
-    pdf.text(new Date().toLocaleString('pt-BR'),pw-margin,12,{align:'right'});
-    let y=22; const pageImgH=ph-y-margin;
-    if(imgH<=pageImgH){ pdf.addImage(img,'PNG',margin,y,usableW,imgH); }
-    else {
-      const sliceCanvas=document.createElement('canvas'); const ctx=sliceCanvas.getContext('2d');
-      const pxPerMM=canvas.width/usableW; const slicePxH=pageImgH*pxPerMM;
-      let srcY=0, first=true;
-      while(srcY<canvas.height){
-        const h=Math.min(slicePxH,canvas.height-srcY);
-        sliceCanvas.width=canvas.width; sliceCanvas.height=h;
-        ctx.fillStyle=PDF_BG; ctx.fillRect(0,0,canvas.width,h);
-        ctx.drawImage(canvas,0,srcY,canvas.width,h,0,0,canvas.width,h);
-        const sImg=sliceCanvas.toDataURL('image/png');
-        if(!first){ pdf.addPage(); pdf.setFillColor(242,242,239); pdf.rect(0,0,pw,ph,'F'); }
-        pdf.addImage(sImg,'PNG',margin,first?y:margin,usableW,h/pxPerMM);
-        srcY+=h; first=false;
-      }
-    }
-    pdf.save(`relatorio-${getEmpresaNome().replace(/\s+/g,'-').toLowerCase()}-${_activeMonth}.pdf`);
-    toast('PDF pronto','O download foi iniciado.','ok');
-  }catch(err){ console.error(err); toast('Erro ao gerar PDF',String(err.message||err),'err',6000); }
-  finally{ btn.disabled=false; btn.textContent=orig; }
-}
-
-// ── PARSER FLEXÍVEL (compartilhado por XLSX e COLAR) ──────────────────
-function cleanNum(v){
-  if(v==null||v==='')return 0;
-  const s=String(v).replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').replace(/[^0-9.\-]/g,'');
-  return parseFloat(s)||0;
-}
-function cleanPct(v){
-  if(v==null||v==='')return 0;
-  const s=String(v).replace('%','').replace(',','.').trim();
-  const n=parseFloat(s)||0;
-  return n>1?n/100:n;
-}
-// findCol: acha o índice da coluna pelo primeiro keyword que casar (case-insensitive)
-function findCol(headers,...keywords){
-  const H=headers.map(h=>String(h).toUpperCase().trim());
-  for(const kw of keywords){
-    const K=kw.toUpperCase();
-    const idx=H.findIndex(h=>h.includes(K));
-    if(idx>=0)return idx;
-  }
-  return -1;
-}
-// constrói os vendedores a partir de cabeçalho + linhas — agnóstico de ERP
-function parseVendedores(headers, dataRows, diasCor, diasMes){
-  const iLoja  = findCol(headers,'LOJA','UNIDADE','FILIAL');
-  const iVend  = findCol(headers,'VENDEDOR','NOME','FUNCIONARIO','FUNCIONÁRIO','COLABORADOR','OPERADOR');
-  const iVal   = findCol(headers,'VALOR VENDIDO','VENDIDO','FATURAMENTO','VALOR','TOTAL','RECEITA');
-  const iNV    = findCol(headers,'Nº VENDAS','N VENDAS','NUM VENDAS','QTD','QUANTIDADE','PEDIDOS','VENDAS');
-  const iDesc  = findCol(headers,'DESCONTO','DESC');
-  const iMeta  = findCol(headers,'META MENSAL','META','OBJETIVO');
-  const iProj  = findCol(headers,'PROJEÇÃO','PROJECAO','PROJEC');
-  const iTicket= findCol(headers,'TICKET');
-  return dataRows.map(r=>{
-    const vendido=iVal>=0?cleanNum(r[iVal]):0;
-    const meta=iMeta>=0?cleanNum(r[iMeta]):0;
-    const nVendas=iNV>=0?cleanNum(r[iNV]):0;
-    const desc=iDesc>=0?cleanPct(r[iDesc]):0;
-    const proj=iProj>=0?cleanNum(r[iProj]):(diasCor>0?vendido/diasCor*diasMes:0);
-    const ticket=iTicket>=0?cleanNum(r[iTicket]):(nVendas>0?vendido/nVendas:0);
-    const pct=meta>0?vendido/meta:null;
-    return {loja:iLoja>=0?String(r[iLoja]).trim():'?', nome:iVend>=0?String(r[iVend]).trim():'?',
-      vendido, meta, nVendas, desconto:desc, proj, ticket, pct,
-      status:pct==null?'SEM META':pct>=.85?'BOM':pct>=.6?'ATENÇÃO':'CRÍTICO'};
-  }).filter(v=> v.nome && v.nome!=='?' || v.vendido>0);
-}
-
-// ── MODAL COLAR ───────────────────────────────────────────────────────
-let _parsedDados=null, _parsedSemanal=null;
-function openPasteModal(){ document.getElementById('paste-modal').style.display='flex'; document.body.style.overflow='hidden'; }
-function closePasteModal(){ document.getElementById('paste-modal').style.display='none'; document.body.style.overflow=''; }
-function overlayPasteClick(e){ if(e.target===document.getElementById('paste-modal'))closePasteModal(); }
-function switchPTab(t){
-  document.querySelectorAll('.ptab').forEach((b,i)=>b.classList.toggle('active',['dados','semanal'][i]===t));
-  document.querySelectorAll('.ptab-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('ptab-'+t).classList.add('active');
-}
-function parseTSV(text){ return text.trim().split('\n').map(l=>l.split('\t').map(c=>c.trim())); }
-function previewPaste(type){
-  const text=document.getElementById('paste-'+type).value;
-  const statusEl=document.getElementById('status-'+type);
-  const previewEl=document.getElementById('preview-'+type+'-wrap');
-  if(!text.trim()){ statusEl.innerHTML=''; previewEl.innerHTML=''; return; }
-  const rows=parseTSV(text);
-  if(rows.length<2){ statusEl.innerHTML='<span class="ps-warn">⚠ Poucas linhas detectadas.</span>'; return; }
-  // acha cabeçalho: linha que contém LOJA/VENDEDOR ou que tenha alguma coluna de valor
-  let hdrIdx=-1;
-  for(let i=0;i<Math.min(rows.length,6);i++){
-    const up=rows[i].map(c=>String(c).toUpperCase());
-    const hasNome = up.some(c=>/VENDEDOR|NOME|COLABORADOR|FUNCION/.test(c));
-    const hasVal  = up.some(c=>/VALOR|VENDIDO|FATUR|TOTAL|RECEITA/.test(c));
-    if(hasNome || (hasVal && up.some(c=>/LOJA|UNIDADE|FILIAL/.test(c)))){ hdrIdx=i; break; }
-  }
-  if(hdrIdx<0){ statusEl.innerHTML='<span class="ps-warn">⚠ Não reconheci o cabeçalho. Verifique se há colunas como Vendedor e Valor.</span>'; previewEl.innerHTML=''; return; }
-  const headers=rows[hdrIdx];
-  const dataRows=rows.slice(hdrIdx+1).filter(r=>r[0]&&!String(r[0]).toUpperCase().includes('TOTAL')&&r.join('').trim()!='');
-  if(dataRows.length===0){ statusEl.innerHTML='<span class="ps-err">✕ Nenhuma linha após o cabeçalho.</span>'; previewEl.innerHTML=''; return; }
-  const showCols=Math.min(headers.length,8);
-  let tbl=`<table class="preview-table"><thead><tr>${headers.slice(0,showCols).map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
-  dataRows.slice(0,8).forEach(r=>{ tbl+=`<tr>${r.slice(0,showCols).map(c=>`<td>${c}</td>`).join('')}</tr>`; });
-  tbl+='</tbody></table>';
-  // mostra quais colunas foram reconhecidas
-  if(type==='dados'){
-    const map=[['Loja',findCol(headers,'LOJA','UNIDADE','FILIAL')],['Vendedor',findCol(headers,'VENDEDOR','NOME','COLABORADOR','FUNCION')],['Valor',findCol(headers,'VALOR VENDIDO','VENDIDO','FATURAMENTO','VALOR','TOTAL','RECEITA')],['Meta',findCol(headers,'META MENSAL','META','OBJETIVO')]];
-    const okCols=map.filter(([,i])=>i>=0).map(([n])=>n).join(', ');
-    statusEl.innerHTML=`<span class="ps-ok">✓ ${dataRows.length} linha(s) · colunas reconhecidas: ${okCols||'nenhuma'}</span>`;
-  } else {
-    statusEl.innerHTML=`<span class="ps-ok">✓ ${dataRows.length} linha(s) detectada(s)</span>`;
-  }
-  previewEl.innerHTML=tbl;
-  if(type==='dados')_parsedDados={headers,dataRows}; else _parsedSemanal={headers,dataRows};
-}
-function applyPaste(){
-  if(!_parsedDados){ toast('Faltam dados','Cole os dados da aba DADOS primeiro.','err'); return; }
-  const diasCor=Number(document.getElementById('p-dias-cor').value)||20;
-  const diasMes=Number(document.getElementById('p-dias-mes').value)||24;
-  const semAtual=Number(document.getElementById('p-sem-atual').value)||4;
-  const semTotal=Number(document.getElementById('p-sem-total').value)||4;
-  const vendedores=parseVendedores(_parsedDados.headers,_parsedDados.dataRows,diasCor,diasMes);
-  if(vendedores.length===0){ toast('Nenhum vendedor','Não consegui extrair linhas válidas.','warn'); return; }
-  let semanalData=null;
-  if(_parsedSemanal){
-    const hs=_parsedSemanal.headers;
-    const isLoja=findCol(hs,'LOJA','UNIDADE'),isVend=findCol(hs,'VENDEDOR','NOME'),isMetaM=findCol(hs,'META MENSAL','META');
-    const isS1=findCol(hs,'SEM. 1','SEM1','SEMANA 1','SEMANA1');
-    const isS2=findCol(hs,'SEM. 2','SEM2','SEMANA 2','SEMANA2');
-    const isS3=findCol(hs,'SEM. 3','SEM3','SEMANA 3','SEMANA3');
-    const isS4=findCol(hs,'SEM. 4','SEM4','SEMANA 4','SEMANA4');
-    const isVS=findCol(hs,'VENDIDO SEMANA','VENDIDO SEM','VENDIDO');
-    const sv=_parsedSemanal.dataRows.map(r=>{
-      const metas=[isS1,isS2,isS3,isS4].map(i=>i>=0?cleanNum(r[i]):0);
-      const ms=metas[semAtual-1]||0,vs=isVS>=0?cleanNum(r[isVS]):0,ps=ms>0?vs/ms:null;
-      return {loja:isLoja>=0?String(r[isLoja]):'?',nome:isVend>=0?String(r[isVend]):'?',metaMensal:isMetaM>=0?cleanNum(r[isMetaM]):0,metas,metaSem:ms,vendidoSem:vs,pctSem:ps,status:ps==null?'AGUARDANDO':ps>=.85?'BOM':ps>=.6?'ATENÇÃO':'CRÍTICO'};
-    });
-    semanalData={semAtual,semTotal,vendedores:sv};
-  }
-  IS_DEMO=false; closePasteModal();
-  const dataObj={diasCorridos:diasCor,diasMes,vendedores,semanalData};
-  renderDashboard(dataObj);
-  const ok=saveMonthData(_activeMonth, dataObj);
-  buildMonthOptions();
-  toast('Dados aplicados',`${vendedores.length} vendedor(es) · salvos em ${monthLabel(_activeMonth)}.`,'ok');
-}
-
-// ── MODAL MANUAL ──────────────────────────────────────────────────────
-function openModal(){
-  buildVRows();
-  const sub=document.getElementById('modal-manual-sub');
-  if(sub) sub.innerHTML=`Preencha os campos. Os dados serão salvos em <b>${monthLabel(_activeMonth)}</b>.`;
-  document.getElementById('modal').style.display='flex'; document.body.style.overflow='hidden';
-}
-function closeModal(){ document.getElementById('modal').style.display='none'; document.body.style.overflow=''; }
-function overlayClick(e){ if(e.target===document.getElementById('modal'))closeModal(); }
-function buildVRows(){
-  const cont=document.getElementById('vrows');
-  cont.innerHTML=getVendedores().map((v,i)=>`
-    <div class="vrow">
-      <div class="floja">${v.loja}</div><div class="fnome">${v.nome}</div>
-      <input class="finput" id="mv-ven-${i}" type="number" min="0" placeholder="0" value="">
-      <input class="finput" id="mv-met-${i}" type="number" min="0" value="${v.meta}">
-      <input class="finput" id="mv-nv-${i}"  type="number" min="0" placeholder="0" value="">
-      <input class="finput" id="mv-des-${i}" type="number" min="0" max="100" step="0.1" placeholder="0">
-      <select class="status-sel" id="mv-st-${i}">
-        <option value="AUTO">Auto</option><option value="BOM">BOM</option>
-        <option value="ATENÇÃO">ATENÇÃO</option><option value="CRÍTICO">CRÍTICO</option>
-        <option value="FÉRIAS">FÉRIAS</option><option value="ATESTADO">ATESTADO</option>
-      </select>
-    </div>`).join('');
-}
-function applyManual(){
-  const diasCor=Number(document.getElementById('m-dias-cor').value)||20;
-  const diasMes=Number(document.getElementById('m-dias-mes').value)||24;
-  const semAtual=Number(document.getElementById('m-sem-atual').value)||4;
-  const semTotal=Number(document.getElementById('m-sem-total').value)||4;
-  let totalVendido=0;
-  const vendedores=getVendedores().map((v,i)=>{
-    const vendido=Number(document.getElementById(`mv-ven-${i}`).value)||0;
-    const meta=Number(document.getElementById(`mv-met-${i}`).value)||0;
-    const nVendas=Number(document.getElementById(`mv-nv-${i}`).value)||0;
-    const desc=Number(document.getElementById(`mv-des-${i}`).value)||0;
-    const stSel=document.getElementById(`mv-st-${i}`).value;
-    const proj=diasCor>0?(vendido/diasCor)*diasMes:0;
-    const pct=meta>0?vendido/meta:null;
-    const autoSt=pct==null?'SEM META':pct>=.85?'BOM':pct>=.6?'ATENÇÃO':'CRÍTICO';
-    totalVendido+=vendido;
-    return {loja:v.loja,nome:v.nome,vendido,meta,nVendas,desconto:desc/100,proj,pct,status:stSel==='AUTO'?autoSt:stSel,ticket:nVendas>0?vendido/nVendas:0};
-  });
-  if(totalVendido===0){ toast('Sem valores','Preencha ao menos um valor vendido.','warn'); return; }
-  const semVendedores=vendedores.map(v=>({...v,metaSem:v.meta>0?Math.round(v.meta/semTotal):0,vendidoSem:0,pctSem:null}));
-  IS_DEMO=false; closeModal();
-  const dataObj={diasCorridos:diasCor,diasMes,vendedores,semanalData:{semAtual,semTotal,vendedores:semVendedores},fromManual:true};
-  renderDashboard(dataObj);
-  saveMonthData(_activeMonth, dataObj);
-  buildMonthOptions();
-  toast('Dados aplicados',`Salvos em ${monthLabel(_activeMonth)}.`,'ok');
-}
-
-// ── FILE INPUT / XLSX ─────────────────────────────────────────────────
-function handleFileInput(input){
-  const f=input.files[0]; if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>processXLSX(ev.target.result);
-  r.onerror=()=>toast('Erro ao ler arquivo','Não foi possível abrir a planilha.','err');
-  r.readAsArrayBuffer(f);
-}
-document.body.addEventListener('dragover',e=>e.preventDefault());
-document.body.addEventListener('drop',e=>{
-  e.preventDefault();
-  const f=e.dataTransfer.files[0]; if(!f)return;
-  const r=new FileReader(); r.onload=ev=>processXLSX(ev.target.result); r.readAsArrayBuffer(f);
-});
-function processXLSX(buffer){
-  if(typeof XLSX==='undefined'){ toast('Sem conexão','A biblioteca não carregou. Recarregue a página.','err',7000); return; }
-  try{
-    const wb=XLSX.read(buffer,{type:'array'});
-    // tenta achar a aba DADOS; se não houver, usa a primeira
-    const sheetName = wb.SheetNames.includes('DADOS') ? 'DADOS' : wb.SheetNames[0];
-    const wsD=wb.Sheets[sheetName];
-    if(!wsD){ toast('Planilha vazia','Não há abas legíveis no arquivo.','err',6000); return; }
-    const dados=XLSX.utils.sheet_to_json(wsD,{header:1,defval:''});
-    // dias corridos/úteis (formato MR) — opcional
-    let diasCorridos=20,diasMes=24;
-    for(let r=0;r<dados.length;r++){
-      for(let c=0;c<dados[r].length;c++){
-        const cell=String(dados[r][c]).toLowerCase();
-        if(cell.includes('dias corridos')){ diasCorridos=Number(dados[r][c+1])||diasCorridos; }
-        if(cell.includes('dias úteis')||cell.includes('dias uteis')){ diasMes=Number(dados[r][c+1])||diasMes; }
-      }
-    }
-    // acha o cabeçalho de forma flexível
-    let hdr=-1;
-    for(let r=0;r<Math.min(dados.length,15);r++){
-      const up=dados[r].map(c=>String(c).toUpperCase());
-      const hasNome=up.some(c=>/VENDEDOR|NOME|COLABORADOR|FUNCION/.test(c));
-      const hasVal =up.some(c=>/VALOR|VENDIDO|FATUR|TOTAL|RECEITA/.test(c));
-      if(hasNome || (hasVal && up.some(c=>/LOJA|UNIDADE|FILIAL/.test(c)))){ hdr=r; break; }
-    }
-    if(hdr<0){ toast('Cabeçalho não encontrado','Não achei colunas como Vendedor/Valor na planilha.','err',6000); return; }
-    const headers=dados[hdr];
-    const dataRows=[];
-    for(let r=hdr+1;r<dados.length;r++){
-      const row=dados[r];
-      if(!row[0]||String(row[0]).toUpperCase().includes('TOTAL'))continue;
-      if(row.join('').trim()==='')continue;
-      dataRows.push(row);
-    }
-    const vendedores=parseVendedores(headers,dataRows,diasCorridos,diasMes);
-    if(vendedores.length===0){ toast('Nenhum vendedor','Não encontrei linhas de dados.','warn',6000); return; }
-    // META SEMANAL (opcional, formato MR)
-    const wsS=wb.Sheets['META SEMANAL'];
-    let semanalData=null;
-    if(wsS){
-      const rawS=XLSX.utils.sheet_to_json(wsS,{header:1,defval:''});
-      let semAtual=1,semTotal=4;
-      for(let r=0;r<rawS.length;r++){
-        for(let c=0;c<rawS[r].length;c++){
-          if(String(rawS[r][c]).toLowerCase().includes('semana atual'))semAtual=Number(rawS[r][c+1])||1;
-          if(String(rawS[r][c]).toLowerCase().includes('semanas no mês'))semTotal=Number(rawS[r][c+1])||4;
-        }
-      }
-      let hS=-1;
-      for(let r=0;r<rawS.length;r++){if(String(rawS[r][0]).toUpperCase()==='LOJA'){hS=r;break;}}
-      const sv=[];
-      if(hS>=0) for(let r=hS+1;r<rawS.length;r++){
-        const row=rawS[r];
-        if(!row[0]||String(row[0]).toUpperCase().includes('TOTAL'))continue;
-        const metas=[Number(row[3])||0,Number(row[4])||0,Number(row[5])||0,Number(row[6])||0];
-        const ms=metas[semAtual-1]||0,vs=Number(row[7])||0,ps=ms>0?vs/ms:null;
-        sv.push({loja:String(row[0]),nome:String(row[1]),metaMensal:Number(row[2])||0,metas,metaSem:ms,vendidoSem:vs,pctSem:ps,status:row[9]?String(row[9]):(ps==null?'AGUARDANDO':ps>=.85?'BOM':ps>=.6?'ATENÇÃO':'CRÍTICO')});
-      }
-      semanalData={semAtual,semTotal,vendedores:sv};
-    }
-    // CONFIGURACAO (opcional)
-    const wsC=wb.Sheets['CONFIGURACAO'];
-    if(wsC){
-      try{
-        const rawC=XLSX.utils.sheet_to_json(wsC,{header:1,defval:''});
-        const empresa=String(rawC[1]?.[1]||'').trim();
-        const vendsC=[];
-        for(let r=5;r<rawC.length;r++){
-          const n=String(rawC[r][0]||'').trim(); const l=String(rawC[r][1]||'').trim(); const m=Number(rawC[r][2])||0;
-          if(n) vendsC.push({nome:n,loja:l||'Loja',meta:m});
-        }
-        if(empresa||vendsC.length>0){
-          const cfgAtual=cfgLoad()||{};
-          cfgSave({...cfgAtual,empresa:empresa||cfgAtual.empresa,vendedores:vendsC.length>0?vendsC:(cfgAtual.vendedores||[])});
-          if(empresa) applyEmpresaNome(empresa);
-        }
-      }catch(e){ console.warn('Erro aba CONFIGURACAO:',e); }
-    }
-    IS_DEMO=false;
-    const dataObj={diasCorridos,diasMes,vendedores,semanalData};
-    renderDashboard(dataObj);
-    saveMonthData(_activeMonth, dataObj);
-    buildMonthOptions();
-    toast('Planilha carregada',`${vendedores.length} vendedor(es) · salvos em ${monthLabel(_activeMonth)}.`,'ok');
-  }catch(err){ console.error(err); toast('Erro ao processar','Verifique se o arquivo é válido.','err',6000); }
-}
-
-// ── RENDER PRINCIPAL ──────────────────────────────────────────────────
-function renderPie(lojas, total){
-  const wrap=document.getElementById('pie-wrap'); if(!wrap)return;
-  const palette=['#1F2022','#7C846B','#6B6F72','#a0a894','#2d2f31','#9aaa90'];
-  const entries=Object.entries(lojas).filter(([,i])=>i.vendido>0).sort((a,b)=>b[1].vendido-a[1].vendido);
-  if(entries.length===0||total<=0){ wrap.innerHTML=''; return; }
-  const size=210,cx=size/2,cy=size/2,r=94,inner=68;
-  let angle=-Math.PI/2,paths='';
-  entries.forEach(([loja,info],idx)=>{
-    const frac=info.vendido/total; const a2=angle+frac*Math.PI*2;
-    const x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
-    const x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
-    const xi1=cx+inner*Math.cos(a2),yi1=cy+inner*Math.sin(a2);
-    const xi2=cx+inner*Math.cos(angle),yi2=cy+inner*Math.sin(angle);
-    const large=frac>.5?1:0;
-    paths+=`<path d="M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${xi1} ${yi1} A ${inner} ${inner} 0 ${large} 0 ${xi2} ${yi2} Z" fill="${palette[idx%palette.length]}" stroke="#fff" stroke-width="2.5"/>`;
-    angle=a2;
-  });
-  const svg=`<svg class="pie-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}
-    <text x="${cx}" y="${cy-7}" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="1.5">TOTAL</text>
-    <text x="${cx}" y="${cy+14}" text-anchor="middle" font-family="Inter,sans-serif" font-size="15" font-weight="800" fill="#0b1220" letter-spacing="-0.5">${R(total)}</text></svg>`;
-  let leg='<div class="pie-leg">';
-  entries.forEach(([loja,info],idx)=>{
-    const pct=(info.vendido/total*100).toFixed(1).replace('.',',');
-    leg+=`<div class="pie-leg-item"><span class="pie-dot" style="background:${palette[idx%palette.length]}"></span><div><div class="pie-leg-name">Loja ${loja}</div><div class="pie-leg-val">${R(info.vendido)} (${pct}%)</div></div></div>`;
-  });
-  leg+='</div>'; wrap.innerHTML=svg+leg;
-}
-function rkSb(s){
-  const m={BOM:'bom','ATENÇÃO':'at',ATENCAO:'at','CRÍTICO':'cr',CRITICO:'cr','FÉRIAS':'fer',FERIAS:'fer',ATESTADO:'ates',AGUARDANDO:'agu','SEM META':'agu'};
-  return `<span class="rk-sb rk-sb-${m[(s||'').toUpperCase().trim()]||'agu'}">${s||'—'}</span>`;
-}
-function renderDashboard(d){
-  _lastData=d;
-  document.getElementById('empty-state').style.display='none';
-  document.getElementById('dashboard').style.display='block';
-  document.getElementById('pdf-btn').disabled=false;
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  const cz=document.getElementById('capture-zone'); if(cz)cz.style.display='block';
-  const tabs=document.querySelector('.tabs'); if(tabs)tabs.style.display='flex';
-  document.querySelectorAll('.nav-item').forEach(btn=>btn.classList.toggle('active',btn.textContent.trim()==='Visão Geral'));
-  const rib=document.getElementById('demo-ribbon');
-  if(rib) rib.classList.toggle('show', !!IS_DEMO);
-  updateSaveWarn();
-  updateMonthDot();
-
-  const tv=d.vendedores.reduce((s,v)=>s+v.vendido,0);
-  const tm=d.vendedores.reduce((s,v)=>s+v.meta,0);
-  const tp=d.vendedores.reduce((s,v)=>s+(v.proj||0),0);
-  const tn=d.vendedores.reduce((s,v)=>s+v.nVendas,0);
-  const pg=tm>0?tv/tm:0; const tick=tn>0?tv/tn:0;
-  const ritmoPct = tm>0 ? tp/tm : 0;
-  const diasRest = (d.diasMes && d.diasCorridos) ? Math.max(d.diasMes - d.diasCorridos, 0) : 0;
-  const faltaMeta = Math.max(tm - tv, 0);
-  const precisaDia = diasRest > 0 ? faltaMeta / diasRest : 0;
-  const ritmoCls = ritmoPct>=1 ? 'ok' : ritmoPct>=.9 ? 'at' : 'cr';
-  const ritmoTxt = ritmoPct>=1 ? 'No ritmo de bater a meta ✓'
-    : (diasRest>0 ? `Precisa de ${R(precisaDia)}/dia nos ${diasRest} dias restantes` : 'Período encerrado');
-  const now=new Date();
-  const pt=document.getElementById('period-t'); if(pt)pt.textContent=`${d.diasCorridos||'—'} dias corridos`;
-  const ps=document.getElementById('period-s'); if(ps)ps.textContent=`${d.diasMes||'—'} dias úteis · ${monthLabelShort(_activeMonth)}`;
-
-  const icoFat='<svg viewBox="0 0 24 24" fill="none" stroke="#1F2022" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>';
-  const icoProj='<svg viewBox="0 0 24 24" fill="none" stroke="#7C846B" stroke-width="2"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>';
-  const icoVend='<svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/></svg>';
-  const icoTick='<svg viewBox="0 0 24 24" fill="none" stroke="#ea7a3c" stroke-width="2"><path d="M20 12V8H6a2 2 0 01-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12a2 2 0 002 2h14v-4"/><path d="M18 12a2 2 0 000 4h4v-4z"/></svg>';
-  const icoRitmo='<svg viewBox="0 0 24 24" fill="none" stroke="#7C846B" stroke-width="2"><path d="M12 20v-6M12 14a8 8 0 108-8"/><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>';
-  const ritmoBg = ritmoCls==='ok'?'#e3efe3':ritmoCls==='at'?'#f5f0df':'#f6e6e6';
-  document.getElementById('kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-head"><div class="kpi-ico" style="background:#e8ebe2">${icoFat}</div><div class="kpi-lbl">Faturamento Total</div></div><div class="kpi-val num">${R(tv)}</div><div class="kpi-foot">Meta: ${R(tm)}</div><span class="kpi-pct txt-${sc(pg)}">${P(pg)} da meta</span><div class="kpi-bar"><div class="kpi-bar-fill fill-${sc(pg)}" style="width:${Math.min(pg*100,100).toFixed(1)}%"></div></div></div>
-    <div class="kpi"><div class="kpi-head"><div class="kpi-ico" style="background:#eaeae7">${icoProj}</div><div class="kpi-lbl">Projeção do Mês</div></div><div class="kpi-val num">${R(tp)}</div><div class="kpi-foot txt-ok">${P(pg)} da meta</div></div>
-    <div class="kpi"><div class="kpi-head"><div class="kpi-ico" style="background:#e9e9e6">${icoVend}</div><div class="kpi-lbl">Total de Vendas</div></div><div class="kpi-val num">${N(tn)}</div><div class="kpi-foot">Pedidos no período</div></div>
-    <div class="kpi"><div class="kpi-head"><div class="kpi-ico" style="background:#ebe9e3">${icoTick}</div><div class="kpi-lbl">Ticket Médio</div></div><div class="kpi-val num">${R(tick)}</div><div class="kpi-foot">Por venda</div></div>
-    <div class="kpi"><div class="kpi-head"><div class="kpi-ico" style="background:${ritmoBg}">${icoRitmo}</div><div class="kpi-lbl">Ritmo de Meta</div></div><div class="kpi-val num txt-${ritmoCls}">${P(ritmoPct)}</div><div class="kpi-bar"><div class="kpi-bar-fill fill-${ritmoCls}" style="width:${Math.min(ritmoPct*100,100).toFixed(1)}%"></div></div><div class="kpi-ritmo-txt txt-${ritmoCls}">${ritmoTxt}</div></div>`;
-
-  const lojas={};
-  d.vendedores.forEach(v=>{ if(!lojas[v.loja])lojas[v.loja]={vendido:0,meta:0,proj:0};
-    lojas[v.loja].vendido+=v.vendido; lojas[v.loja].meta+=v.meta; lojas[v.loja].proj+=(v.proj||0); });
-  const icoStore='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5M5 9v11h14V9M9 20v-6h6v6"/></svg>';
-  let lH='';
-  for(const [loja,info] of Object.entries(lojas)){
-    const p=info.meta>0?info.vendido/info.meta:0; const gap=Math.max(info.meta-info.vendido,0);
-    lH+=`<div class="loja"><div class="loja-top"><div class="loja-ico">${icoStore}</div><div class="loja-name">Loja ${loja}</div><span class="badge badge-${sc(p)}">${sl(p)}</span></div><div class="loja-val num">${R(info.vendido)}</div><div class="loja-meta">Meta: ${R(info.meta)} · Proj.: ${R(info.proj)}</div><div class="loja-bar"><div class="loja-bar-fill fill-${sc(p)}" style="width:${Math.min(p*100,100).toFixed(1)}%"></div></div><div class="loja-foot"><span class="at txt-${sc(p)}">${P(p)} atingido</span><span class="gap">Gap ${R(gap)}</span></div></div>`;
-  }
-  document.getElementById('lojas').innerHTML=lH;
-  renderPie(lojas,tv);
-
-  const sorted=[...d.vendedores].sort((a,b)=>b.vendido-a.vendido);
-  let rH='';
-  sorted.forEach((v,i)=>{
-    const pos=i+1,pc=pos===1?'p1':pos===2?'p2':pos===3?'p3':'po';
-    const s=v.pct!=null?sc(v.pct):'nt'; const psx=v.pct!=null?P(v.pct)+' da meta':'sem meta';
-    const bw=v.pct!=null?Math.min(v.pct*100,100).toFixed(1):'0';
-    const ds=v.desconto!=null&&v.desconto!==''?(isNaN(Number(v.desconto))?v.desconto:(Number(v.desconto)*100).toFixed(1).replace('.',',')+'%'):'—';
-    rH+=`<div class="rk-row"><span class="rk-pos ${pc}">${pos}</span><span class="rk-av" style="background:${avColor(v.nome)}">${initials(v.nome)}</span><div class="rk-mid"><div class="rk-name-row"><span class="rk-name">${v.nome}</span>${rkSb(v.status)}<span class="rk-store">Loja ${v.loja}</span></div><div class="rk-kpis">Ticket <b>${R(v.ticket)}</b> · Vendas <b>${v.nVendas}</b> · Desc. <b>${ds}</b></div><div class="rk-prog"><div class="rk-prog-fill fill-${s}" style="width:${bw}%"></div></div></div><div class="rk-right"><div class="rk-val num">${R(v.vendido)}</div><div class="rk-pct txt-${s}">${psx}</div></div></div>`;
-  });
-  document.getElementById('ranking').innerHTML=rH;
-
-  document.getElementById('totalbar').innerHTML=`
-    <div><div class="tb-lbl">Total Geral</div></div>
-    <div><div class="tb-val num">${N(tn)} vendas</div><div class="tb-sub">no período</div></div>
-    <div><div class="tb-val num">${R(tv)}</div><div class="tb-sub">faturado</div></div>
-    <div><div class="tb-val num" style="color:${pg>=.85?'#16a34a':pg>=.6?'#ca8a04':'#dc2626'}">${P(pg)}</div><div class="tb-sub">da meta</div></div>
-    <div><div class="tb-val num">${R(tp)}</div><div class="tb-sub">projeção final</div></div>`;
-
-  if(!d.semanalData){
-    document.getElementById('semanal').style.display='none';
-    document.getElementById('sem-empty').style.display='block';
-  } else {
-    document.getElementById('sem-empty').style.display='none';
-    document.getElementById('semanal').style.display='flex';
-    const sd=d.semanalData;
-    let sH=`<div class="sec-title" style="margin-bottom:6px">Semana ${sd.semAtual} de ${sd.semTotal} · Desempenho individual</div>`;
-    [...sd.vendedores].sort((a,b)=>b.vendidoSem-a.vendidoSem).forEach((v,i)=>{
-      const pos=i+1,pc=pos===1?'p1':pos===2?'p2':pos===3?'p3':'po';
-      const s=v.pctSem!=null?sc(v.pctSem):'nt'; const psx=v.pctSem!=null?P(v.pctSem)+' da meta':'sem dado';
-      const bw=v.pctSem!=null?Math.min(v.pctSem*100,100).toFixed(1):'0';
-      sH+=`<div class="rk-row"><span class="rk-pos ${pc}">${pos}</span><span class="rk-av" style="background:${avColor(v.nome)}">${initials(v.nome)}</span><div class="rk-mid"><div class="rk-name-row"><span class="rk-name">${v.nome}</span>${rkSb(v.status)}<span class="rk-store">Loja ${v.loja}</span></div><div class="rk-kpis">Meta sem. <b>${R(v.metaSem)}</b> · Meta mês <b>${R(v.metaMensal||v.meta||0)}</b></div><div class="rk-prog"><div class="rk-prog-fill fill-${s}" style="width:${bw}%"></div></div></div><div class="rk-right"><div class="rk-val num">${R(v.vendidoSem)}</div><div class="rk-pct txt-${s}">${psx}</div></div></div>`;
-    });
-    document.getElementById('semanal').innerHTML=sH;
-  }
-}
-
-function switchTab(t){
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['mensal','semanal'][i]===t));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-}
-</script>
-
-<!-- ════════════ SEÇÃO DE OFERTA (integrada, scroll único) ════════════ -->
-<style>
-  .pvo-section{background:#1F2022;color:#ECECEA;font-family:'Inter',sans-serif;padding:88px 24px;}
-  .pvo-wrap{max-width:1040px;margin:0 auto;}
-  .pvo-eyebrow{font-family:'Poppins',sans-serif;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#7C846B;font-weight:600;margin:0 0 14px;text-align:center;}
-  .pvo-title{font-family:'Poppins',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:700;line-height:1.15;margin:0 0 10px;text-align:center;color:#fff;}
-  .pvo-sub{text-align:center;color:#B9BBB4;font-size:17px;max-width:560px;margin:0 auto 48px;line-height:1.6;}
-  .pvo-card{background:#26282B;border:1px solid #34373B;border-radius:18px;max-width:760px;margin:0 auto;padding:40px 36px;position:relative;}
-  .pvo-badge{position:absolute;top:-16px;left:50%;transform:translateX(-50%);background:#7C846B;color:#1F2022;font-family:'Poppins',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;padding:8px 18px;border-radius:999px;white-space:nowrap;}
-  .pvo-price-row{display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;margin:14px 0 4px;}
-  .pvo-price-old{color:#7d7f7a;text-decoration:line-through;font-size:20px;font-weight:500;}
-  .pvo-price{font-family:'Poppins',sans-serif;font-weight:700;font-size:clamp(44px,6vw,58px);color:#fff;line-height:1;}
-  .pvo-price small{font-size:22px;font-weight:600;color:#B9BBB4;}
-  .pvo-parcel{text-align:center;color:#B9BBB4;font-size:15px;margin:6px 0 0;}
-  .pvo-once{text-align:center;font-family:'Poppins',sans-serif;color:#9aa388;font-weight:600;font-size:15px;margin:18px 0 28px;}
-  .pvo-list{list-style:none;padding:0;margin:0 0 30px;display:grid;grid-template-columns:1fr 1fr;gap:13px 28px;}
-  .pvo-list li{font-size:15.5px;line-height:1.5;color:#ECECEA;padding-left:28px;position:relative;}
-  .pvo-list li::before{content:"✓";position:absolute;left:0;top:0;color:#7C846B;font-weight:700;}
-  .pvo-cta{display:block;text-align:center;text-decoration:none;background:#7C846B;color:#1F2022;font-family:'Poppins',sans-serif;font-weight:600;font-size:17px;padding:17px 28px;border-radius:12px;transition:transform .15s ease, background .15s ease;}
-  .pvo-cta:hover{background:#8d9579;transform:translateY(-2px);}
-  .pvo-cta:focus-visible{outline:3px solid #fff;outline-offset:3px;}
-  .pvo-guarantee{text-align:center;color:#9b9d97;font-size:13.5px;margin:16px 0 0;}
-  .pvo-anchor{text-align:center;color:#B9BBB4;font-size:15px;max-width:520px;margin:34px auto 0;line-height:1.6;}
-  .pvo-anchor strong{color:#fff;}
-  .pvo-faq{max-width:760px;margin:64px auto 0;}
-  .pvo-faq h3{font-family:'Poppins',sans-serif;font-size:22px;font-weight:600;color:#fff;text-align:center;margin:0 0 26px;}
-  .pvo-faq details{background:#26282B;border:1px solid #34373B;border-radius:12px;margin-bottom:10px;overflow:hidden;}
-  .pvo-faq summary{cursor:pointer;padding:16px 20px;font-family:'Poppins',sans-serif;font-weight:500;font-size:15.5px;color:#ECECEA;list-style:none;position:relative;}
-  .pvo-faq summary::-webkit-details-marker{display:none;}
-  .pvo-faq summary::after{content:"+";position:absolute;right:20px;top:14px;color:#7C846B;font-size:20px;font-weight:600;}
-  .pvo-faq details[open] summary::after{content:"–";}
-  .pvo-faq p{margin:0;padding:0 20px 18px;color:#B9BBB4;font-size:14.5px;line-height:1.65;}
-  @media (max-width:640px){.pvo-section{padding:64px 18px;}.pvo-card{padding:36px 22px;}.pvo-list{grid-template-columns:1fr;}}
-  @media (prefers-reduced-motion:reduce){.pvo-cta{transition:none;}}
-  .pvo-whats{position:fixed;right:20px;bottom:20px;z-index:9999;width:58px;height:58px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.3);transition:transform .15s ease;}
-  .pvo-whats:hover{transform:scale(1.07);}
-  .pvo-whats svg{width:30px;height:30px;fill:#fff;}
-</style>
-
-<section class="pvo-section" id="oferta">
-  <div class="pvo-wrap">
-    <p class="pvo-eyebrow">Oferta de lançamento</p>
-    <h2 class="pvo-title">Seu painel de vendas.<br>Pago uma vez. Seu para sempre.</h2>
-    <p class="pvo-sub">Sem mensalidade, sem assinatura, sem surpresa no cartão. Você paga uma única vez e o painel é seu.</p>
-
-    <div class="pvo-card">
-      <span class="pvo-badge">Condição válida para as primeiras 10 empresas</span>
-      <div class="pvo-price-row">
-        <span class="pvo-price-old">R$ 497,00</span>
-        <span class="pvo-price"><small>R$</small> 297<small>,00</small></span>
-      </div>
-      <p class="pvo-parcel">à vista no Pix &nbsp;·&nbsp; ou 3x de R$ 99,00 no cartão</p>
-      <p class="pvo-once">Pagamento único — nada de mensalidade</p>
-      <ul class="pvo-list">
-        <li><strong>Setup completo feito para você:</strong> logo, cores da sua marca e equipe já cadastrada</li>
-        <li><strong>Vendedores e lojas ilimitados</strong> — cresceu, o painel cresce junto</li>
-        <li><strong>Histórico mês a mês</strong> com comparação automática de faturamento</li>
-        <li><strong>Importa de qualquer ERP</strong> (Bling, Tiny, Omie) ou cole do Excel</li>
-        <li><strong>Relatório executivo em PDF</strong> com um clique, pronto para enviar ao dono</li>
-        <li><strong>30 dias de suporte direto no WhatsApp</strong> após a entrega</li>
-      </ul>
-      <a class="pvo-cta"
-         href="https://wa.me/5584986329566?text=Ol%C3%A1!%20Quero%20o%20painel%20PIV%20para%20minha%20empresa%20na%20condi%C3%A7%C3%A3o%20de%20lan%C3%A7amento%20de%20R%24%20297%2C00."
-         target="_blank" rel="noopener">
-        Quero meu painel por R$ 297,00 →
-      </a>
-      <p class="pvo-guarantee">Entrega em até 48h úteis · Painel personalizado e pronto para usar</p>
-    </div>
-
-    <p class="pvo-anchor">
-      Faça a conta: <strong>uma única venda a mais no mês já paga o painel.</strong>
-      O resto é lucro de decidir com dados em vez de adivinhar.
-    </p>
-
-    <div class="pvo-faq">
-      <h3>Perguntas frequentes</h3>
-      <details>
-        <summary>Meus dados de vendas ficam seguros?</summary>
-        <p>Ficam — e mais do que você imagina. O painel roda 100% no seu navegador: os números da sua empresa não são enviados para nenhum servidor e ninguém além de você tem acesso. Você ainda pode exportar um backup com um clique sempre que quiser.</p>
-      </details>
-      <details>
-        <summary>Preciso instalar alguma coisa?</summary>
-        <p>Não. O painel abre direto no navegador do computador ou do celular, como um site. Sem instalação, sem TI, sem complicação.</p>
-      </details>
-      <details>
-        <summary>Funciona com a planilha que eu já uso?</summary>
-        <p>Sim. O painel reconhece as colunas automaticamente, então você pode colar os dados do seu Excel, Google Sheets ou de qualquer ERP (Bling, Tiny, Omie). Se preferir, também dá para carregar o arquivo .xlsx ou digitar os valores na tela.</p>
-      </details>
-      <details>
-        <summary>Consigo comparar um mês com o outro?</summary>
-        <p>Sim. Cada mês que você salva fica guardado no histórico. Na tela de comparação você escolhe dois meses e vê a variação de faturamento, ticket médio e pedidos — lado a lado.</p>
-      </details>
-      <details>
-        <summary>E depois dos 30 dias de suporte?</summary>
-        <p>O painel continua funcionando normalmente — ele é seu para sempre. Os 30 dias cobrem dúvidas de uso e ajustes finos da entrega. Depois disso, novas personalizações podem ser contratadas avulsas, sem nenhuma obrigação.</p>
-      </details>
-      <details>
-        <summary>Por que esse preço é "de lançamento"?</summary>
-        <p>As 10 primeiras empresas entram com condição especial em troca de feedback e depoimento. Depois disso, o valor passa a R$ 497,00 — quem entrar agora garante o preço de fundador.</p>
-      </details>
-    </div>
+    <a href="#catalog" class="hero-cta-main">Ver coleção ↓</a>
+    <a href="https://chat.whatsapp.com/LXa5amw4R86Fpl6nfwL37J?mode=gi_t" target="_blank" rel="noopener" class="hero-cta-vip">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Grupo VIP — Novidades Exclusivas
+    </a>
   </div>
 </section>
 
-<a class="pvo-whats" aria-label="Falar no WhatsApp"
-   href="https://wa.me/5584986329566?text=Ol%C3%A1!%20Vi%20o%20site%20do%20PIV%20e%20quero%20saber%20mais."
-   target="_blank" rel="noopener">
-  <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 .8C7.6.8.8 7.6.8 16c0 2.7.7 5.3 2 7.6L.8 31.2l7.8-2c2.2 1.2 4.7 1.9 7.4 1.9 8.4 0 15.2-6.8 15.2-15.1S24.4.8 16 .8zm0 27.6c-2.4 0-4.7-.6-6.7-1.8l-.5-.3-4.6 1.2 1.2-4.5-.3-.5c-1.3-2-2-4.4-2-6.8C3.1 8.9 8.9 3.1 16 3.1S28.9 8.9 28.9 16 23.1 28.4 16 28.4zm7.1-9.3c-.4-.2-2.3-1.1-2.6-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.5-.2.3-.5.3-.9.1-.4-.2-1.6-.6-3.1-1.9-1.1-1-1.9-2.3-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.5.6-.7.2-.2.3-.4.4-.7.1-.3.1-.5 0-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.6-.7-.9-.7h-.8c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.8 4.2 6.7 5.9.9.4 1.7.6 2.2.8.9.3 1.8.3 2.5.2.8-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.1-.2-.4-.3-.8-.5z"/></svg>
+<div id="trust-bar">
+  <div class="trust-item"><strong>Entrega rápida</strong><span>Em até 7 dias úteis</span></div>
+  <div class="trust-item"><strong>Parcele em 10x</strong><span>No cartão de crédito</span></div>
+  <div class="trust-item"><strong>Atendimento humano</strong><span>Direto no WhatsApp</span></div>
+  <div class="trust-item"><strong>Compre 1, ganhe 30%</strong><span>No segundo par</span></div>
+</div>
+
+<div id="filters">
+  <span class="filter-label">Filtrar:</span>
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="available">Disponíveis</button>
+  <button class="filter-btn" data-filter="esgotado">Esgotados</button>
+</div>
+
+<section id="catalog">
+  <div class="section-header">
+    <h2 class="section-title">Nossos <span>Modelos</span></h2>
+    <span id="products-count"></span>
+  </div>
+  <div id="products-grid"></div>
+</section>
+
+<section style="background:#f5f5f3;padding:60px 20px;text-align:center;border-top:1px solid #e6e6e3;">
+  <p style="font-size:.85rem;letter-spacing:.2em;text-transform:uppercase;color:#FF6A00;margin-bottom:12px;">NÃO ENCONTROU O QUE PROCURAVA?</p>
+  <h2 style="font-size:1.8rem;font-weight:900;color:#1a1a1a;margin-bottom:12px;">Fale com a gente pelo WhatsApp</h2>
+  <p style="font-size:.95rem;color:#6b6b68;margin-bottom:28px;">Te ajudamos a encontrar o modelo ideal. Atendimento rápido e personalizado.</p>
+  <a href="https://wa.me/5584994746936?text=Ol%C3%A1!%20N%C3%A3o%20encontrei%20o%20modelo%20que%20procurava%20no%20site.%20Pode%20me%20ajudar%3F" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:#25D366;color:#fff;font-weight:700;font-size:1rem;padding:16px 32px;border-radius:50px;text-decoration:none;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Chamar no WhatsApp
+  </a>
+</section>
+
+<section style="background:#fff;padding:60px 20px;text-align:center;border-top:1px solid #e6e6e3;">
+  <p style="font-size:.75rem;letter-spacing:.22em;text-transform:uppercase;color:#1aa34a;margin-bottom:14px;">● ACESSO EXCLUSIVO</p>
+  <h2 style="font-size:1.7rem;font-weight:900;color:#1a1a1a;margin-bottom:10px;">Entre no Grupo VIP</h2>
+  <p style="font-size:.92rem;color:#6b6b68;margin-bottom:32px;max-width:340px;margin-left:auto;margin-right:auto;line-height:1.6;">Receba <strong style="color:#1a1a1a;">lançamentos em primeira mão</strong>, drops limitados e ofertas exclusivas direto no seu WhatsApp.</p>
+  <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:36px;">
+    <div style="background:#f5f5f3;border:1px solid #e6e6e3;padding:16px 20px;min-width:110px;border-top:2px solid #25D366;border-radius:8px;"><div style="font-size:20px;margin-bottom:6px;">⚡</div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b6b68;margin-bottom:3px;">Drops</div><div style="font-size:12px;color:#1a1a1a;">Antes de todo mundo</div></div>
+    <div style="background:#f5f5f3;border:1px solid #e6e6e3;padding:16px 20px;min-width:110px;border-top:2px solid #25D366;border-radius:8px;"><div style="font-size:20px;margin-bottom:6px;">🔒</div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b6b68;margin-bottom:3px;">Ofertas</div><div style="font-size:12px;color:#1a1a1a;">Só pra membros</div></div>
+    <div style="background:#f5f5f3;border:1px solid #e6e6e3;padding:16px 20px;min-width:110px;border-top:2px solid #25D366;border-radius:8px;"><div style="font-size:20px;margin-bottom:6px;">👟</div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b6b68;margin-bottom:3px;">News</div><div style="font-size:12px;color:#1a1a1a;">Novidades todo dia</div></div>
+  </div>
+  <a href="https://chat.whatsapp.com/LXa5amw4R86Fpl6nfwL37J?mode=gi_t" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:#25D366;color:#000;font-weight:800;font-size:.95rem;padding:16px 32px;border-radius:4px;text-decoration:none;letter-spacing:.05em;text-transform:uppercase;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Entrar no Grupo VIP
+  </a>
+  <p style="margin-top:16px;font-size:11px;color:#9b9b98;">Sem spam · Saia quando quiser</p>
+</section>
+
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">DAM<span class="dot">.</span>SHOES</div>
+    <p class="footer-copy">© <span id="footer-year"></span> DAM Shoes — Todos os direitos reservados</p>
+    <a class="footer-wa" href="https://wa.me/5584994746936" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Fale conosco
+    </a>
+  </div>
+</footer>
+
+<a id="wa-float" href="https://wa.me/5584994746936?text=Ol%C3%A1!%20Vi%20o%20site%20da%20DAM%20Shoes%20e%20quero%20saber%20mais." target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
+
+<div id="side-menu-overlay" class="side-overlay">
+  <div id="side-menu" class="side-menu" role="dialog" aria-modal="true" aria-label="Menu de navegação">
+    <div class="side-menu-header">
+      <div class="logo">DAM<span class="dot">.</span>SHOES</div>
+      <button id="close-side-menu" class="modal-close" aria-label="Fechar menu">✕</button>
+    </div>
+    <div class="side-section"><p class="side-section-label">Urban Style. Every Step.</p></div>
+    <div class="side-divider"></div>
+    <div class="side-section">
+      <p class="side-section-title">Navegação</p>
+      <a class="side-link" href="#hero" onclick="closeSideMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Início</a>
+      <a class="side-link" href="#catalog" onclick="closeSideMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Catálogo</a>
+    </div>
+    <div class="side-divider"></div>
+    <div class="side-section">
+      <p class="side-section-title">Filtrar por Marca</p>
+      <div id="side-brands" class="side-brands"><button class="side-brand-btn active" data-filter="all" onclick="sideFilter('all',this)"><span class="side-brand-icon">👟</span> Todos</button></div>
+    </div>
+    <div class="side-divider"></div>
+    <div class="side-section">
+      <p class="side-section-title">Atendimento</p>
+      <a class="side-link side-link-wa" href="https://wa.me/5584994746936" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Comprar pelo WhatsApp
+      </a>
+    </div>
+    <div class="side-promo"><strong>🔥 COMPRE 1 PAR</strong><span>E GANHE 30% OFF NO SEGUNDO</span></div>
+  </div>
+</div>
+
+<div class="overlay" id="admin-overlay">
+  <div class="modal modal-wide" role="dialog" aria-modal="true" aria-label="Painel administrativo">
+    <button class="modal-close" id="close-admin" aria-label="Fechar painel admin">✕</button>
+    <div id="login-section">
+      <h2 class="modal-title">Acesso <span>Admin</span></h2>
+      <div class="form-row"><label for="input-password">Senha de Administrador</label><input type="password" id="input-password" placeholder="Digite a senha..." /></div>
+      <div id="msg-login" class="msg"></div>
+      <button class="btn-primary" id="btn-login">Entrar</button>
+    </div>
+    <div id="admin-panel" style="display:none">
+      <h2 class="modal-title">Painel <span>Admin</span></h2>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="add">Novo Produto</button>
+        <button class="tab-btn" data-tab="list">Gerenciar</button>
+        <button class="tab-btn" data-tab="settings">Config</button>
+      </div>
+      <div id="tab-add">
+        <div class="form-cols">
+          <div class="form-row"><label for="add-name">Nome do produto *</label><input type="text" id="add-name" placeholder="Ex: Air Max Urbano" /></div>
+          <div class="form-row"><label for="add-brand">Marca</label><input type="text" id="add-brand" placeholder="Nike, Adidas..." /></div>
+        </div>
+        <div class="form-row" style="margin-top:.85rem"><label for="add-ref">Referência</label><input type="text" id="add-ref" placeholder="Ex: AM-001" /></div>
+        <div class="form-cols" style="margin-top:.85rem">
+          <div class="form-row"><label for="add-price">Preço de venda (R$) *</label><input type="number" id="add-price" placeholder="299.90" step="0.01" min="0" /></div>
+          <div class="form-row"><label for="add-price-old">Preço antigo (R$)</label><input type="number" id="add-price-old" placeholder="399.90" step="0.01" min="0" /></div>
+        </div>
+        <div class="form-row" style="margin-top:.85rem"><label for="add-cost">Custo interno (R$) <span style="color:var(--grey);font-weight:400">— não aparece no site</span></label><input type="number" id="add-cost" placeholder="180.00" step="0.01" min="0" /></div>
+        <div class="margin-box" id="margin-calc">
+          <div class="margin-item"><label>Lucro</label><span class="margin-value" id="margin-lucro">R$ 0,00</span></div>
+          <div class="margin-item"><label>Margem</label><span class="margin-value" id="margin-pct">0.0%</span></div>
+          <div class="margin-item"><label>Custo vs Venda</label><span class="margin-value" id="margin-status" style="font-size:.75rem;color:var(--grey)">—</span></div>
+        </div>
+        <div class="form-row" style="margin-top:.85rem"><label for="add-sizes">Numeração disponível (separe por vírgula)</label><input type="text" id="add-sizes" placeholder="37, 38, 39, 40, 41, 42, 43" /></div>
+        <div class="form-row" style="margin-top:.85rem"><label>Fotos do produto (máx. 3)</label><p class="form-hint">Toque em + para escolher fotos da galeria ou tirar uma foto.</p><div class="photo-uploader" id="add-photo-uploader"></div></div>
+        <div class="form-row" style="margin-top:.85rem"><label for="add-desc">Descrição (opcional)</label><textarea id="add-desc" placeholder="Detalhes do produto..."></textarea></div>
+        <div class="form-row" style="margin-top:.85rem"><label for="add-status">Status</label><select id="add-status"><option value="available">Disponível</option><option value="esgotado">Esgotado</option></select></div>
+        <div id="msg-add" class="msg"></div>
+        <button class="btn-primary" id="btn-add-product">Salvar Produto</button>
+      </div>
+      <div id="tab-list" style="display:none"><div class="admin-list" id="admin-list"><p style="color:var(--grey);font-size:.8rem;text-align:center;padding:1rem">Carregando...</p></div></div>
+      <div id="tab-settings" style="display:none">
+        <div class="form-row"><label>Foto do Banner Principal (URL)</label><input type="text" id="cfg-hero-img" placeholder="https://..." /><p class="form-hint">Cole a URL de uma foto de tênis. Troque conforme a campanha.</p></div>
+        <div class="form-row" style="margin-top:.85rem"><label>Título do Banner (headline)</label><input type="text" id="cfg-hero-title" placeholder="Seu estilo. Seu passo." /><p class="form-hint">Use | para quebrar a linha. Ex: Seu estilo.|Seu passo.</p></div>
+        <div class="form-row" style="margin-top:.85rem"><label>Subtítulo do Banner</label><input type="text" id="cfg-hero-subtitle" placeholder="Tênis premium com entrega rápida..." /></div>
+        <div class="form-row" style="margin-top:.85rem"><label>Texto da Promoção</label><input type="text" id="cfg-promo" placeholder="COMPRE 1 PAR E GANHE 30% OFF NO SEGUNDO" /></div>
+        <div class="form-row" style="margin-top:.85rem"><label>WhatsApp (com DDI+DDD)</label><input type="text" id="cfg-whatsapp" placeholder="5584994746936" /></div>
+        <div class="form-cols" style="margin-top:.85rem">
+          <div class="form-row"><label>Prazo de Entrega</label><input type="text" id="cfg-prazo" placeholder="7 dias úteis" /></div>
+          <div class="form-row"><label>Parcelas</label><input type="number" id="cfg-parcelas" placeholder="10" min="1" max="24" /></div>
+        </div>
+        <div class="form-row" style="margin-top:.85rem"><label>Taxa do Cartão (%)</label><input type="number" id="cfg-taxa" placeholder="2.99" step="0.01" min="0" /></div>
+        <div id="msg-settings" class="msg"></div>
+        <button class="btn-primary" id="btn-save-settings">Salvar Configurações</button>
+      </div>
+      <div class="divider"></div>
+      <button class="btn-secondary" id="btn-logout" style="width:100%">Sair do Admin</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="edit-overlay">
+  <div class="modal modal-wide" role="dialog" aria-modal="true" aria-label="Editar produto">
+    <button class="modal-close" id="close-edit" aria-label="Fechar edição">✕</button>
+    <h2 class="modal-title">Editar <span>Produto</span></h2>
+    <div class="form-cols">
+      <div class="form-row"><label>Nome *</label><input type="text" id="edit-name" /></div>
+      <div class="form-row"><label>Marca</label><input type="text" id="edit-brand" /></div>
+    </div>
+    <div class="form-row" style="margin-top:.85rem"><label>Referência</label><input type="text" id="edit-ref" /></div>
+    <div class="form-cols" style="margin-top:.85rem">
+      <div class="form-row"><label>Preço de venda (R$) *</label><input type="number" id="edit-price" step="0.01" min="0" /></div>
+      <div class="form-row"><label>Preço antigo (R$)</label><input type="number" id="edit-price-old" step="0.01" min="0" /></div>
+    </div>
+    <div class="form-row" style="margin-top:.85rem"><label>Custo interno (R$)</label><input type="number" id="edit-cost" step="0.01" min="0" /></div>
+    <div class="margin-box">
+      <div class="margin-item"><label>Lucro</label><span class="margin-value" id="edit-margin-lucro">R$ 0,00</span></div>
+      <div class="margin-item"><label>Margem</label><span class="margin-value" id="edit-margin-pct">0.0%</span></div>
+      <div class="margin-item"><label>Status</label><span class="margin-value" id="edit-margin-status" style="font-size:.75rem;color:var(--grey)">—</span></div>
+    </div>
+    <div class="form-row" style="margin-top:.85rem"><label>Numeração (separe por vírgula)</label><input type="text" id="edit-sizes" /></div>
+    <div class="form-row" style="margin-top:.85rem"><label>Fotos do produto (máx. 3)</label><p class="form-hint">Toque em + para adicionar ou substituir fotos.</p><div class="photo-uploader" id="edit-photo-uploader"></div></div>
+    <div class="form-row" style="margin-top:.85rem"><label>Descrição</label><textarea id="edit-desc"></textarea></div>
+    <div class="form-row" style="margin-top:.85rem"><label>Status</label><select id="edit-status"><option value="available">Disponível</option><option value="esgotado">Esgotado</option></select></div>
+    <div id="msg-edit" class="msg"></div>
+    <button class="btn-primary" id="btn-save-edit">Salvar Alterações</button>
+  </div>
+</div>
+
+<div class="overlay" id="product-overlay">
+  <div class="modal modal-product" role="dialog" aria-modal="true" aria-label="Detalhes do produto">
+    <button class="modal-close" id="close-product" aria-label="Fechar produto">✕</button>
+    <div class="product-gallery">
+      <div class="gallery-main">
+        <img id="gallery-main-img" src="" alt="" />
+        <button class="gallery-arrow left" id="gallery-prev" aria-label="Foto anterior">&#8249;</button>
+        <button class="gallery-arrow right" id="gallery-next" aria-label="Próxima foto">&#8250;</button>
+        <div class="gallery-counter" id="gallery-counter"></div>
+      </div>
+      <div class="gallery-thumbs" id="gallery-thumbs"></div>
+    </div>
+    <div class="product-detail">
+      <div class="product-detail-brand" id="detail-brand"></div>
+      <h2 class="product-detail-name" id="detail-name"></h2>
+      <div class="product-detail-ref" id="detail-ref"></div>
+      <div class="product-detail-prices">
+        <span class="detail-price-old" id="detail-price-old"></span>
+        <span class="detail-price-new" id="detail-price-new"></span>
+      </div>
+      <div class="detail-parcela" id="detail-parcela" style="display:none"></div>
+      <div class="product-detail-desc" id="detail-desc"></div>
+      <div class="product-detail-sizes-wrap">
+        <p class="detail-label">Numerações disponíveis</p>
+        <div class="product-detail-sizes" id="detail-sizes"></div>
+      </div>
+      <div class="product-detail-status" id="detail-status"></div>
+      <a class="btn-buy-detail" id="detail-wa-btn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Comprar pelo WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="supabase.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
