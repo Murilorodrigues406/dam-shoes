@@ -26,17 +26,19 @@
   <link rel="stylesheet" href="destaques.css" />
   <style>
     /* HERO LIMPO — só a imagem (embutido para garantir) */
-    #hero.hero-clean { position: relative; min-height: clamp(300px, 48vw, 620px); overflow: hidden; }
+    #hero.hero-clean {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1774 / 887; /* mesma proporção do hero.jpg = nunca corta */
+      max-height: 640px;
+      overflow: hidden;
+    }
     #hero.hero-clean .hero-content,
     #hero.hero-clean .hero-bg,
     #hero.hero-clean .hero-pattern { display: none !important; }
     #hero.hero-clean .hero-img {
       position: absolute; inset: 0; width: 100%; height: 100%;
       object-fit: cover; object-position: center;
-    }
-    @media (max-width: 640px) {
-      #hero.hero-clean { min-height: 240px; }
-      #hero.hero-clean .hero-img { object-position: center; }
     }
   </style>
 </head>
