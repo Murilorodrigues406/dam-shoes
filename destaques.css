@@ -1,4 +1,34 @@
 /* ===========================================================
+   HERO LIMPO — só a imagem de fundo
+   Os textos/botões continuam no HTML (o app.js precisa deles),
+   mas ficam invisíveis. Para voltar ao hero completo, basta
+   remover a classe "hero-clean" da <section id="hero">.
+   =========================================================== */
+#hero.hero-clean {
+  position: relative;
+  min-height: clamp(300px, 48vw, 620px);
+  overflow: hidden;
+}
+#hero.hero-clean .hero-content,
+#hero.hero-clean .hero-bg,
+#hero.hero-clean .hero-pattern {
+  display: none !important;
+}
+#hero.hero-clean .hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* prioriza o lado direito, onde ficam os tênis da sua imagem */
+  object-position: 68% center;
+}
+@media (max-width: 640px) {
+  #hero.hero-clean { min-height: 240px; }
+  #hero.hero-clean .hero-img { object-position: 75% center; }
+}
+
+/* ===========================================================
    DAM SHOES — Vitrine "Em Destaque" (esteira em movimento)
    Adicione ao final do seu style.css
    =========================================================== */
