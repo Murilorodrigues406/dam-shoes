@@ -1,14 +1,14 @@
 /* ===========================================================
    DAM SHOES — Vitrine "Em Destaque" (esteira em movimento)
-   Arquivo independente. Carregue DEPOIS de supabase.js e app.js:
-     <script src="destaques.js"></script>
-   Requer a coluna booleana `destaque` na tabela de produtos.
+   Arquivo independente. Já vem linkado no index.html revisado.
+   Requer a coluna booleana `destaque` na tabela de produtos
+   (rode o SQL do guia no Supabase antes de publicar).
    =========================================================== */
 (function () {
   "use strict";
 
-  var TABELA = "produtos";        // <- troque para "products" se for esse o nome da sua tabela
-  var VELOCIDADE = 6;             // segundos que cada card leva para atravessar (maior = mais lento)
+  var VELOCIDADE = 6; // segundos por card (maior = mais lento)
+  var TABELA = null;  // detectada automaticamente: produtos / products
 
   /* --- acha o client do Supabase que o app.js já criou --- */
   function acharClient() {
@@ -24,6 +24,24 @@
       } catch (e) {}
     }
     return null;
+  }
+
+  /* --- descobre o nome da tabela (produtos ou products) --- */
+  function detectarTabela(sb) {
+    if (TABELA) return Promise.resolve(TABELA);
+    var nomes = ["produtos", "products", "produto", "product"];
+    var i = 0;
+    return new Promise(function (resolve) {
+      function tentar() {
+        if (i >= nomes.length) { resolve(null); return; }
+        var nome = nomes[i++];
+        sb.from(nome).select("id").limit(1).then(function (res) {
+          if (!res.error) { TABELA = nome; resolve(nome); }
+          else tentar();
+        });
+      }
+      tentar();
+    });
   }
 
   /* --- normaliza um produto vindo do banco --- */
@@ -87,7 +105,7 @@
     return el;
   }
 
-  /* --- abre o modal do produto reaproveitando o que o app.js já faz --- */
+  /* --- abre o modal do produto reaproveitando o app.js --- */
   function abrirProduto(id) {
     var fns = ["openProduct", "openProductModal", "abrirProduto", "showProduct"];
     for (var i = 0; i < fns.length; i++) {
@@ -95,7 +113,6 @@
         try { window[fns[i]](id); return; } catch (e) {}
       }
     }
-    // fallback: rola até o card no catálogo e clica nele
     var card = document.querySelector('#products-grid [data-id="' + id + '"]');
     if (card) {
       card.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -116,7 +133,6 @@
     secao.style.display = "";
     track.innerHTML = "";
 
-    // duplica a lista para o loop ficar contínuo (o CSS anda -50%)
     for (var volta = 0; volta < 2; volta++) {
       produtos.forEach(function (p) {
         var card = montarCard(p);
@@ -124,34 +140,114 @@
         track.appendChild(card);
       });
     }
-
     track.style.setProperty("--destaques-duration", produtos.length * VELOCIDADE + "s");
   }
 
-  /* --- busca no Supabase --- */
+  /* --- busca e mostra os destaques --- */
   function carregar() {
     var sb = acharClient();
-    if (!sb) {
-      console.warn("[destaques] Cliente Supabase não encontrado. Carregue destaques.js depois do app.js.");
-      return;
-    }
-    sb.from(TABELA)
-      .select("*")
-      .eq("destaque", true)
-      .then(function (res) {
+    if (!sb) { console.warn("[destaques] Cliente Supabase não encontrado."); return; }
+    detectarTabela(sb).then(function (tabela) {
+      if (!tabela) { console.warn("[destaques] Tabela de produtos não encontrada."); return; }
+      sb.from(tabela).select("*").eq("destaque", true).then(function (res) {
         if (res.error) {
-          console.error("[destaques] Erro ao buscar:", res.error.message);
+          // coluna ainda não existe? mantém o site funcionando normalmente
+          console.warn("[destaques] " + res.error.message + " — rode o SQL do guia no Supabase.");
           return;
         }
         renderizar((res.data || []).map(normalizar));
       });
+    });
   }
-
   window.recarregarDestaques = carregar;
 
+  /* ===========================================================
+     Integração com o painel admin (sem precisar editar o app.js)
+     - Ao salvar (novo ou edição), grava o checkbox no banco
+       localizando o produto pelo nome digitado.
+     - Ao abrir a edição, lê o estado atual e marca o checkbox.
+     =========================================================== */
+  function salvarDestaquePorNome(nome, marcado, tentativa) {
+    tentativa = tentativa || 0;
+    var sb = acharClient();
+    if (!sb || !nome) return;
+    detectarTabela(sb).then(function (tabela) {
+      if (!tabela) return;
+      var colNome = null;
+      sb.from(tabela).select("*").limit(1).then(function (probe) {
+        var linha = (probe.data && probe.data[0]) || {};
+        colNome = ("name" in linha) ? "name" : ("nome" in linha) ? "nome" : "name";
+        sb.from(tabela).update({ destaque: marcado }).eq(colNome, nome).select("id")
+          .then(function (res) {
+            if ((res.error || !res.data || !res.data.length) && tentativa < 3) {
+              // produto pode ainda não ter terminado de salvar; tenta de novo
+              setTimeout(function () { salvarDestaquePorNome(nome, marcado, tentativa + 1); }, 1500);
+            } else {
+              carregar();
+            }
+          });
+      });
+    });
+  }
+
+  function prepararAdmin() {
+    var btnAdd = document.getElementById("btn-add-product");
+    var btnEdit = document.getElementById("btn-save-edit");
+
+    if (btnAdd) {
+      btnAdd.addEventListener("click", function () {
+        var nome = (document.getElementById("add-name") || {}).value || "";
+        var cb = document.getElementById("add-destaque");
+        var marcado = !!(cb && cb.checked);
+        if (!nome.trim()) return;
+        if (marcado) setTimeout(function () { salvarDestaquePorNome(nome.trim(), true); }, 2000);
+      });
+    }
+
+    if (btnEdit) {
+      btnEdit.addEventListener("click", function () {
+        var nome = (document.getElementById("edit-name") || {}).value || "";
+        var cb = document.getElementById("edit-destaque");
+        if (!nome.trim() || !cb) return;
+        setTimeout(function () { salvarDestaquePorNome(nome.trim(), cb.checked); }, 2000);
+      });
+    }
+
+    // quando o modal de edição abre, busca o estado atual do checkbox
+    var overlay = document.getElementById("edit-overlay");
+    var inputNome = document.getElementById("edit-name");
+    if (overlay && inputNome) {
+      var obs = new MutationObserver(function () {
+        var visivel = overlay.classList.contains("active") ||
+                      overlay.classList.contains("open") ||
+                      getComputedStyle(overlay).display !== "none";
+        if (!visivel) return;
+        setTimeout(function () {
+          var nome = inputNome.value;
+          var cb = document.getElementById("edit-destaque");
+          var sb = acharClient();
+          if (!nome || !cb || !sb) return;
+          detectarTabela(sb).then(function (tabela) {
+            if (!tabela) return;
+            sb.from(tabela).select("*").limit(1).then(function (probe) {
+              var linha = (probe.data && probe.data[0]) || {};
+              var colNome = ("name" in linha) ? "name" : ("nome" in linha) ? "nome" : "name";
+              sb.from(tabela).select("destaque").eq(colNome, nome).limit(1).then(function (res) {
+                cb.checked = !!(res.data && res.data[0] && res.data[0].destaque);
+              });
+            });
+          });
+        }, 300);
+      });
+      obs.observe(overlay, { attributes: true, attributeFilter: ["class", "style"] });
+    }
+  }
+
+  function iniciar() { carregar(); prepararAdmin(); }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", carregar);
+    document.addEventListener("DOMContentLoaded", iniciar);
   } else {
-    carregar();
+    iniciar();
   }
 })();

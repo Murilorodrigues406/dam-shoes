@@ -23,6 +23,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="destaques.css" />
 </head>
 <body>
 
@@ -60,12 +61,15 @@
   </div>
 </section>
 
-<div id="trust-bar">
-  <div class="trust-item"><strong>Entrega rápida</strong><span>Em até 7 dias úteis</span></div>
-  <div class="trust-item"><strong>Parcele em 10x</strong><span>No cartão de crédito</span></div>
-  <div class="trust-item"><strong>Atendimento humano</strong><span>Direto no WhatsApp</span></div>
-  <div class="trust-item"><strong>Compre 1, ganhe 30%</strong><span>No segundo par</span></div>
-</div>
+<section id="destaques" style="display:none">
+  <div class="destaques-head">
+    <span class="destaques-eyebrow">● Selecionados da semana</span>
+    <h2 class="destaques-title">Em <span>Destaque</span></h2>
+  </div>
+  <div class="destaques-track-wrap">
+    <div class="destaques-track" id="destaques-track"></div>
+  </div>
+</section>
 
 <div id="filters">
   <span class="filter-label">Filtrar:</span>
@@ -189,6 +193,10 @@
         <div class="form-row" style="margin-top:.85rem"><label>Fotos do produto (máx. 3)</label><p class="form-hint">Toque em + para escolher fotos da galeria ou tirar uma foto.</p><div class="photo-uploader" id="add-photo-uploader"></div></div>
         <div class="form-row" style="margin-top:.85rem"><label for="add-desc">Descrição (opcional)</label><textarea id="add-desc" placeholder="Detalhes do produto..."></textarea></div>
         <div class="form-row" style="margin-top:.85rem"><label for="add-status">Status</label><select id="add-status"><option value="available">Disponível</option><option value="esgotado">Esgotado</option></select></div>
+        <div class="destaque-toggle">
+          <input type="checkbox" id="add-destaque" />
+          <label for="add-destaque">Mostrar na vitrine "Em Destaque"<small>O produto passa na esteira no topo do site</small></label>
+        </div>
         <div id="msg-add" class="msg"></div>
         <button class="btn-primary" id="btn-add-product">Salvar Produto</button>
       </div>
@@ -236,6 +244,10 @@
     <div class="form-row" style="margin-top:.85rem"><label>Fotos do produto (máx. 3)</label><p class="form-hint">Toque em + para adicionar ou substituir fotos.</p><div class="photo-uploader" id="edit-photo-uploader"></div></div>
     <div class="form-row" style="margin-top:.85rem"><label>Descrição</label><textarea id="edit-desc"></textarea></div>
     <div class="form-row" style="margin-top:.85rem"><label>Status</label><select id="edit-status"><option value="available">Disponível</option><option value="esgotado">Esgotado</option></select></div>
+    <div class="destaque-toggle">
+      <input type="checkbox" id="edit-destaque" />
+      <label for="edit-destaque">Mostrar na vitrine "Em Destaque"<small>O produto passa na esteira no topo do site</small></label>
+    </div>
     <div id="msg-edit" class="msg"></div>
     <button class="btn-primary" id="btn-save-edit">Salvar Alterações</button>
   </div>
@@ -278,6 +290,7 @@
 
 <script src="supabase.js"></script>
 <script src="app.js"></script>
+<script src="destaques.js"></script>
 
 </body>
 </html>
