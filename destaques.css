@@ -1,0 +1,218 @@
+/* ===========================================================
+   DAM SHOES — Vitrine "Em Destaque" (esteira em movimento)
+   Adicione ao final do seu style.css
+   =========================================================== */
+
+#destaques {
+  position: relative;
+  background: #111110;
+  padding: 46px 0 52px;
+  overflow: hidden;
+  border-top: 1px solid #26251f;
+  border-bottom: 1px solid #26251f;
+}
+
+/* faixa diagonal sutil de fundo (identidade urbana) */
+#destaques::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 106, 0, .05) 0 2px,
+    transparent 2px 18px
+  );
+  pointer-events: none;
+}
+
+.destaques-head {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 0 20px 22px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.destaques-eyebrow {
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #FF6A00;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.destaques-title {
+  font-family: "Bebas Neue", "Barlow", sans-serif;
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1;
+  letter-spacing: .02em;
+  color: #fff;
+  margin: 0;
+}
+.destaques-title span { color: #FF6A00; }
+
+/* ---- esteira ---- */
+.destaques-track-wrap {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.destaques-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  padding: 4px 8px;
+  animation: destaques-scroll var(--destaques-duration, 40s) linear infinite;
+}
+
+/* pausa ao passar o mouse ou tocar */
+.destaques-track-wrap:hover .destaques-track,
+.destaques-track-wrap:active .destaques-track,
+.destaques-track.paused { animation-play-state: paused; }
+
+@keyframes destaques-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* ---- card ---- */
+.destaque-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: 210px;
+  background: #1a1a18;
+  border: 1px solid #2c2b26;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  transition: border-color .2s ease, transform .2s ease;
+}
+.destaque-card:hover,
+.destaque-card:focus-visible {
+  border-color: #FF6A00;
+  transform: translateY(-4px);
+}
+.destaque-card:focus-visible { outline: 2px solid #FF6A00; outline-offset: 3px; }
+
+.destaque-thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: #f5f5f3;
+  overflow: hidden;
+}
+.destaque-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.destaque-flag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #FF6A00;
+  color: #000;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+.destaque-flag.esgotado { background: #6b6b68; color: #fff; }
+
+.destaque-info { padding: 12px 13px 15px; }
+
+.destaque-brand {
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #9b9b98;
+  margin-bottom: 4px;
+}
+
+.destaque-name {
+  font-size: .88rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.3em;
+}
+
+.destaque-prices { display: flex; align-items: baseline; gap: 7px; }
+.destaque-price-old {
+  font-size: .72rem;
+  color: #77766f;
+  text-decoration: line-through;
+}
+.destaque-price {
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #FF6A00;
+}
+
+.destaques-empty {
+  color: #77766f;
+  font-size: .85rem;
+  text-align: center;
+  padding: 10px 20px 4px;
+}
+
+@media (max-width: 520px) {
+  .destaque-card { width: 168px; }
+  #destaques { padding: 36px 0 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .destaques-track {
+    animation: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  .destaques-track-wrap { overflow-x: auto; }
+}
+
+/* ---- checkbox de destaque no painel admin ---- */
+.destaque-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: .85rem;
+  padding: 12px 14px;
+  background: #fff7f0;
+  border: 1px solid #ffd7b8;
+  border-radius: 8px;
+}
+.destaque-toggle input { width: 18px; height: 18px; accent-color: #FF6A00; flex: 0 0 auto; }
+.destaque-toggle label { font-size: .82rem; font-weight: 600; color: #1a1a1a; cursor: pointer; margin: 0; }
+.destaque-toggle small { display: block; font-weight: 400; color: #6b6b68; font-size: .72rem; margin-top: 2px; }
+
+/* selo na lista "Gerenciar" */
+.admin-destaque-badge {
+  display: inline-block;
+  background: #FF6A00;
+  color: #000;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+}
